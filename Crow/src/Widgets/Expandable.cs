@@ -46,9 +46,12 @@ namespace Crow
 			}
 		}
 		#endregion
+		public override void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e)
+		{
+			base.OnDataSourceChanged(sender, e);
+			NotifyValueChanged ("IsExpandable", IsExpandable);
 
-		public BooleanTestOnInstance GetIsExpandable;
-
+		}
 		/// <summary>
 		/// mouse click event handler for easy expand triggering in IML
 		/// </summary>
@@ -96,7 +99,7 @@ namespace Crow
 		[XmlIgnore]public bool IsExpandable {
 			get {
 				try {
-					return GetIsExpandable == null ? true : GetIsExpandable (this);
+					return IsToggleable == null ? true : IsToggleable (this);
 				} catch (Exception ex) {
 					System.Diagnostics.Debug.WriteLine ("Not Expandable error: " + ex.ToString ());
 					return false;

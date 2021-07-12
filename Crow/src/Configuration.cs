@@ -85,6 +85,13 @@ namespace Crow
 			}
 			startSavingThread ();
 		}
+		/// <summary>
+		/// Create readonly configuration
+		/// </summary>
+		/// <param name="defaultConf"></param>
+		public Configuration (Stream defaultConf = null) {			
+			load (defaultConf);
+		}		
 
 		static Configuration ()
 		{
@@ -145,6 +152,14 @@ namespace Crow
 		{
 			return !items.ContainsKey (key) ? default(T) : items [key].GetValue<T> ();
 		}
+		/// <summary>
+		/// retrive the value of the configuration key given in parameter
+		/// </summary>
+		/// <param name="key">option name</param>
+		public T Get<T>(string key, T defaultValue)
+		{
+			return !items.ContainsKey (key) ? defaultValue : items [key].GetValue<T> ();
+		}		
 		/// <summary>
 		/// store the value of the configuration key given in parameter
 		/// </summary>

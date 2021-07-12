@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?> 
+<VerticalStack Height="Fit" Width="Fit" Margin="10" Background="Onyx">
+	<HorizontalStack Width="Stretched">
+		<Label Text="th" Width="Stretched" Background="Grey"/>
+		<Label Text="this is a fit label" Width="Fit" Background="Teal"/>
+	</HorizontalStack>
+	<HorizontalStack Width="Stretched">
+		<Label Text="this is a stretchedlkqsdflkj" Width="Stretched" Background="Grey"/>
+		<Label Text="this" Width="Fit" Background="Teal"/>
+	</HorizontalStack>
+	<HorizontalStack Width="Stretched">
+		<Label Text="this is a stretched label" Width="Stretched" Background="Grey"/>
+		<Label Text="th" Width="Fit" Background="Teal"/>
+	</HorizontalStack>
+</VerticalStack> 

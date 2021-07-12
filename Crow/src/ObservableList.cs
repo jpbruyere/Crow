@@ -10,7 +10,7 @@ using System.Collections;
 
 namespace Crow
 {
-	public class ObservableList<T> : IList<T>, IObservableList, IValueChange {
+	public class ObservableList<T> : IList<T>, IObservableList, IValueChange, ICollection {
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged (string MemberName, object _value)
@@ -61,6 +61,10 @@ namespace Crow
 		public int Count => items.Count;
 
 		public bool IsReadOnly => false;
+
+		public bool IsSynchronized => throw new NotImplementedException();
+
+		public object SyncRoot => throw new NotImplementedException();
 
 		public T this[int index] {
 			get => items[index];
@@ -157,6 +161,8 @@ namespace Crow
 		public IEnumerator<T> GetEnumerator() => items.GetEnumerator ();
 
 		IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator ();
+
+		public void CopyTo(Array array, int index) => items.ToArray().CopyTo (array, index);
 	}
 }
 

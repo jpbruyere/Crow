@@ -6,6 +6,7 @@
 			<Label Text="Instance:" Foreground="White" Width="50%" />	
 			<Label Text="{InstanceIndex}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Center"/>				
 		</HorizontalStack>
+		<Label Text="{Message}" Foreground="White" Background="Onyx" Width="Stretched" Visible="{HasMessage}" Margin="2" Tooltip="{}"/>			
 		<HorizontalStack Height="Fit" Width="Stretched" Spacing="2" Background="DimGrey" Margin="2">
 			<Label Text="Duration:" Foreground="White" Width="50%" />	
 			<Label Text="{DurationMS}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Right"/>				

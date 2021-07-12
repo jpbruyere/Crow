@@ -1,0 +1,19 @@
+﻿<ColorPicker Height="Stretched" Background="Onyx" Width="Fit">
+	<Template>
+		<ListBox Width="Stretched" Data="{./AvailableColors}" Margin="10">
+			<Template>
+				<Scroller Name="scroller1" Margin="5" ClipToClientRect="true" Background="Onyx">
+					<VerticalStack Name="ItemsContainer" Height="Fit" VerticalAlignment="Top"/>
+				</Scroller>
+			</Template>
+			<ItemTemplate>
+				<ListItem Margin="1" Width="Stretched"
+						Selected="{Background=White}"
+						Unselected="{Background=Transparent}" >
+						<Label CornerRadius="3" Margin="2" Background="{}" Text="{}" Width="Stretched" />
+				</ListItem>
+			</ItemTemplate>
+		</ListBox>
+	</Template>
+</ColorPicker>
+				

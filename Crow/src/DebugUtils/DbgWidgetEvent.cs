@@ -23,10 +23,17 @@ namespace Crow.DebugLogger
 		public override Color Color {
 			get {
 				switch (type) {
+				case DbgEvtType.GOSetProperty:
+					return Colors.Lime;
 				case DbgEvtType.GOMeasure:
+					return Colors.Pink;
 				case DbgEvtType.GOSearchLargestChild:
 				case DbgEvtType.GOSearchTallestChild:
 					return Colors.HotPink;
+				case DbgEvtType.GOOnChildLayoutChange:
+					return Colors.DarkViolet;
+				case DbgEvtType.GOAdjustStretchedGo:
+					return Colors.PaleVioletRed;
 				case DbgEvtType.GOClassCreation:
 					return Colors.DarkSlateGrey;
 				case DbgEvtType.GOInitialization:

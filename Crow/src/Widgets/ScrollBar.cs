@@ -26,13 +26,16 @@ namespace Crow
 			set {
 				if (cursorRatio == value)
 					return;
-				cursorRatio = value;
+				if (double.IsFinite(value))
+					cursorRatio = value;
+				else
+					cursorRatio = -1;
 				updateCursor ();
 			}
         }
 
 		void updateCursor () {
-			if (cursorRatio < 0)
+			if (cursorRatio < 0 || !double.IsFinite(cursorRatio))
 				return;
 			ILayoutable l = cursor?.Parent;
 			if (l == null)

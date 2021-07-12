@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Window Caption="Showcase" Height="90%" Width="90%" Background="DarkGrey">
+<Window Caption="Showcase" Height="90%" Width="91%" Background="DarkGrey">
 	<HorizontalStack>
 		<VerticalStack Width="30%" Margin="5">
 			<ListBox Data="{PerfMeasures}" Height="Fit">

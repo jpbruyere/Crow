@@ -42,6 +42,7 @@ namespace Crow
 				if (_contentContainer == null)
 					throw new Exception ("TemplatedContainer template Must contain a Container named 'Content'");
 				_contentContainer.SetChild(value);
+				value.LogicalParent = this;
 				NotifyValueChanged ("HasContent", HasContent);
 			}
 		}

@@ -5,6 +5,9 @@ DockStack {
 }
 DockWindow {
 	Template="#ui.dockWin.template";
+	AllowedStates="Normal|Maximized|Minimized";
+	Width="260";
+	Height="200";
 }
 TabView {
 	Template="#ui.TabView.template";

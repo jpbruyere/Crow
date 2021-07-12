@@ -732,8 +732,6 @@ namespace Crow.IML {
 						il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 						//load enum value name
 						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
-						//load false
-						il.Emit (OpCodes.Ldc_I4_0);
 					} else {
 						lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
 						if (lopParseMi == null)

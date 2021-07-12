@@ -97,78 +97,85 @@ namespace Crow
 		public override int measureRawSize (LayoutingType lt)
 		{
 			int tmp = 0;
-			//Wrapper can't fit in the opposite direction of the wrapper, this func is called only if Fit
-			if (lt == LayoutingType.Width) {
-				if (Orientation == Orientation.Vertical) {
-					Width = Measure.Stretched;
+			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this);
+			try {
+				DbgLogger.SetMsg(DbgEvtType.GOMeasure, $"{lt}");
+
+				//Wrapper can't fit in the opposite direction of the wrapper, this func is called only if Fit
+				if (lt == LayoutingType.Width) {
+					if (Orientation == Orientation.Vertical) {
+						Width = Measure.Stretched;
+						return -1;
+					} else if (RequiredLayoutings.HasFlag (LayoutingType.Height))
+						return -1;
+					else {
+						int dy = 0;
+						int largestChild = 0;
+
+						childrenRWLock.EnterReadLock();
+						try {
+							foreach (Widget c in Children) {
+								if (!c.IsVisible)
+									continue;
+								if (c.Height.IsRelativeToParent &&
+								    c.RequiredLayoutings.HasFlag (LayoutingType.Height)) {							
+									return -1;
+								}
+								if (dy + c.Slot.Height > ClientRectangle.Height) {
+									dy = 0;
+									tmp += largestChild + Spacing;
+									largestChild = c.Slot.Width;
+								} else if (largestChild < c.Slot.Width)
+									largestChild = c.Slot.Width;
+
+								dy += c.Slot.Height + Spacing;
+							}
+						} finally {
+							childrenRWLock.ExitReadLock ();
+						}
+
+						if (dy == 0)
+							tmp -= Spacing;
+						return tmp + largestChild + 2 * Margin;
+					}
+				} else if (Orientation == Orientation.Horizontal) {
+					Height = Measure.Stretched;
 					return -1;
-				} else if (RegisteredLayoutings.HasFlag (LayoutingType.Height))
+				} else if (RequiredLayoutings.HasFlag (LayoutingType.Width))
 					return -1;
 				else {
-					int dy = 0;
-					int largestChild = 0;
+					int dx = 0;
+					int tallestChild = 0;
 
 					childrenRWLock.EnterReadLock();
 					try {
 						foreach (Widget c in Children) {
 							if (!c.IsVisible)
 								continue;
-							if (c.Height.IsRelativeToParent &&
-							    c.RegisteredLayoutings.HasFlag (LayoutingType.Height)) {							
+							if (c.Width.IsRelativeToParent &&
+							    c.RequiredLayoutings.HasFlag (LayoutingType.Width)) {
 								return -1;
 							}
-							if (dy + c.Slot.Height > ClientRectangle.Height) {
-								dy = 0;
-								tmp += largestChild + Spacing;
-								largestChild = c.Slot.Width;
-							} else if (largestChild < c.Slot.Width)
-								largestChild = c.Slot.Width;
+							if (dx + c.Slot.Width > ClientRectangle.Width) {
+								dx = 0;
+								tmp += tallestChild + Spacing;
+								tallestChild = c.Slot.Height;
+							} else if (tallestChild < c.Slot.Height)
+								tallestChild = c.Slot.Height;
 
-							dy += c.Slot.Height + Spacing;
+							dx += c.Slot.Width + Spacing;
 						}
 					} finally {
-						childrenRWLock.ExitReadLock ();
+						childrenRWLock.ExitReadLock();
 					}
 
-					if (dy == 0)
+					if (dx == 0)
 						tmp -= Spacing;
-					return tmp + largestChild + 2 * Margin;
-				}
-			} else if (Orientation == Orientation.Horizontal) {
-				Height = Measure.Stretched;
-				return -1;
-			} else if (RegisteredLayoutings.HasFlag (LayoutingType.Width))
-				return -1;
-			else {
-				int dx = 0;
-				int tallestChild = 0;
-
-				childrenRWLock.EnterReadLock();
-				try {
-					foreach (Widget c in Children) {
-						if (!c.IsVisible)
-							continue;
-						if (c.Width.IsRelativeToParent &&
-						    c.RegisteredLayoutings.HasFlag (LayoutingType.Width)) {
-							return -1;
-						}
-						if (dx + c.Slot.Width > ClientRectangle.Width) {
-							dx = 0;
-							tmp += tallestChild + Spacing;
-							tallestChild = c.Slot.Height;
-						} else if (tallestChild < c.Slot.Height)
-							tallestChild = c.Slot.Height;
-
-						dx += c.Slot.Width + Spacing;
-					}
-				} finally {
-					childrenRWLock.ExitReadLock();
-				}
-
-				if (dx == 0)
-					tmp -= Spacing;
-				return tmp + tallestChild + 2 * Margin;
+					return tmp + tallestChild + 2 * Margin;
 			}
+			} finally {
+				DbgLogger.EndEvent(DbgEvtType.GOMeasure);	
+			}		
 		}
 
 		public override bool UpdateLayout (LayoutingType layoutType)
@@ -176,15 +183,10 @@ namespace Crow
 			RegisteredLayoutings &= (~layoutType);
 
 			if (layoutType == LayoutingType.ArrangeChildren) {
-				if ((RegisteredLayoutings & LayoutingType.Sizing) != 0)
+				if ((RequiredLayoutings & LayoutingType.Sizing) != 0)
 					return false;
 
 				ComputeChildrenPositions ();
-
-				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					IFace.EnqueueForRepaint (this);
-
 				return true;
 			}
 

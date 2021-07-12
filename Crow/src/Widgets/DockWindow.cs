@@ -16,13 +16,20 @@ namespace Crow
 		public DockWindow (Interface iface) : base (iface) {}
 		#endregion
 
+		protected override void loadTemplate(Widget template = null)
+		{
+			initCommands ();
+
+			base.loadTemplate (template);
+		}
+
 		int undockThreshold = 10;
 		bool isDocked = false;
 		Alignment docking = Alignment.Undefined;
 
 		Point undockingMousePosOrig; //mouse pos when docking was donne, use for undocking on mouse move
 		internal Rectangle savedSlot;	//last undocked slot recalled when view is undocked
-		internal bool wasResizable;
+		internal bool wasResizable, freezeDockState;
 
 		public bool IsDocked {
 			get { return isDocked; }
@@ -40,6 +47,35 @@ namespace Crow
 		[XmlIgnore] public bool IsDockedInTabView => LogicalParent is TabView;
 		[XmlIgnore] public bool IsDockedInStack => Parent is DockStack;
 
+		public Command CMDFreezeDockState, CMDUnfreezeDockState;
+		public CommandGroup DockCommands => new CommandGroup (CMDFreezeDockState, CMDUnfreezeDockState);
+		void initCommands () {
+			CMDFreezeDockState = new Command ("Freeze Dock State", () => FreezeDockState = true, "#Crow.Icons.unpin.svg", !FreezeDockState);
+			CMDUnfreezeDockState = new Command ("Unfreeze Dock State", () => FreezeDockState = false, "#Crow.Icons.pin.svg", FreezeDockState);
+		}
+
+		/// <summary>
+		/// if true, current dock status (docked or undocked) is frozen, and trying to move the
+		/// window will not trigger docking try.
+		/// </summary>
+		/// <value></value>
+		public bool FreezeDockState {
+			get { return freezeDockState; }
+			set {
+				if (freezeDockState == value)
+					return;
+				freezeDockState = value;
+				NotifyValueChangedAuto (freezeDockState);
+
+				if (CMDFreezeDockState == null)
+					initCommands ();
+				else {
+					CMDFreezeDockState.CanExecute = !freezeDockState;
+					CMDUnfreezeDockState.CanExecute = freezeDockState;
+				}
+			}
+		}
+
 		public Alignment DockingPosition {
 			get { return docking; }
 			set {
@@ -49,27 +85,22 @@ namespace Crow
 				NotifyValueChangedAuto (DockingPosition);
 			}
 		}
-		/*public override bool PointIsIn (ref Point m)
-		{			
-			if (!base.PointIsIn(ref m))
-				return false;
-
-			Group p = Parent as Group;
-			if (p != null) {
-				lock (p.Children) {
-					for (int i = p.Children.Count - 1; i >= 0; i--) {
-						if (p.Children [i] == this)
-							break;
-						if (p.Children [i].IsDragged)
-							continue;
-						if (p.Children [i].Slot.ContainsOrIsEqual (m)) {						
-							return false;
-						}
-					}
-				}
+		Group floatingGroup;
+		/// <summary>
+		/// If null, the default container for the floating windows is the Interface. If a valid
+		/// group is set, undocked windows will be contained in this widget, allowing multiple independant levels
+		/// of dockable windows
+		/// </summary>
+		/// <value></value>
+		public Group FloatingGroup {
+			get => floatingGroup;
+			set {
+				if (floatingGroup == value)
+					return;
+				floatingGroup = value;
+				NotifyValueChangedAuto (floatingGroup);
 			}
-			return Slot.ContainsOrIsEqual(m);
-		}*/
+		}
 		
 		bool tryGetTargetDockStack (DockWindow dw, out DockStack ds) {
 			if (dw.Parent is DockStack dwp)
@@ -83,14 +114,14 @@ namespace Crow
 		bool dockParentParent = false;
 		public override void onDrag (object sender, MouseMoveEventArgs e)
 		{			
-			if (isDocked)
-				CheckUndock (e.Position);
+			if (!freezeDockState && isDocked)
+				checkUndock (e.Position);
 			else
 				moveAndResize (e.XDelta, e.YDelta, currentDirection);
 			
 			base.onDrag (sender, e);
 
-			if (isDocked)
+			if (freezeDockState || isDocked)
 				return;
 
 			Alignment dockingPosSave = DockingPosition;
@@ -190,16 +221,6 @@ namespace Crow
 			if (this.HasFocus && IsDocked && e.Button == MouseButton.Left)
 				undockingMousePosOrig = e.Position;
 		}
-		public bool CheckUndock (Point mousePos) {
-			//if (DockingPosition == Alignment.Center)
-			//	return false;
-			System.Diagnostics.Debug.WriteLine ($"{mousePos.X},{mousePos.Y}");
-			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
-			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
-				return false;
-			Undock ();
-			return true;
-		}
 
 		protected override void onStartDrag (object sender, DragDropEventArgs e)
 		{
@@ -246,6 +267,8 @@ namespace Crow
 						tv.Dispose();
 						w.IsVisible = true;
 						ds.checkAlignments();
+						w.NotifyValueChanged ("IsDockedInTabView", false);
+						w.NotifyValueChanged ("IsDockedInStack", true);
 					}
 				} else if (Parent is DockStack ds) {
 					ds.Undock (this);
@@ -264,7 +287,16 @@ namespace Crow
 				Resizable = wasResizable;
 			}
 		}
-
+		bool checkUndock (Point mousePos) {
+			//if (DockingPosition == Alignment.Center)
+			//	return false;
+			System.Diagnostics.Debug.WriteLine ($"{mousePos.X},{mousePos.Y}");
+			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
+			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
+				return false;
+			Undock ();
+			return true;
+		}
 		void dock () {
 			IFace.RemoveWidget (this);
 
@@ -276,9 +308,8 @@ namespace Crow
 			LastSlots = LastPaintedSlot = Slot = default(Rectangle);
 			Left = Top = 0;
 		}
-		public void Dock (DockWindow target) {
+		void Dock (DockWindow target) {
 			lock (IFace.UpdateMutex) {
-				//IsDocked = true;
 				dock ();
 
 				if (target.LogicalParent is TabView tv) {
@@ -299,11 +330,14 @@ namespace Crow
 					tv2.AddItem (this);
 					target.Width = target.Height = this.Width = this.Height = Measure.Stretched;
 					target.DockingPosition = this.DockingPosition = Alignment.Center;
+					target.NotifyValueChanged ("IsDockedInTabView", true);
+					target.NotifyValueChanged ("IsDockedInStack", false);
+
 					IsDocked = true;
 				}				
 			}
 		}
-		public void Dock (DockStack target){
+		void Dock (DockStack target){
 			lock (IFace.UpdateMutex) {				
 				dock ();
 
@@ -318,8 +352,34 @@ namespace Crow
 			base.close ();
 		}
 
-		internal string GetConfigString () =>
+		internal string GetDockConfigString () =>
 			string.Format($"WIN;{Name};{Width};{Height};{DockingPosition};{savedSlot};{wasResizable};");
+
+		
+		public string FloatingConfigString =>
+			$"{Name};{Left};{Top};{Width};{Height};{FreezeDockState};{Resizable}";
+		public static DockWindow CreateFromFloatingConfigString (Interface iface, ReadOnlySpan<char> conf, object datasource = null) {
+			int i = conf.IndexOf (';');
+			string wname = conf.Slice(0, i).ToString();
+			DockWindow dw = iface.CreateInstance (wname) as DockWindow;
+			dw.Name = wname;
+			conf = conf.Slice (i + 1); i = conf.IndexOf (';');
+			dw.Left = int.Parse (conf.Slice(0, i).ToString());
+			conf = conf.Slice (i + 1); i = conf.IndexOf (';');
+			dw.Top = int.Parse (conf.Slice(0, i).ToString());
+			conf = conf.Slice (i + 1); i = conf.IndexOf (';');
+			dw.Width = Measure.Parse (conf.Slice(0, i).ToString());
+			conf = conf.Slice (i + 1); i = conf.IndexOf (';');
+			dw.Height = Measure.Parse (conf.Slice(0, i).ToString());
+			conf = conf.Slice (i + 1); i = conf.IndexOf (';');
+			dw.FreezeDockState = bool.Parse (conf.Slice(0, i).ToString());
+			
+			dw.Resizable = bool.Parse (conf.Slice (i + 1).ToString());
+			dw.DataSource = datasource;
+
+			iface.AddWidget (dw);
+			return dw;
+		}
 	}
 }
 

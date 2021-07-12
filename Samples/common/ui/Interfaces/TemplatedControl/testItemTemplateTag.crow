@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="2" Fit="true" Background="DarkGrey">
 	<VerticalStack Fit="true" Margin="5">
-		<ListBox Data="{TestList}" Background="Jet" HorizontalAlignment="Center" Width="200" Height="200" Margin="5">
+		<ListBox Data="{TestList}" Background="Jet" HorizontalAlignment="Center" Width="Fit" Height="200" Margin="5">
 			<Template>
 				<Border BorderWidth="1" Background="{./Background}">
 					<HorizontalStack Margin="1">
@@ -18,7 +18,7 @@
 			<ItemTemplate DataType="Crow.Colors">
 				<HorizontalStack
 							HorizontalAlignment="Left"
-							Height="Fit" Width="200" Margin="1" Focusable="true"
+							Height="Fit" Width="Stretched" Margin="1" Focusable="true"
 							MouseEnter="{Background=RoyalBlue}"
 							MouseLeave="{Background=Transparent}">
 					

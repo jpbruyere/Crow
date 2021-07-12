@@ -220,7 +220,9 @@ namespace Crow
 			//dm is unbound, arg0 is instance of Item container to expand
 			dm = new DynamicMethod ("dyn_count_" + fetchMethodName,
 				typeof (bool), new Type[] {typeof(object)}, true);
-			il = dm.GetILGenerator (256);
+			il = dm.GetILGenerator (256);			
+			System.Reflection.Emit.Label end = il.DefineLabel ();
+			System.Reflection.Emit.Label test = il.DefineLabel ();
 
 			//get the dataSource of the arg0
 			il.Emit (OpCodes.Ldarg_0);
@@ -235,11 +237,22 @@ namespace Crow
 					il.Emit (OpCodes.Call, CompilerServices.miGetDataTypeAndFetch);
 				}else
 					emitGetSubData(il, dataType);			
-			}
-			
-			il.Emit (OpCodes.Callvirt, CompilerServices.miGetColCount);
+			}			
+			il.Emit (OpCodes.Isinst, typeof(System.Collections.ICollection));
+			il.Emit (OpCodes.Dup);//duplicate children for testing if it's a collection for childs counting
+			il.Emit (OpCodes.Brtrue, test);//if true, jump to perform count
+			il.Emit (OpCodes.Pop);//pop null
+			il.Emit (OpCodes.Ldc_I4_0);//push false			
+			il.Emit (OpCodes.Br, end);
+
+			il.MarkLabel (test);
+
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetColCount);			
 			il.Emit (OpCodes.Ldc_I4_0);
 			il.Emit (OpCodes.Cgt);
+
+			il.MarkLabel (end);
+
 			il.Emit (OpCodes.Ret);
 			HasSubItems = (BooleanTestOnInstance)dm.CreateDelegate (typeof(BooleanTestOnInstance));
 			#endregion

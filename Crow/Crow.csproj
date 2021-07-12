@@ -39,7 +39,8 @@
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="FastEnum" Version="1.5.3" />
+		<!--<PackageReference Include="FastEnum" Version="1.5.3" />-->
+		<PackageReference Include="Enums.NET" Version="4.0.0" />		
 		<PackageReference Include="glfw-sharp" Version="$(GlfwSharpVersion)" />
 	</ItemGroup>
 

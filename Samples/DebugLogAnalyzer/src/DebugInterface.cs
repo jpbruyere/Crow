@@ -70,8 +70,10 @@ namespace Crow
 					Thread.Sleep(1000);	
 				}
 				
-				if (IsDirty)
-					delRegisterForRepaint();				
+				if (IsDirty) {
+					delRegisterForRepaint();
+					//Console.WriteLine ("[DbgIFace]RegisterForRepaint");
+				}
 					
 				Thread.Sleep (UPDATE_INTERVAL);
 			}
@@ -131,7 +133,7 @@ namespace Crow
 		}
 		public override void ForceMousePosition()
 		{
-			Point p = (Point)delGetScreenCoordinate();
+			Point p = Point.Parse(delGetScreenCoordinate().ToString());
 			Glfw.Glfw3.SetCursorPosition (WindowHandle, p.X + MousePosition.X, p.Y + MousePosition.Y);
 		}
 	}

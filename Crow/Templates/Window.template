@@ -5,23 +5,12 @@
 			<Widget Width="5"/>
 			<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
 			<Label Name="MoveHandle" Width="Stretched" Foreground="${WindowTitleBarForeground" Margin="2" TextAlignment="Center" Text="{./Caption}" />
-			<Border Visible="{./ShowMinimize}" Style="WindowIconBorder">
-				<Image Focusable="true" Path="#Crow.Icons.minimize.svg"
-					 MouseClick="./onMinimized"/>
-			</Border>
-			<Border Visible="{./ShowNormal}" Style="WindowIconBorder">
-				<Image Focusable="true" Path="#Crow.Icons.normalize.svg"
-					 MouseClick="./onUnmaximized"/>
-			</Border>
-			<Border Visible="{./ShowMaximize}" Style="WindowIconBorder">
-				<Image Focusable="true" Path="#Crow.Icons.maximize.svg"
-					 MouseClick="./onMaximized"/>
-			</Border>
-			<Border BorderWidth="1" Style="WindowIconBorder">
-				<Image Focusable="true" Path="#Crow.Icons.exit2.svg"
-					 MouseClick="./onQuitPress"/>
-			</Border>
-			<Widget Width="5"/>
+			<ListBox Data="{./Commands}" Fit="true">
+				<Template>
+					<HorizontalStack Name="ItemsContainer" />
+				</Template>
+				<ItemTemplate Path="#Crow.WindowButton.template"/>
+			</ListBox>
 		</HorizontalStack>
 		<Container Name="Content" MinimumSize="0,0" />
 	</VerticalStack>

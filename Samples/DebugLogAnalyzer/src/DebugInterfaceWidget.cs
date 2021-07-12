@@ -375,7 +375,7 @@ namespace Crow
 		}
 		protected override void UpdateCache(Context ctx)
 		{			
-			if (initialized && bmp != null) {				
+			if (initialized && bmp != null) {
 				paintCache (ctx, Slot + Parent.ClientRectangle.Position);
 				delResetDirtyState ();				
 			}

@@ -156,7 +156,7 @@ namespace Crow
                     return;
 
 				int oldTextLength = string.IsNullOrEmpty (_text) ? 0 : _text.Length;
-				lock (linesMutex) {					
+				lock (linesMutex) {
 					_text = value;
 					getLines ();
 					textMeasureIsUpToDate = false;

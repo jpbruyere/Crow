@@ -1,0 +1,23 @@
+﻿<ColorPicker Name="Names" Height="Stretched" Background="Onyx">
+	<Template>
+		<ListBox Height="Fit" Width="Stretched" Data="{./AvailableColors}" >		
+			<ItemTemplate>
+				<ListItem Margin="0" Height="16" Width="Fit"
+							Selected="{Background=Black}"
+							Unselected="{Background=Transparent}">
+					<Label Height="Fit" Width="Fit" Text="{}" Background="{}" Margin="5"/>
+				</ListItem>
+			</ItemTemplate>
+			<Template>
+				<VerticalStack Width="Stretched" >
+					<Scroller Name="scroller"   >
+						<HorizontalStack Name="ItemsContainer"  Width="Fit" HorizontalAlignment="Left"/>
+					</Scroller>
+					<ScrollBar Style="HScrollBar" Name="scrollbar1" Value="{²../scroller.ScrollX}"
+						LargeIncrement="{../scroller.PageWidth}" SmallIncrement="30" CursorRatio="{../scroller.ChildWidthRatio}"
+						Maximum="{../scroller.MaxScrollX}" Height="12" />
+				</VerticalStack>
+			</Template>
+		</ListBox>
+	</Template>
+</ColorPicker>

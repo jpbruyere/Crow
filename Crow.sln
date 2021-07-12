@@ -10,8 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{728545
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crow", "Crow\Crow.csproj", "{C2980F9B-4798-4C05-99E2-E174810F7C7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowDbgShared", "CrowDbgShared\CrowDbgShared.csproj", "{91F1CE07-EECE-4F1D-A3EE-7239B563654A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}"
 	ProjectSection(SolutionItems) = preProject
 		Samples\Directory.Build.props = Samples\Directory.Build.props
@@ -57,8 +55,6 @@ Global
 		{56329D48-D382-4850-93DE-59C453894E8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56329D48-D382-4850-93DE-59C453894E8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56329D48-D382-4850-93DE-59C453894E8A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{91F1CE07-EECE-4F1D-A3EE-7239B563654A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91F1CE07-EECE-4F1D-A3EE-7239B563654A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Release|Any CPU.ActiveCfg = Release|Any CPU

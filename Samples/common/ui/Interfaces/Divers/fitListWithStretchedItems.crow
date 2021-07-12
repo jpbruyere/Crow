@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0"?>
-
 <ListBox Data="{TestList}" Width="Fit" Focusable="true" >
 	<Template>
 		<Scroller Name="ItemsScroller" Height="Stretched" Background="Onyx" Margin="10">

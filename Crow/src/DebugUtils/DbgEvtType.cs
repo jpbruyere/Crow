@@ -57,6 +57,8 @@ namespace Crow
 		GORegisterForRedraw		 		= Widget | 0x0C,
 		GOComputeChildrenPositions 		= Widget | 0x0D,
 		GOOnChildLayoutChange	 		= Widget | 0x0E,
+		GOAdjustStretchedGo		 		= Widget | 0x0F,
+		GOSetProperty			 		= Widget | 0x10,
 
 		AlreadyDisposed					= Widget | Dispose | Error | 0x01,
 		DisposedByGC					= Widget | Dispose | Error | 0x02,

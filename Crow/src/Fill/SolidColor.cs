@@ -40,32 +40,17 @@ namespace Crow
         public static implicit operator Color(SolidColor c) => c.color;        
 		public static implicit operator SolidColor(Color c) => new SolidColor (c);
 
-		//public static bool operator ==(SolidColor left, SolidColor right) => left?.color == right?.color;		
-		//public static bool operator !=(SolidColor left, SolidColor right) => left?.color != right?.color;
-
-		public override int GetHashCode ()
-		{
-			return color.GetHashCode();
-		}
+		public override int GetHashCode () => color.GetHashCode();
 		public override bool Equals (object obj)		
 			=> obj is Color c ? color.Equals (c) : obj is Colors cl ? color.Equals(cl) : obj is SolidColor sc && color.Equals (sc.color);			
 		public static SolidColor operator *(SolidColor c, Double f)
-		{
-			return new SolidColor(new Color(c.color.R,c.color.G,c.color.B,c.color.A * f));
-		}
+			=> new SolidColor(new Color(c.color.R,c.color.G,c.color.B,c.color.A * f));
 		public static SolidColor operator +(SolidColor c1, SolidColor c2)
-		{
-			return new SolidColor(new Color(c1.color.R + c2.color.R,c1.color.G + c2.color.G,c1.color.B + c2.color.B,c1.color.A + c2.color.A));
-		}
+			=> new SolidColor(new Color(c1.color.R + c2.color.R,c1.color.G + c2.color.G,c1.color.B + c2.color.B,c1.color.A + c2.color.A));
 		public static SolidColor operator -(SolidColor c1, SolidColor c2)
-		{
-			return new SolidColor(new Color(c1.color.R - c2.color.R,c1.color.G - c2.color.G,c1.color.B - c2.color.B,c1.color.A - c2.color.A));
-		}
+			=> new SolidColor(new Color(c1.color.R - c2.color.R,c1.color.G - c2.color.G,c1.color.B - c2.color.B,c1.color.A - c2.color.A));
 		#endregion
 
-		public override string ToString()
-		{
-			return color.ToString ();
-		}
+		public override string ToString() => color.ToString ();
     }
 }

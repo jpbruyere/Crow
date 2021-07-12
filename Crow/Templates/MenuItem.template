@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <ListItem>
 	<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
-		Foreground = "{./Foreground}" BubbleMouseEvent="true"
+		Foreground = "{./Foreground}" BubbleMouseEvent="All"
 		IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
 		<Template>
 			

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?> 
+<Container Width="Stretched">
+<VerticalStack Height="Fit" Width="Stretched" Margin="5" Background="Onyx">
+	<HorizontalStack Width="Fit" >
+		<Label Text="thed label" Width="Stretched" Background="Grey"/>
+		<Label Text="this  label" Width="Fit" Background="Teal"/>
+	</HorizontalStack>
+	<HorizontalStack  Width="Stretched">
+		<Label Text="this is a stretched label" Width="Stretched" Background="Grey"/>
+		<Label Text="this is a fit label" Width="Fit" Background="Teal"/>
+	</HorizontalStack>
+	<HorizontalStack Width="Stretched" >
+		<Label Text="this is a stret" Width="Stretched" Background="Grey"/>
+		<Label Text="thi" Width="Fit" Background="Teal"/>
+	</HorizontalStack>
+</VerticalStack>
+</Container>

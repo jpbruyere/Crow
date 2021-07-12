@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?> 
+<Container Height="Fit" Width="Fit" Margin="1" Background="CornflowerBlue">
+	<VerticalStack Height="Stretched" >
+		<Label Text="this is a stretched label" Width="Stretched" Height="Stretched"/>
+		<Label Text="this is a fit label" Width="Stretched" Height="Fit"/>
+	</VerticalStack>
+</Container>

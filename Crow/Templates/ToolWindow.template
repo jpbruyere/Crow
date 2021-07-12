@@ -7,11 +7,12 @@
 				<Widget Width="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
 				<Label Width="Stretched" Foreground="{./TitleBarForeground}" Margin="1" TextAlignment="Center" Text="{./Caption}" />
-				<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
-					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-					<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
-						 MouseClick="./onQuitPress"/>
-				</Border>
+				<ListBox Data="{./Commands}" Fit="true">
+					<Template>
+						<HorizontalStack Name="ItemsContainer" />
+					</Template>
+					<ItemTemplate Path="#Crow.WindowButton.template"/>
+				</ListBox>
 				<Widget Width="5"/>
 			</HorizontalStack>
 		<Container Name="Content" MinimumSize="50,50"/>

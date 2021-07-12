@@ -134,6 +134,7 @@ MessageBox {
 	//MinimumSize = "200,120";
 	AlwaysOnTop = "true";
 	Resizable = "false";
+	AllowedStates = "Normal";
 }
 Slider {
 	Foreground = "Grey";
@@ -166,12 +167,15 @@ WindowIconBorder {
 	Foreground="Transparent";
 	Height="12";
 	Width="12";
-	MouseEnter="{Foreground=White}";
+	MouseEnter="{Foreground=Grey}";
 	MouseLeave="{Foreground=Transparent}";
+	MouseDown="{Background=${ControlHighlight}}";
+	MouseUp="{Background=Transparent}";
 }
 ToolWindow {
 	Caption = "Window";
 	Template = "#Crow.ToolWindow.template";
+	AllowedStates = "Normal";
 	Focusable = "true";
 	MinimumSize="50,50";
 	Width = "150";
@@ -183,7 +187,8 @@ DockStack {
 	AllowDrop = "true";
 	AllowedDropTypes = "Crow.DockWindow";
 }
-DockWindow {	
+DockWindow {
+	AllowedStates = "Normal";
 	Focusable = "true";
 	AllowDrag = "true";
 	AllowDrop="true";
@@ -321,8 +326,9 @@ MessageBox, Popper, Slider, Spinner, TextBox, NumericControl {
 	Background = "${ControlBackground}";
 	CornerRadius = "${ControlCornerRadius}";
 	Margin="0";
-	BubbleMouseEvent="false";
+	BubbleMouseEvent="MouseWheel|Keyboard";
 }
-TemplatedControl, GenericStack {
-	CacheEnabled="true";
-}
+
+//TemplatedControl, GenericStack {
+//	CacheEnabled="true";
+//}

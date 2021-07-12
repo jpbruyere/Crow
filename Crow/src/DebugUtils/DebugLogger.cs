@@ -69,7 +69,24 @@ namespace Crow
 			}
 #endif
 		}
-
+[Conditional ("DEBUG_LOG")]
+		public static void SetMsg (DbgEvtType evtType, string message)
+		{
+#if DEBUG_LOG
+			if (!logevt (evtType))
+				return;
+lock (logMutex) {
+				chrono.Stop ();
+				if (!startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId))
+					throw new Exception ("Current thread has no event started");
+				DbgEvent e = startedEvents [Thread.CurrentThread.ManagedThreadId].Peek ();
+				if (e.type != evtType)
+					throw new Exception ($"Begin/end event logging mismatch: {e.type}/{evtType}");
+				e.Message = message;
+				chrono.Start ();
+			}
+#endif
+		}
 		[Conditional ("DEBUG_LOG")]
 		public static void EndEvent (DbgEvtType evtType, bool discardIfNoChildEvents = false)
 		{
@@ -149,6 +166,20 @@ namespace Crow
 			}
 #endif
 		}
+		[Conditional("DEBUG_LOG")]
+		public static void AddEventWithMsg (DbgEvtType evtType, string message, params object [] data) {
+#if DEBUG_LOG			
+			if (!logevt (evtType))
+				return;
+
+			lock (logMutex) {
+				chrono.Stop ();
+				DbgEvent evt = addEventInternal (evtType, data);
+				evt.Message = message;
+				chrono.Start ();
+			}
+#endif
+		}
 
 #if DEBUG_LOG
 		static DbgEvent addEventInternal (DbgEvtType evtType, params object [] data)
@@ -156,10 +187,19 @@ namespace Crow
 			DbgEvent evt = null;
 			if (data == null || data.Length == 0)
 				evt = new DbgEvent (chrono.ElapsedTicks, evtType);
-			else if (data [0] is Widget w)
+			else if (data [0] is Widget w) {
 				evt = new DbgWidgetEvent (chrono.ElapsedTicks, evtType, w.instanceIndex);
-			else if (data [0] is LayoutingQueueItem lqi)
-				evt = new DbgLayoutEvent (chrono.ElapsedTicks, evtType, lqi.graphicObject.instanceIndex, lqi.LayoutType, lqi.result, lqi.Slot, lqi.NewSlot);
+				if (evtType == DbgEvtType.GONewParent) {
+					if (data[1] is Widget wi)
+						evt.Message = $"{wi.instanceIndex}";
+					else if (data[1] is Interface)
+						evt.Message = "Interface";
+					else
+						evt.Message = $"{data[1]}";
+				}
+					
+			} else if (data [0] is LayoutingQueueItem lqi)
+				evt = new DbgLayoutEvent (chrono.ElapsedTicks, evtType, (lqi.Layoutable as Widget).instanceIndex, lqi.LayoutType, lqi.result, lqi.Slot, lqi.NewSlot);
 			else
 				evt = new DbgEvent (chrono.ElapsedTicks, evtType);
 
@@ -245,7 +285,7 @@ namespace Crow
 							writer.WriteLine ("[GraphicObjects]");
 						for (int i = startingWidgetsIndex; i < Widget.GraphicObjects.Count; i++) {
 							Widget g = Widget.GraphicObjects [i];
-							writer.WriteLine ($"{g.GetType ().Name};{g.instanceIndex};{g.yIndex};{g.xLevel};{g.Width};{g.Height}");
+							writer.WriteLine ($"{g.GetType ().Name};{g.instanceIndex};{g.yIndex};{g.xLevel}");
 						}
 					}
 

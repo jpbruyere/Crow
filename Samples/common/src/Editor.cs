@@ -110,7 +110,7 @@ namespace Crow
 										Suggestions = (new string[] {"Stretched", "Fit"}).
 											Where (s => s.StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
 									else if (pi.PropertyType == typeof (Fill)) 
-										Suggestions = FastEnumUtility.FastEnum.GetValues<Colors> ()
+										Suggestions = EnumsNET.Enums.GetValues<Colors> ()
 											.Where (s => s.ToString().StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
 								}
 							} else if (currentToken.Type == TokenType.AttributeValueOpen) {
@@ -124,7 +124,7 @@ namespace Crow
 									else if (pi.PropertyType == typeof(bool))
 										Suggestions = new List<string> (new string[] {"true", "false"});
 									else if (pi.PropertyType == typeof (Fill)) 
-										Suggestions = FastEnumUtility.FastEnum.GetValues<Colors> ().ToList ();
+										Suggestions = EnumsNET.Enums.GetValues<Colors> ().ToList ();
 									else if (pi.PropertyType == typeof (Measure))
 										Suggestions = new List<string> (new string[] {"Stretched", "Fit"});
 								}

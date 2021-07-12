@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<Widget Name="go" Width="100" Height="60" Background="DarkBlue"/>
+	<Widget Width="100" Height="60" Background="{../colorPicker.CurrentColor}"/>
+	<Label Text="{../colorPicker.CurrentColor}"/>
+	<ColorPicker CurrentColor="{²../go.Background}" Name="colorPicker" Background="DimGrey" MinimumSize="0,0" Width="300" Template="/mnt/devel/CrowIDE/Crow/Samples/common/ui/templates/ColorPicker.template" />
+</VerticalStack>

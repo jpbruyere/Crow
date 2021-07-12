@@ -317,7 +317,7 @@ namespace Samples
 		}
 
 
-		IList<Colors> testList = (IList<Colors>)FastEnumUtility.FastEnum.GetValues<Colors>().ToList();//.ColorDic.Values//.OrderBy(c=>c.Hue)
+		IList<Colors> testList = (IList<Colors>)EnumsNET.Enums.GetValues<Colors>().ToList();//.ColorDic.Values//.OrderBy(c=>c.Hue)
 																									  //.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
 																									  //.ToList ();
 		public IList<Colors> TestList
@@ -330,7 +330,7 @@ namespace Samples
 			get { return testList; }
 		}
 		void OnClear(object sender, MouseButtonEventArgs e) => TestList = null;
-		void OnLoadList(object sender, MouseButtonEventArgs e) => TestList = (IList<Colors>)FastEnumUtility.FastEnum.GetValues<Colors>().ToList();
+		void OnLoadList(object sender, MouseButtonEventArgs e) => TestList = (IList<Colors>)EnumsNET.Enums.GetValues<Colors>().ToList();
 
 
 		string curSources = "";

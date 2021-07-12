@@ -107,9 +107,14 @@ namespace Crow
 		}
 		public override int measureRawSize (LayoutingType lt)
 		{
-			if (lt == LayoutingType.Height && Children.Count > 0 && tallestChild == null)
-				searchTallestChild ();					
-			return base.measureRawSize (lt);
+			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this);
+			try {			
+				if (lt == LayoutingType.Height && Children.Count > 0 && tallestChild == null)
+					searchTallestChild ();					
+				return base.measureRawSize (lt);
+			} finally {
+				DbgLogger.EndEvent(DbgEvtType.GOMeasure);	
+			}
 		}		
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
@@ -166,7 +171,7 @@ namespace Crow
 					int ch = 0;
 					if (forceMeasure)
 						ch = Children [i].measureRawSize (LayoutingType.Height);
-					else if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					else if (Children [i].RequiredLayoutings.HasFlag (LayoutingType.Height))
 						continue;
 					else
 						ch = Children [i].Slot.Height;

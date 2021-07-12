@@ -1,0 +1,23 @@
+﻿<ColorPicker Width="Fit" Height="Stretched" Background="Onyx">
+	<Template>
+		<ListBox Data="{./AvailableColors}" Margin="15">
+			<Template>
+				<Scroller>
+					<VerticalStack Name="ItemsContainer" Height="Fit" VerticalAlignment="Top" Background="DarkGrey" Margin="5" />
+				</Scroller>
+			</Template>
+			<ItemTemplate>
+				<ListItem Margin="1" Width="Stretched" 
+					Selected="{Background=RoyalBlue}"
+					Unselected="{Background=Transparent}">
+					<HorizontalStack Height="Fit" >
+						<Widget Width="20" Height="14" Background="{}" CornerRadius="3"/>
+						<Label Text="{}" Width="Stretched" />
+					</HorizontalStack>
+				</ListItem>
+			</ItemTemplate>
+		</ListBox>
+	</Template>
+</ColorPicker>
+
+				

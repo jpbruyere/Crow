@@ -4,10 +4,10 @@
 		<VerticalStack Width="Stretched" Margin="10" Background="FireBrick">
 			<VerticalStack Width="Stretched" Margin="10" Background="Teal">
 				<VerticalStack Width="Stretched" Margin="10" Background="CornflowerBlue">
-					<Label Text="{./Caption}" Width="Stretched"/>
-					<Label Text="{./Caption}" Width="Stretched"/>
-					<Label Text="{./Caption}" Width="Stretched"/>
-					<Label Text="{./Caption}" Width="Stretched"/>
+					<Label Text="label" Width="Stretched"/>
+					<Label Text="a bit longer" Width="Stretched"/>
+					<Label Text="cow" Width="Stretched"/>
+					<Label Text="horse" Width="Stretched"/>
 				</VerticalStack>
 			</VerticalStack>
 		</VerticalStack>

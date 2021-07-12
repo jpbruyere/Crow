@@ -60,6 +60,22 @@ namespace Crow
 		#endregion
 
 		internal static List<Assembly> crowAssemblies = new List<Assembly> ();
+		public void AddCrowAssembly (Assembly a) {
+			lock (UpdateMutex) {
+				if (crowAssemblies.Contains (a))
+					return;
+				crowAssemblies.Add (a);
+				loadStylingFromAssembly (a);
+			}
+		}
+		public void RemoveCrowAssembly (Assembly a) {
+			lock (UpdateMutex) {
+				if (!crowAssemblies.Contains (a))
+					return;
+				crowAssemblies.Remove (a);
+				init_internal ();
+			}
+		}
 
 		#region CTOR
 		static Interface ()
@@ -458,10 +474,10 @@ namespace Crow
 		public const int MaxCacheSize = 2048;
 		/// <summary> Above this count, the layouting is discard from the current
 		/// update cycle and requeued for the next</summary>
-		public const int MaxLayoutingTries = 3;
+		public static int MaxLayoutingTries = 30;
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
-		public const int MaxDiscardCount = 5;
+		public static int MaxDiscardCount = 5;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		public static FontOptions FontRenderingOptions;
 		/// <summary> Global font rendering settings for Cairo </summary>
@@ -1244,8 +1260,7 @@ namespace Crow
 
 			lock (UpdateMutex)
 				GraphicTree.Insert (ptr, g);
-
-			g.RegisteredLayoutings = LayoutingType.None;
+			
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 
 			return g;
@@ -1658,47 +1673,48 @@ namespace Crow
 		public virtual bool OnMouseButtonUp (MouseButton button)
 		{
 			DbgLogger.StartEvent (DbgEvtType.MouseUp);
-			mouseRepeatTimer.Reset ();
-			lastMouseDownEvent = null;
 
-			if (DragAndDropInProgress) {				
-				if (DragAndDropOperation.DropTarget != null)
-					DragAndDropOperation.DragSource.onDrop (this, DragAndDropOperation);
-				else
-					DragAndDropOperation.DragSource.onEndDrag (this, DragAndDropOperation);
-				DragAndDropOperation = null;
-				if (ActiveWidget != null) {
-					ActiveWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
-					ActiveWidget = null;
+			try {
+				mouseRepeatTimer.Reset ();
+				lastMouseDownEvent = null;
+
+				if (DragAndDropInProgress) {				
+					if (DragAndDropOperation.DropTarget != null)
+						DragAndDropOperation.DragSource.onDrop (this, DragAndDropOperation);
+					else
+						DragAndDropOperation.DragSource.onEndDrag (this, DragAndDropOperation);
+					DragAndDropOperation = null;
+					if (ActiveWidget != null) {
+						ActiveWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
+						ActiveWidget = null;
+					}
+					return true;
+	            }
+
+				if (_activeWidget == null)
+					return false;
+
+				_activeWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
+
+				if (_activeWidget == null) {					
+					DbgLogger.SetMsg (DbgEvtType.MouseUp, "[BUG]Mystery reset of _activeWidget");
+					return true;
 				}
-				DbgLogger.EndEvent (DbgEvtType.MouseUp);
+
+				if (doubleClickTriggered)
+					_activeWidget.onMouseDoubleClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
+				else
+					_activeWidget.onMouseClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
+
+				ActiveWidget = null;
+				//			if (!lastActive.MouseIsIn (Mouse.Position)) {
+				//				ProcessMouseMove (Mouse.X, Mouse.Y);
+				//			}
+				
 				return true;
-            }
-
-			if (_activeWidget == null) {
+			} finally {
 				DbgLogger.EndEvent (DbgEvtType.MouseUp);
-				return false;
 			}
-
-			_activeWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
-
-			if (_activeWidget == null) {
-				Debug.WriteLine ("[BUG]Mystery reset of _activeWidget");
-				DbgLogger.EndEvent (DbgEvtType.MouseUp | DbgEvtType.Error);
-				return true;
-			}
-
-			if (doubleClickTriggered)
-				_activeWidget.onMouseDoubleClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
-			else
-				_activeWidget.onMouseClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
-
-			ActiveWidget = null;
-			//			if (!lastActive.MouseIsIn (Mouse.Position)) {
-			//				ProcessMouseMove (Mouse.X, Mouse.Y);
-			//			}
-			DbgLogger.EndEvent (DbgEvtType.MouseUp);
-			return true;
 		}
 		/// <summary>
 		/// Forward the mouse wheel event from the host to the crow interface
@@ -1909,7 +1925,7 @@ namespace Crow
 				else
 					ctxMenuContainer.IsOpened = true;
 
-				ctxMenuContainer.BubbleMouseEvent = false;
+				ctxMenuContainer.BubbleMouseEvent = DeviceEventType.None;
 				ctxMenuContainer.LogicalParent = go;
 				ctxMenuContainer.DataSource = go;
 				
@@ -1954,6 +1970,10 @@ namespace Crow
 			set { throw new NotImplementedException (); }
 		}
 		public LayoutingType RegisteredLayoutings {
+			get => LayoutingType.None;
+			set { throw new NotImplementedException (); }
+		}
+		public LayoutingType RequiredLayoutings {
 			get => LayoutingType.None;
 			set { throw new NotImplementedException (); }
 		}

@@ -4,7 +4,6 @@
 
 using System;
 using System.Text;
-using FastEnumUtility;
 
 namespace Crow
 {
@@ -289,9 +288,9 @@ namespace Crow
 		}
 
 		//read next value in config string until next ';'
-		string getConfAttrib (string conf, ref int i) {
-			int nextI = conf.Substring (i).IndexOf (';');
-			string tmp = conf.Substring (i, nextI);
+		ReadOnlySpan<char> getConfAttrib (ReadOnlySpan<char> conf, ref int i) {
+			int nextI = conf.Slice (i).IndexOf (';');
+			ReadOnlySpan<char> tmp = conf.Slice (i, nextI);
 			i += nextI + 1;
 			return tmp;
 		}
@@ -300,12 +299,12 @@ namespace Crow
 		/// </summary>
 		/// <param name="conf">Conf.</param>
 		/// <param name="dataSource">Data source for the docked windows</param>
-		public void ImportConfig (string conf, object dataSource = null) {
+		public void ImportConfig (ReadOnlySpan<char> conf, object dataSource = null) {
 			lock (IFace.UpdateMutex) {
 				ClearChildren ();
 				stretchedChild = null;
 				int i = 0;
-				Orientation = FastEnum.Parse<Orientation> (getConfAttrib (conf, ref i));
+				Orientation = EnumsNET.Enums.Parse<Orientation> (getConfAttrib (conf, ref i).ToString());
 				importConfig (conf, ref i, dataSource);
 			}
 		}
@@ -313,38 +312,39 @@ namespace Crow
 			return Orientation.ToString() + ";" + exportConfig();
 		}
 
-		DockWindow importDockWinConfig (string conf, ref int i, object dataSource){
+		DockWindow importDockWinConfig (ReadOnlySpan<char> conf, ref int i, object dataSource){
 			DockWindow dw = null;
-			string wName = getConfAttrib (conf, ref i);
+			string wName = getConfAttrib (conf, ref i).ToString();
 			try {
 				dw = IFace.CreateInstance (wName) as DockWindow;	
-			} catch {
+			} catch (Exception ex){
+				Console.WriteLine ($"[importDockWinConfig]{ex}");
 				dw = new DockWindow (IFace);						
 			}
 
 			dw.Name = wName;
-			dw.Width = Measure.Parse (getConfAttrib (conf, ref i));
-			dw.Height = Measure.Parse (getConfAttrib (conf, ref i));
-			dw.DockingPosition = FastEnum.Parse<Alignment> (getConfAttrib (conf, ref i));
-			dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i));
-			dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i));
+			dw.Width = Measure.Parse (getConfAttrib (conf, ref i).ToString());
+			dw.Height = Measure.Parse (getConfAttrib (conf, ref i).ToString());
+			dw.DockingPosition = EnumsNET.Enums.Parse<Alignment> (getConfAttrib (conf, ref i).ToString());
+			dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i).ToString());
+			dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i).ToString());
 			dw.Resizable = false;
 			
 			dw.DataSource = dataSource;
 			return dw;
 		}
-		void importConfig (string conf, ref int i, object dataSource) {						
+		void importConfig (ReadOnlySpan<char> conf, ref int i, object dataSource) {						
 			if (conf [i++] != '(')
 				return;
 			DockWindow dw = null;			
 			while (i < conf.Length - 4) {
-				string sc = conf.Substring (i, 4);
+				string sc = conf.Slice (i, 4).ToString();
 				i += 4;
 				switch (sc) {
 				case "TVI;":
 					TabView tv = new TabView (IFace, "DockingTabView");
-					tv.Width = Measure.Parse (getConfAttrib (conf, ref i));
-					tv.Height = Measure.Parse (getConfAttrib (conf, ref i));
+					tv.Width = Measure.Parse (getConfAttrib (conf, ref i).ToString());
+					tv.Height = Measure.Parse (getConfAttrib (conf, ref i).ToString());
 					this.AddChild (tv);
 					i++;					
 					while (conf [i] != ')') {
@@ -361,9 +361,9 @@ namespace Crow
 					break;
 				case "STK;":
 					DockStack ds = new DockStack (IFace);
-					ds.Width = Measure.Parse (getConfAttrib (conf, ref i));
-					ds.Height = Measure.Parse (getConfAttrib (conf, ref i));
-					ds.Orientation = FastEnum.Parse<Orientation> (getConfAttrib (conf, ref i));
+					ds.Width = Measure.Parse (getConfAttrib (conf, ref i).ToString());
+					ds.Height = Measure.Parse (getConfAttrib (conf, ref i).ToString());
+					ds.Orientation = EnumsNET.Enums.Parse<Orientation> (getConfAttrib (conf, ref i).ToString());
 
 					this.AddChild (ds);
 
@@ -371,8 +371,8 @@ namespace Crow
 					break;
 				case "SPL;":
 					Splitter sp = new Splitter (IFace);
-					sp.Width = Measure.Parse (getConfAttrib (conf, ref i));
-					sp.Height = Measure.Parse (getConfAttrib (conf, ref i));
+					sp.Width = Measure.Parse (getConfAttrib (conf, ref i).ToString());
+					sp.Height = Measure.Parse (getConfAttrib (conf, ref i).ToString());
 					sp.Thickness = int.Parse (getConfAttrib (conf, ref i));
 					this.AddChild (sp);
 					break;
@@ -387,11 +387,11 @@ namespace Crow
 
 			for (int i = 0; i < Children.Count; i++) {
 				if (Children [i] is DockWindow dw)					
-					tmp.Append (dw.GetConfigString());
+					tmp.Append (dw.GetDockConfigString());
 				else if (Children [i] is TabView tv) {
 					tmp.Append ($"TVI;{tv.Width};{tv.Height};(");
 					foreach (DockWindow d in tv.Items)
-						tmp.Append (d.GetConfigString().Substring(4));					
+						tmp.Append (d.GetDockConfigString().Substring(4));					
 					tmp.Append (")");
 				}else if (Children [i] is DockStack ds)
 					tmp.Append ($"STK;{ds.Width};{ds.Height};{ds.Orientation};{ds.exportConfig()}");

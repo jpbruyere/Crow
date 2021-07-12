@@ -20,6 +20,7 @@ namespace Crow
 
 		bool ArrangeChildren { get; }
 		LayoutingType RegisteredLayoutings { get; set; }
+		LayoutingType RequiredLayoutings { get; set; }
 		void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType);
 		void RegisterForLayouting(LayoutingType layoutType);
 		void RegisterClip(Rectangle clip);

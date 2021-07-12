@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Xml;
 using Crow.IML;
 using System.Text;
-using FastEnumUtility;
+//using FastEnumUtility;
 
 namespace Crow.IML
 {
@@ -32,9 +32,8 @@ namespace Crow.IML
 		internal static MethodInfo stringEquals = typeof (string).GetMethod("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
 		internal static MethodInfo miObjToString = typeof(object).GetMethod("ToString");
 		internal static MethodInfo miGetType = typeof(object).GetMethod("GetType");
-		internal static MethodInfo miParseEnum = typeof(Enum).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public,
-			Type.DefaultBinder, new Type [] {typeof (Type), typeof (string), typeof (bool)}, null);
-		internal static MethodInfo miParseEnumInversedParams = typeof(CompilerServices).GetMethod ("ParseEnum", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miParseEnum = typeof(CompilerServices).GetMethod("parseEnum", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miParseEnumInversedParams = typeof(CompilerServices).GetMethod ("parseEnumInverseParams", BindingFlags.Static | BindingFlags.NonPublic);
 
 		internal static MethodInfo miGetTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle");
 		internal static MethodInfo miGetEvent = typeof(Type).GetMethod("GetEvent", new Type[] {typeof(string)});
@@ -219,9 +218,7 @@ namespace Crow.IML
 					il.Emit(OpCodes.Ldtoken, pi.PropertyType);
 					il.Emit(OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 					//load enum value name
-					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:implement here string format?
-					//load false
-					il.Emit (OpCodes.Ldc_I4_0);
+					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:implement here string format?					
 					il.Emit (OpCodes.Call, CompilerServices.miParseEnum);
 
 					if (CompilerServices.miParseEnum.ReturnType != pi.PropertyType)
@@ -416,23 +413,28 @@ namespace Crow.IML
 			foundMI = null;
 			if (assembly == null)
 				return false;
-			foreach (Type t in assembly.GetTypes ().Where
-					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
-				foreach (MethodInfo mi in t.GetMethods 
-					(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
-						(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
-						 m.GetParameters ().Length > 0)) {
-					Type curType = extendedType;
-					while (curType != null) {
-						if (mi.GetParameters () [0].ParameterType == curType) {
-							foundMI = mi;
-							return true;
-						}
-						curType = curType.BaseType;
-					}						
-				}
-			
+			try
+			{
+				
+				foreach (Type t in assembly.GetExportedTypes().Where
+						(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
+					foreach (MethodInfo mi in t.GetMethods 
+						(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
+							(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
+							 m.GetParameters ().Length > 0)) {
+						Type curType = extendedType;
+						while (curType != null) {
+							if (mi.GetParameters () [0].ParameterType == curType) {
+								foundMI = mi;
+								return true;
+							}
+							curType = curType.BaseType;
+						}						
+					}
+				
+				}				
 			}
+			catch (System.Exception) {}
 			return false;
 		}
 		/// <summary>
@@ -632,7 +634,6 @@ namespace Crow.IML
 				}
 			}
 		}
-		internal static object ParseEnum (string str, Type enumType) => Enum.Parse (enumType, str);
 
 		internal static bool isValueType (object obj) => obj.GetType ().IsValueType;
 		/// <summary>
@@ -873,16 +874,16 @@ namespace Crow.IML
 				knownTypes.Add (strDataType, dataType);
 				return dataType;
 			}
-			foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies ()) {
-				if (a.IsDynamic)
-					continue;
-				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name != strDataType && expT.FullName != strDataType)
-						continue;
-					if (!knownTypes.ContainsKey(strDataType))
-						knownTypes.Add (strDataType, expT);
-					return expT;
-				}
+			foreach (Assembly a in Interface.crowAssemblies) {
+				try {
+					foreach (Type expT in a.GetExportedTypes ()) {
+						if (expT.Name != strDataType && expT.FullName != strDataType)
+							continue;
+						if (!knownTypes.ContainsKey(strDataType))
+							knownTypes.Add (strDataType, expT);
+						return expT;
+					}
+				}catch{}
 			}
 			knownTypes.Add (strDataType, null);
 			return null;
@@ -1016,6 +1017,25 @@ namespace Crow.IML
 				mi.MemberType == MemberTypes.Field ? (mi as FieldInfo).FieldType :
 				mi.MemberType == MemberTypes.Property ? (mi as PropertyInfo).PropertyType :
 				mi.MemberType == MemberTypes.Method ? (mi as MethodInfo).ReturnType : null;
+
+		/*internal static object parseEnum (Type enumType, string val)
+			=> EnumsNET.FlagEnums.IsFlagEnum (enumType) ?
+				EnumsNET.FlagEnums.ParseFlags (enumType, val, true, "|") :
+				EnumsNET.Enums.Parse (enumType, val, true);*/
+		internal static object parseEnum (Type enumType, string val) {
+			try
+			{
+			 return EnumsNET.FlagEnums.IsFlagEnum (enumType) ?
+				EnumsNET.FlagEnums.ParseFlags (enumType, val, true, "|") :
+				EnumsNET.Enums.Parse (enumType, val, true);				
+			}
+			catch (System.Exception)
+			{
+				Console.WriteLine($"{enumType} {val}");
+				throw;
+			}
+		}
+		internal static object parseEnumInverseParams (string str, Type enumType) => parseEnum (enumType, str);
 	}
 }
 

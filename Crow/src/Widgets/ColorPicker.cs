@@ -34,7 +34,7 @@ namespace Crow
 			}
 		}
 		public IList<Colors> AvailableColors => //Enum.GetValues (typeof (Color)).ToList<Color> ();// Colors. ColorDic.Values.OrderBy (c => c.Hue).ToList ();
-			FastEnumUtility.FastEnum.GetValues<Colors> ().ToList<Colors> ();
+			EnumsNET.Enums.GetValues<Colors> ().ToList<Colors> ();
 
 		public void onSelectedItemChanged(object sender, SelectionChangeEventArgs e) {
 			CurrentColor = (Color)(Colors)e.NewValue;

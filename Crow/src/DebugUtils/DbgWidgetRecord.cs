@@ -23,9 +23,7 @@ namespace Crow.DebugLogger
 		//useful to track events for obj shown later, not on start
 		public int InstanceIndex;
 		public int yIndex;//index in parenting, the whole main graphic tree is one continuous suite
-		public int xLevel;//depth
-		public String Width;
-		public String Height;
+		public int xLevel;//depth		
 
 		public static DbgWidgetRecord Parse (string str)
 		{
@@ -37,8 +35,6 @@ namespace Crow.DebugLogger
 			g.InstanceIndex = int.Parse (tmp [1]);
 			g.yIndex = int.Parse (tmp [2]);
 			g.xLevel = int.Parse (tmp [3]);
-			g.Width = tmp [4];
-			g.Height = tmp [5];
 			return g;
 		}
 

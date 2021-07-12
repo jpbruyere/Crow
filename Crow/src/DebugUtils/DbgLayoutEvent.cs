@@ -34,20 +34,21 @@ namespace Crow.DebugLogger
 			=> $"{base.ToString ()};{layouting};{result};{OldSlot};{NewSlot}";
 		public override Color Color {
 			get {
-			if (type == DbgEvtType.GORegisterLayouting)
-				return Colors.GreenYellow;
-			if (type == DbgEvtType.GOProcessLayoutingWithNoParent)
-				return Colors.DarkRed;
-			switch (result) {
-			case LayoutingQueueItem.Result.Success:
-				return Colors.Green;
-			case LayoutingQueueItem.Result.Deleted:
-				return Colors.Red;
-			case LayoutingQueueItem.Result.Discarded:
-				return Colors.OrangeRed;
-			default:
-				return Colors.Orange;
-			}					}
+				if (type == DbgEvtType.GORegisterLayouting)
+					return Colors.GreenYellow;
+				if (type == DbgEvtType.GOProcessLayoutingWithNoParent)
+					return Colors.DarkRed;
+				switch (result) {
+				case LayoutingQueueItem.Result.Success:
+					return Colors.Green;
+				case LayoutingQueueItem.Result.Deleted:
+					return Colors.Red;
+				case LayoutingQueueItem.Result.Discarded:
+					return Colors.OrangeRed;
+				default:
+					return Colors.Orange;
+				}
+			}
 		}			
 	}
 }

@@ -9,6 +9,7 @@ namespace tests
 		static void Main ()
 		{
 			using (BasicTests app = new BasicTests ()) {
+				app.SolidBackground = false;
 				app.Run ();
 			}
 		}

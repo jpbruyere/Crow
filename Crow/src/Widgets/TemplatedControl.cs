@@ -98,9 +98,8 @@ namespace Crow
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
 			}
-
-			if (child != null)
-				child.Paint (gr);
+			
+			child?.Paint (gr);
 
 			gr.Restore ();
 

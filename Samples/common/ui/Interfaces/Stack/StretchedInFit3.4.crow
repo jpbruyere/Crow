@@ -1,0 +1,4 @@
+﻿<HorizontalStack Height="Fit" Width="Fit" Background="DarkSlateBlue" Margin="10">
+	<Label Name="lab" Text="this is a long stretched label" Width="Stretched" Background="Grey"/>
+	<Label Text="label" Width="Fit" Background="Teal"/>
+</HorizontalStack>

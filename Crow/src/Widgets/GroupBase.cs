@@ -236,7 +236,7 @@ namespace Crow
 			try
 			{
 				for (int i = 0; i < Children.Count; i++) 
-					Children[i].Paint (gr);				
+					Children[i].Paint (gr);
 			} finally {
 				childrenRWLock.ExitReadLock ();
 			}

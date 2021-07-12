@@ -14,6 +14,7 @@ namespace Crow.DebugLogger
 		public int threadId;
 		public DbgEvtType type;
 		public DbgEvtType Category => type & DbgEvtType.All;
+		public string Message;
 		public DbgEvent parentEvent;
 		public bool HasChildEvents => Events != null && Events.Count > 0;
 		public override long Duration => end - begin;
@@ -22,6 +23,7 @@ namespace Crow.DebugLogger
 		public double EndMS => Math.Round ((double)end / Stopwatch.Frequency, 6);
 		public virtual bool IsWidgetEvent => false;
 		public virtual bool IsLayoutEvent => false;
+		public bool HasMessage => !string.IsNullOrEmpty(Message);
 
 		public void AddEvent (DbgEvent evt)
 		{
@@ -33,21 +35,22 @@ namespace Crow.DebugLogger
 		}
 
 		public DbgEvent () { }
-		public DbgEvent (long timeStamp, DbgEvtType evt)
+		public DbgEvent (long timeStamp, DbgEvtType evt, string message = null)
 		{
 			type = evt;
 			begin = timeStamp;
 			end = timeStamp;
 			threadId = Thread.CurrentThread.ManagedThreadId;
+			Message = message;
 		}
 
 		public static DbgEvent Parse (string str)
 		{
 			if (str == null)
 				return null;
-			string [] tmp = str.Trim ().Split (';');
+			string [] tmp = str.Trim ().Split (';', StringSplitOptions.None);
 
-			DbgEvtType evtType = (DbgEvtType)Enum.Parse (typeof (DbgEvtType), tmp [3]);
+			DbgEvtType evtType = (DbgEvtType)Enum.Parse (typeof (DbgEvtType), tmp [3]);			
 
 			if (evtType.HasFlag (DbgEvtType.Widget)) {
 				if (evtType.HasFlag (DbgEvtType.Layouting))
@@ -56,27 +59,30 @@ namespace Crow.DebugLogger
 						end = long.Parse (tmp [1]),
 						threadId = int.Parse (tmp [2]),
 						type = evtType,
-						InstanceIndex = int.Parse (tmp [4]),
-						layouting = (LayoutingType)Enum.Parse (typeof (LayoutingType), tmp [5]),
+						Message = tmp[4],
+						InstanceIndex = int.Parse (tmp [5]),
+						layouting = (LayoutingType)Enum.Parse (typeof (LayoutingType), tmp [6]),
 						result = evtType == DbgEvtType.GOProcessLayouting ?
-							(LayoutingQueueItem.Result)Enum.Parse (typeof (LayoutingQueueItem.Result), tmp [6])
+							(LayoutingQueueItem.Result)Enum.Parse (typeof (LayoutingQueueItem.Result), tmp [7])
 							: LayoutingQueueItem.Result.Unknown,
-						OldSlot = Rectangle.Parse (tmp [7]),
-						NewSlot = Rectangle.Parse (tmp [8]),
+						OldSlot = Rectangle.Parse (tmp [8]),
+						NewSlot = Rectangle.Parse (tmp [9]),
 					};
-				return (tmp.Length < 5) ?
+				return (tmp.Length < 6) ?
  							new DbgWidgetEvent () {
 								begin = long.Parse (tmp [0]),
 								end = long.Parse (tmp [1]),
 								threadId = int.Parse (tmp [2]),
 								type = evtType,
+								Message = tmp[4],
 								InstanceIndex = -1,
 							} : new DbgWidgetEvent () {
 								begin = long.Parse (tmp [0]),
 								end = long.Parse (tmp [1]),
 								threadId = int.Parse (tmp [2]),
 								type = evtType,
-								InstanceIndex = int.Parse (tmp [4]),
+								Message = tmp[4],
+								InstanceIndex = int.Parse (tmp [5]),
 							};
 			}
 			return new DbgEvent () {
@@ -84,12 +90,13 @@ namespace Crow.DebugLogger
 				end = long.Parse (tmp [1]),
 				threadId = int.Parse (tmp [2]),
 				type = evtType,
+				Message = tmp[4]
 			};
 		}
 		public virtual string Print ()
-			=> $"{begin,10}:{threadId,-2}:{type,-20}:";
+			=> $"{begin,10}:{threadId,-2}:{type,-20}:{Message}";
 		public override string ToString ()
-			=> $"{begin};{end};{threadId};{type}";
+			=> $"{begin};{end};{threadId};{type};{Message}";
 		public virtual Color Color {
 			get {
 				switch (type) {

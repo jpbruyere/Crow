@@ -59,8 +59,7 @@ namespace Crow
 			if (child != null) {
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
-				contentSize = child.Slot.Size;
-				child.RegisteredLayoutings = LayoutingType.None;
+				contentSize = child.Slot.Size;				
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -103,20 +102,26 @@ namespace Crow
 
 		public override int measureRawSize (LayoutingType lt)
 		{
-			if (child != null) {
-				//force measure of child if sizing on children and child has stretched size
-				switch (lt) {
-				case LayoutingType.Width:
-					if (child.Width.IsRelativeToParent)
-						contentSize.Width = child.measureRawSize (LayoutingType.Width);
-					break;
-				case LayoutingType.Height:
-					if (child.Height.IsRelativeToParent)
-						contentSize.Height = child.measureRawSize (LayoutingType.Height);
-					break;
+			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this, lt);
+			try {
+				if (child != null) {
+					//force measure of child if sizing on children and child has stretched size
+					switch (lt) {
+					case LayoutingType.Width:
+						if (child.Width.IsRelativeToParent)
+							contentSize.Width = child.measureRawSize (LayoutingType.Width);
+						break;
+					case LayoutingType.Height:
+						if (child.Height.IsRelativeToParent)
+							contentSize.Height = child.measureRawSize (LayoutingType.Height);
+						break;
+					}
+					DbgLogger.SetMsg(DbgEvtType.GOMeasure, $"{lt} contentSize:{contentSize}");					
 				}
+				return base.measureRawSize (lt);
+			} finally {
+				DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			}
-			return base.measureRawSize (lt);
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{

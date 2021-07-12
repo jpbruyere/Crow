@@ -4,7 +4,7 @@
 
 using System;
 using Crow.Cairo;
-using FastEnumUtility;
+//using FastEnumUtility;
 
 namespace Crow
 {
@@ -88,7 +88,7 @@ namespace Crow
 					f.Name = tmp.ToString ();
 				else {
 					f.Name = tmp.Slice (0, ioc).ToString ();
-					f.Style = FastEnum.Parse<FontStyle> (tmp.Slice (ioc + 1).ToString (), true);
+					f.Style = EnumsNET.Enums.Parse<FontStyle> (tmp.Slice (ioc + 1).ToString (), true);
 				}
 			}
 			return f;			

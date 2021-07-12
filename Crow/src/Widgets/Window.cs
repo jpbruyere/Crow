@@ -22,7 +22,13 @@ namespace Crow
 			SW,
 			SE,
 		}
-
+		[Flags]
+		public enum Status {
+			None = 0x00,
+			Normal = 0x01,
+			Minimized = 0x02,
+			Maximized= 0x04
+		}
 		string _icon;
 		bool resizable;
 		bool movable;
@@ -30,9 +36,12 @@ namespace Crow
 		bool alwaysOnTop = false;
 
 		Rectangle savedBounds;
-		bool _minimized = false;
+		bool wasResizable;
+		
+		Status currentState, allowedStates;
 
 		protected Direction currentDirection = Direction.None;
+
 
 		#region Events
 		public event EventHandler Closing;
@@ -40,41 +49,190 @@ namespace Crow
 		public event EventHandler Unmaximized;
 		public event EventHandler Minimize;
 		#endregion
+		[DefaultValue("Normal|Minimized|Maximized")]
+		public Status AllowedStates {
+			get => allowedStates;
+			set {
+				if (allowedStates == value)
+					return;				
+				allowedStates = value;
+				NotifyValueChangedAuto (allowedStates);
+
+				if (currentState == Status.None)
+					return;
+
+				initCommands();
+
+				if (allowedStates.HasFlag (currentState)) {
+					CMDNormalize.CanExecute = currentState != Status.Normal & allowedStates.HasFlag (Status.Normal);
+					CMDMinimize.CanExecute = currentState != Status.Minimized & allowedStates.HasFlag (Status.Minimized);
+					CMDMaximize.CanExecute = currentState != Status.Maximized & allowedStates.HasFlag (Status.Maximized);
+				} else {
+					if (allowedStates.HasFlag (Status.Normal))
+						CurrentState = Status.Normal;
+					else if (allowedStates.HasFlag (Status.Maximized))
+						CurrentState = Status.Maximized;
+					else
+						CurrentState = Status.Minimized;
+				}
+			}
+		}
+		[DefaultValue("Normal")]
+		public Status CurrentState {
+			get => currentState;
+			set {			
+				Status newState = value;
+				if (!allowedStates.HasFlag (newState)) {
+					if (allowedStates.HasFlag (Status.Normal))
+						newState = Status.Normal;
+					else if (allowedStates.HasFlag (Status.Maximized))
+						newState = Status.Maximized;
+					else
+						newState = Status.Minimized;
+				}
+
+				if (currentState == newState)
+					return;
+
+				if (currentState == Status.Normal) {
+					savedBounds = LastPaintedSlot;
+					wasResizable = Resizable;
+				}				
+
+				currentState = value;
+				NotifyValueChangedAuto (currentState);
+
+				initCommands();
+
+				switch (currentState) {
+				case Status.Maximized:
+					Left = Top = 0;
+					RegisterForLayouting (LayoutingType.Positioning);
+					Width = Height = Measure.Stretched;
+					Resizable = false;
+					CMDNormalize.CanExecute = allowedStates.HasFlag (Status.Normal);
+					CMDMinimize.CanExecute = allowedStates.HasFlag (Status.Minimized);
+					CMDMaximize.CanExecute = false;
+					break;
+				case Status.Minimized:
+					Width = 200;
+					Height = 20;
+					Resizable = false;					
+					CMDNormalize.CanExecute = allowedStates.HasFlag (Status.Normal);
+					CMDMinimize.CanExecute = false;
+					CMDMaximize.CanExecute = allowedStates.HasFlag (Status.Maximized);
+					break;
+				case Status.Normal:
+					Left = savedBounds.Left;
+					Top = savedBounds.Top;
+					Width = savedBounds.Width;
+					Height = savedBounds.Height;
+					Resizable = wasResizable;
+					CMDNormalize.CanExecute = false;
+					CMDMinimize.CanExecute = allowedStates.HasFlag (Status.Minimized);
+					CMDMaximize.CanExecute = allowedStates.HasFlag (Status.Maximized);
+					break;
+				}
+			}
+		}
 
 		#region CTOR
 		protected Window() {}
-		public Window (Interface iface, string style = null) : base (iface, style) { }
+		public Window (Interface iface, string style = null) : base (iface, style) {}
 		#endregion
 
 		Widget moveHandle, sizingHandle;
+
+		public Command CMDMinimize, CMDMaximize, CMDNormalize, CMDClose;
+		CommandGroup commands;
+
+		public CommandGroup Commands {
+			get => commands;
+			set {
+				if (commands == value)
+					return;
+				commands = value;
+				NotifyValueChangedAuto (commands);
+			}
+		}
+		/*public Command CMDMinimize = new Command ("Minimize", (sender) =>
+			{(sender as Window).CurrentState = Status.Minimized;}, "#Crow.Icons.minimize.svg", false);
+		public Command CMDMaximize = new Command ("Maximize", (sender) => 
+			{(sender as Window).CurrentState = Status.Maximized;}, "#Crow.Icons.maximize.svg", false);
+		public Command CMDNormalize = new Command ("Normalize", (sender) => 
+			{(sender as Window).CurrentState = Status.Normal;}, "#Crow.Icons.normalize.svg", false);
+		public Command CMDClose = new Command ("Close", (sender) => 
+			{(sender as Window).close ();}, "#Crow.Icons.exit2.svg", true);*/
+
+
+		void initCommands () {
+			if (CMDMinimize != null)
+				return;
+			CMDMinimize = new Command ("Minimize", () => CurrentState = Status.Minimized, "#Crow.Icons.minimize.svg", allowedStates.HasFlag (Status.Minimized));
+			CMDMaximize = new Command ("Maximize", () => CurrentState = Status.Maximized, "#Crow.Icons.maximize.svg", allowedStates.HasFlag (Status.Maximized));
+			CMDNormalize = new Command ("Normalize", () => CurrentState = Status.Normal, "#Crow.Icons.normalize.svg", false);
+			CMDClose = new Command ("Close", close, "#Crow.Icons.exit2.svg", true);
+
+			Commands = new CommandGroup(CMDMinimize, CMDNormalize, CMDMaximize, CMDClose);
+		}
+
 
 
 		#region TemplatedContainer overrides
 		protected override void loadTemplate(Widget template = null)
 		{
+			initCommands ();
+
 			base.loadTemplate (template);
 
-			NotifyValueChanged ("ShowNormal", false);
-			NotifyValueChanged ("ShowMinimize", true);
-			NotifyValueChanged ("ShowMaximize", true);
+			initHandles ();
+		}
 
+		protected void initHandles () {
 			moveHandle = child?.FindByName ("MoveHandle");
 			sizingHandle = child?.FindByName ("SizeHandle");
 
-			if (sizingHandle == null)
-				return;			
-            //sizingHandle.Unhover += (arg1, arg2) => currentDirection = Direction.None;
-            sizingHandle.Unhover += SizingHandle_Unhover;
+			if (sizingHandle != null) {
+				sizingHandle.Unhover += SizingHandle_Unhover;
+				sizingHandle.MouseDown += setResizeOn;
+				sizingHandle.MouseUp += setResizeOff;
+			}
+				
+			if (moveHandle != null) {				
+				moveHandle.MouseDown += setMoveOn;				
+				moveHandle.MouseUp += setMoveOff;
+			}
 		}
+		protected void resetHandles () {
+			if (sizingHandle != null) {
+				sizingHandle.Unhover -= SizingHandle_Unhover;
+				sizingHandle.MouseDown -= setResizeOn;
+				sizingHandle.MouseUp -= setResizeOff;
+			}
+				
+			if (moveHandle != null) {				
+				moveHandle.MouseDown -= setMoveOn;				
+				moveHandle.MouseUp -= setMoveOff;
+			}
+			moveHandle = null;
+			sizingHandle = null;
+		}
+		void setResizeOn (object o, EventArgs e) => resize = true;
+		void setResizeOff (object o, EventArgs e) => resize = false;
+		void setMoveOn (object o, EventArgs e) => move = true;
+		void setMoveOff (object o, EventArgs e) => move = false;
 
-        private void SizingHandle_Unhover (object sender, EventArgs e) {
+
+		bool move, resize;
+
+		void SizingHandle_Unhover (object sender, EventArgs e) {
 			currentDirection = Direction.None;
 			NotifyValueChanged ("CurDir", currentDirection);
 		}
-        #endregion
+		#endregion
 
-        #region public properties
-        [DefaultValue("#Crow.Icons.crow.svg")]
+		#region public properties
+		[DefaultValue("#Crow.Icons.crow.svg")]
 		public string Icon {
 			get => _icon;
 			set {
@@ -114,22 +272,6 @@ namespace Crow
 				NotifyValueChangedAuto (modal);
 			}
 		}
-		[DefaultValue(false)]
-		public bool IsMinimized {
-			get => _minimized;
-			set{
-				if (value == IsMinimized)
-					return;
-
-				_minimized = value;
-				_contentContainer.IsVisible = !_minimized;
-
-				NotifyValueChangedAuto (_minimized);
-			}
-		}
-		[XmlIgnore]public bool IsMaximized =>
-						Width == Measure.Stretched & Height == Measure.Stretched & !_minimized;		
-		[XmlIgnore]public bool IsNormal => !(IsMaximized|_minimized);
 		[DefaultValue(false)]
 		public bool AlwaysOnTop {
 			get => modal ? true : alwaysOnTop;			
@@ -177,11 +319,16 @@ namespace Crow
 				else
 					currentHeight = this.Slot.Height;
 
-				switch (currentDirection) {
-				case Direction.None:
+				if (move) {
 					this.Left = currentLeft + XDelta;				
 					this.Top = currentTop + YDelta;
-					break;
+					return;
+				}
+
+				if (!resize)
+					return;
+
+				switch (currentDirection) {
 				case Direction.N:
 					this.Height = currentHeight - YDelta;
 					if (this.Height == currentHeight - YDelta)
@@ -226,21 +373,21 @@ namespace Crow
 			//}
 		}
 
-		bool maySize => sizingHandle == null ? false : resizable & sizingHandle.IsHover;
-		bool mayMove => moveHandle == null ? false : movable & moveHandle.IsHover;
+		bool maySize => sizingHandle != null && resizable && sizingHandle.IsHover;
+		bool mayMove => moveHandle != null && movable;
 
 		#region GraphicObject Overrides
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
-			if (maySize || mayMove) {
-				if (grabMouse) {
-					moveAndResize (e.XDelta, e.YDelta, currentDirection);
-					return;
-				}
-			}else
+			if (!(mayMove || maySize))
 				return;
+
+			if (move || resize) {
+				moveAndResize (e.XDelta, e.YDelta, currentDirection);
+				return;
+			}
 
 			Point m = Parent is Widget ? (Parent as Widget).ScreenPointToLocal (e.Position) : e.Position;
 
@@ -269,9 +416,9 @@ namespace Crow
 				return;
 
 			switch (currentDirection) {
-			case Direction.None:
+			/*case Direction.None:
 				IFace.MouseCursor = MouseCursor.move;
-				break;
+				break;*/
 			case Direction.N:
 				IFace.MouseCursor = MouseCursor.top_side;
 				break;
@@ -306,74 +453,38 @@ namespace Crow
 			IFace.MouseCursor = MouseCursor.top_left_arrow;
 			NotifyValueChanged ("CurDir", currentDirection);
 		}
-		bool grabMouse;
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{
-			NotifyValueChanged ("GrabMouse", true);
-			grabMouse = true;
-			e.Handled = true;
-			base.onMouseDown (sender, e);
-		}
-		public override void onMouseUp (object sender, MouseButtonEventArgs e)
-		{
-			NotifyValueChanged ("GrabMouse", false);
-			NotifyValueChanged ("CurDir", currentDirection);
-			grabMouse = false;
-			e.Handled = true;
-			base.onMouseUp (sender, e);
-		}
 		public override bool MouseIsIn (Point m)
 		{
 			return modal ? true : base.MouseIsIn (m);
 		}
 		#endregion
 
-		protected void onMaximized (object sender, EventArgs e){
+		/*protected void onMaximized (){
 			lock (IFace.LayoutMutex) {
-				if (!IsMinimized)
-					savedBounds = this.LastPaintedSlot;
-				Left = Top = 0;
-				RegisterForLayouting (LayoutingType.Positioning);
-				Width = Height = Measure.Stretched;
-				IsMinimized = false;
-				Resizable = false;
 				NotifyValueChanged ("ShowNormal", true);
 				NotifyValueChanged ("ShowMinimize", true);
 				NotifyValueChanged ("ShowMaximize", false);
 			}
 
-			Maximized.Raise (sender, e);
+			Maximized.Raise (this, null);
 		}
-		protected void onUnmaximized (object sender, EventArgs e){
+		protected void onUnmaximized (){
 			lock (IFace.LayoutMutex) {
-				Left = savedBounds.Left;
-				Top = savedBounds.Top;
-				Width = savedBounds.Width;
-				Height = savedBounds.Height;
-				IsMinimized = false;
-				Resizable = true;
 				NotifyValueChanged ("ShowNormal", false);
 				NotifyValueChanged ("ShowMinimize", true);
 				NotifyValueChanged ("ShowMaximize", true);
 			}
 
-			Unmaximized.Raise (sender, e);
+			Unmaximized.Raise (this, null);
 		}
-		protected void onMinimized (object sender, EventArgs e){
+		protected void onMinimized (){
 			lock (IFace.LayoutMutex) {
 				if (IsNormal)
-					savedBounds = this.LastPaintedSlot;
-				Width = 200;
-				Height = 20;
-				Resizable = false;
-				IsMinimized = true;
-				NotifyValueChanged ("ShowNormal", true);
-				NotifyValueChanged ("ShowMinimize", false);
-				NotifyValueChanged ("ShowMaximize", true);
+					
 			}
 
-			Minimize.Raise (sender, e);
-		}
+			Minimize.Raise (this, null);
+		}*/
 
 		public void onQuitPress (object sender, MouseButtonEventArgs e)
 		{

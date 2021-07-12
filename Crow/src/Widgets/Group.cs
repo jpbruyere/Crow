@@ -74,8 +74,7 @@ namespace Crow
 				contentSize.Height = g.LastSlots.Height;
 			}
 			
-			g.LayoutChanged += OnChildLayoutChanges;
-			g.RegisteredLayoutings = LayoutingType.None;
+			g.LayoutChanged += OnChildLayoutChanges;			
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
 		public override void ClearChildren()
@@ -101,16 +100,21 @@ namespace Crow
 		#region GraphicObject overrides
 		public override int measureRawSize (LayoutingType lt)
 		{
-			if (Children.Count > 0) {
-				if (lt == LayoutingType.Width) {
-					//if (largestChild == null)
-						searchLargestChild ();					
-				} else {
-					//if (tallestChild == null)
-						searchTallestChild ();					
+			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this, lt);
+			try {
+				if (Children.Count > 0) {
+					if (lt == LayoutingType.Width) {
+						//if (largestChild == null)
+							searchLargestChild ();					
+					} else {
+						//if (tallestChild == null)
+							searchTallestChild ();					
+					}
 				}
+				return base.measureRawSize (lt);
+			} finally {
+				DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			}
-			return base.measureRawSize (lt);
 		}
 
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -163,8 +167,9 @@ namespace Crow
 						contentSize.Width = g.Slot.Width;
 					} else if (g == largestChild)
 						searchLargestChild ();
-					else
-						break;
+					/*else
+						Console.WriteLine ($"else: {g} largest:{largestChild} {g.RequiredLayoutings} {this.RequiredLayoutings} {largestChild?.RequiredLayoutings}");*/
+						/*break;*/
 					this.RegisterForLayouting (LayoutingType.Width);
 				}
 				break;
@@ -175,8 +180,8 @@ namespace Crow
 						contentSize.Height = g.Slot.Height;
 					} else if (g == tallestChild)
 						searchTallestChild ();
-					else
-						break;
+					/*else
+						break;*/
 					this.RegisterForLayouting (LayoutingType.Height);
 				}
 				break;
@@ -195,6 +200,7 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 
 			try {
+				DbgLogger.SetMsg (DbgEvtType.GOSearchLargestChild, $"forced={forceMeasure}");
 
 				largestChild = null;
 				contentSize.Width = 0;
@@ -204,7 +210,7 @@ namespace Crow
 					int cw = 0;
 					if (forceMeasure)
 						cw = Children [i].measureRawSize (LayoutingType.Width);
-					else if (Children[i].Width.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					else if (Children[i].Width.IsRelativeToParent || Children [i].RequiredLayoutings.HasFlag (LayoutingType.Width))
 						continue;
 					else
 						cw = Children [i].Slot.Width;
@@ -226,6 +232,8 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 
 			try {
+				DbgLogger.SetMsg (DbgEvtType.GOSearchTallestChild, $"forced={forceMeasure}");
+
 				tallestChild = null;
 				contentSize.Height = 0;
 				for (int i = 0; i < Children.Count; i++) {
@@ -234,7 +242,7 @@ namespace Crow
 					int ch = 0;
 					if (forceMeasure)
 						ch = Children [i].measureRawSize (LayoutingType.Height);
-					else if (Children[i].Height.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					else if (Children[i].Height.IsRelativeToParent || Children [i].RequiredLayoutings.HasFlag (LayoutingType.Height))
 						continue;
 					else
 						ch = Children [i].Slot.Height;

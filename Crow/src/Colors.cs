@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FastEnumUtility;
+//using FastEnumUtility;
 
 namespace Crow
 {
@@ -332,7 +332,7 @@ namespace Crow
 			=> value.GetHashCode ();
 
 		public override string ToString()
-			=> FastEnum.IsDefined<Colors> (value) ? FastEnum.GetName((Colors)value) : HtmlCode;
+			=> EnumsNET.Enums.IsValid<Colors> ((Colors)value) ? EnumsNET.Enums.GetName((Colors)value) : HtmlCode;
 			
 		public static Color FromIml (string iml)
 		{
@@ -357,7 +357,7 @@ namespace Crow
 				new Color (0xff + (UInt32.Parse (s.AsSpan ().Slice (1), System.Globalization.NumberStyles.HexNumber)<<8))
 				: new Color (UInt32.Parse (s.AsSpan().Slice (1), System.Globalization.NumberStyles.HexNumber)) :
 				char.IsDigit(s[0]) ? FromIml (s) :
-				FastEnum.TryParse<Colors> (s, out Colors cc) ? new Color(cc) :
+				EnumsNET.Enums.TryParse<Colors> (s, out Colors cc) ? new Color(cc) :
 				throw new Exception ("Unknown color name: " + s);
 
 		public static Color FromHSV (double _h, double _v = 0xff, double _s = 0xff, double _alpha = 0xff) {

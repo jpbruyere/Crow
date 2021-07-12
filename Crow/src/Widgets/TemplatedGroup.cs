@@ -513,6 +513,9 @@ namespace Crow {
 				Monitor.Exit (IFace.UpdateMutex);
 			}
 
+			if (g is ISelectable li)
+				li.Selected += Li_Selected;
+
 			if (iTemp.Expand != null) {
 				IToggle toggle = g as IToggle;
 				
@@ -521,15 +524,9 @@ namespace Crow {
 					
 				if (toggle != null) { 
 					toggle.ToggleOn += iTemp.Expand;
-					if (o is ICollection)
-						toggle.IsToggleable = iTemp.HasSubItems;
-					else
-						toggle.IsToggleable = new BooleanTestOnInstance ((instance) => true);
+					toggle.IsToggleable = iTemp.HasSubItems;
 				}
 			}
-
-			if (g is ISelectable li)
-				li.Selected += Li_Selected;
 
 			g.DataSource = o;
 		}

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<Button Command="{}" MinimumSize="0,0" >
+	<Template>
+		<Border Style="WindowIconBorder" IsVisible="{./IsEnabled}">
+			<Image Path="{./Icon}" Tooltip="{./Caption}"/>
+		</Border>							
+	</Template>
+</Button>
+
