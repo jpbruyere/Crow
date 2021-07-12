@@ -1,5 +1,5 @@
 ﻿<TabView Background="DimGrey">
-	<VerticalStack Name="Base" Background="Black" Margin="1" >
+	<VerticalStack Name="Base" Background="Black" Margin="1" CacheEnabled="true" >
 		<HorizontalStack >
 			<GroupBox Style="allWidgetCell" Caption="Label" >
 				<Label/>

@@ -59,7 +59,7 @@
 				</DirectoryView>
 	</VerticalStack>
 	<Splitter Width="6" />
-	<VerticalStack>
+	<VerticalStack CacheEnabled="true">
 		<!--<VerticalStack Name="Watches" Background="Black" Height="Fit" Width="Stretched">
 			<HorizontalStack Height="Fit">
 				<Label Style="smallLabel" Text="hover:" Width="50"/>
@@ -76,7 +76,7 @@
 		</VerticalStack>-->
 		<Container Name="CrowContainer" Height="60%" Background="Black"/>
 		<Splitter/>
-		<VerticalStack>
+		<VerticalStack CacheEnabled="true">
 			<HorizontalStack Height="Fit">
 				<Button Style="IcoButton" Command="{CMDNew}" />
 				<Button Style="IcoButton" Command="{CMDSave}" />

@@ -1098,7 +1098,17 @@ namespace Crow
 			ctx.Fill ();
 			ctx.Operator = Operator.Over;			
 		}
-		public bool SolidBackground = true;
+        bool solidBackground = false;
+		public bool SolidBackground {
+			get => solidBackground;
+			set {
+				if (Environment.OSVersion.Platform == PlatformID.Unix)
+					solidBackground = value;
+				else
+					Debug.WriteLine ("SolidBackground property only available on unix.");
+			}
+		}
+
 
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
@@ -1992,10 +2002,9 @@ namespace Crow
 		}
 
 		public Rectangle ClientRectangle => clientRectangle; 
-		public Interface HostContainer {
-			get { return this; }
-		}
-		public Rectangle getSlot () => ClientRectangle;
+		public Interface HostContainer => this;
+
+        public Rectangle getSlot () => ClientRectangle;
 		public void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType){	}
 		#endregion
 	}
