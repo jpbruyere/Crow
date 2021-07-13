@@ -4,7 +4,11 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using Glfw;
 
 namespace Crow

@@ -44,13 +44,6 @@
 		<PackageReference Include="glfw-sharp" Version="$(GlfwSharpVersion)" />
 	</ItemGroup>
 
-	<PropertyGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
-		<DefineConstants>$(DefineConstants);VKVG</DefineConstants>
-	</PropertyGroup>
-	<ItemGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
-		<PackageReference Include="vkvg.net" Version="0.2.2-beta" />
-	</ItemGroup>
-
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
 	</PropertyGroup>
@@ -71,9 +64,21 @@
 		<ProjectReference Include="..\CrowDbgShared\CrowDbgShared.csproj" />
 	</ItemGroup>-->
 
+	<PropertyGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
+		<DefineConstants>$(DefineConstants);VKVG</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
+		<Compile Include="src\GraphicBackends\vkvg\**\*.*" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(CrowVkvgBackend)' != 'true'">
+		<Compile Include="src\GraphicBackends\Mono.Cairo\**\*.*"
+			Exclude="src\GraphicBackends\Mono.Cairo\NativeMethods-internal.cs" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<Content Include="..\Images\crow.png" Pack="true" PackagePath="" />
-		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
+		<Compile Include="src\**\*.cs" Exclude="src\GraphicBackends\**\*.*" />
 		<EmbeddedResource Include="Templates\*.*">
 			<LogicalName>Crow.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>

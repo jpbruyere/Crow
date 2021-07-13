@@ -1,4 +1,8 @@
-﻿using Crow.Cairo;
+﻿#if VKVG
+using vkvg;
+#else
+using Crow.Cairo;
+#endif
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -1,38 +1,22 @@
-﻿//
-// CairoHelpers.cs
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#if VKVG
+using vkvg;
+#else
+using Crow.Cairo;
+#endif
+
 namespace Crow
 {
     public static class CairoHelpers
-    {
+    {		
 		public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
 		{
 		    if (val.CompareTo(min) < 0) return min;
@@ -57,18 +41,18 @@ namespace Crow
 
             return arr[minp];
         }
-		public static void CairoRectangle(Cairo.Context gr, RectangleD r, double radius, double stroke = 0.0)
+		public static void CairoRectangle(Context gr, RectangleD r, double radius, double stroke = 0.0)
 		{
 			if (radius > 0)
 				DrawRoundedRectangle (gr, r, radius, stroke);
 			else
 				gr.Rectangle (r, stroke);
 		}
-		public static void CairoCircle(Cairo.Context gr, RectangleD r)
+		public static void CairoCircle(Context gr, RectangleD r)
 		{
 			gr.Arc(r.X + r.Width/2.0, r.Y + r.Height/2.0, Math.Min(r.Width,r.Height)/2.0, 0, 2.0*Math.PI);
 		}
-		public static void DrawRoundedRectangle(Cairo.Context gr, RectangleD r, double radius, double stroke = 0.0)
+		public static void DrawRoundedRectangle(Context gr, RectangleD r, double radius, double stroke = 0.0)
         {
 			if (stroke>0.0) {
 				gr.LineWidth = stroke;
@@ -78,7 +62,7 @@ namespace Crow
 			}else
 				DrawRoundedRectangle(gr, r.X, r.Y, r.Width, r.Height, radius);
         }
-        public static void DrawRoundedRectangle(Cairo.Context gr, double x, double y, double width, double height, double radius)
+        public static void DrawRoundedRectangle(Context gr, double x, double y, double width, double height, double radius)
         {
             gr.Save();
 
@@ -96,7 +80,7 @@ namespace Crow
             gr.ClosePath();
             gr.Restore();
         }
-        public static void StrokeRaisedRectangle(Cairo.Context gr, Rectangle r, double width = 1)
+        public static void StrokeRaisedRectangle(Context gr, Rectangle r, double width = 1)
         {
             gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);
@@ -115,7 +99,7 @@ namespace Crow
 
             gr.Restore();
         }
-        public static void StrokeLoweredRectangle(Cairo.Context gr, Rectangle r, double width = 1)
+        public static void StrokeLoweredRectangle(Context gr, Rectangle r, double width = 1)
         {
             gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);

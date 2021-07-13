@@ -6,7 +6,11 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 namespace Crow
 {

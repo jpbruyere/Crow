@@ -3,8 +3,11 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
-//using FastEnumUtility;
+#endif
 
 namespace Crow
 {

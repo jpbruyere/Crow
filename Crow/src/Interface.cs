@@ -13,7 +13,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using Crow.IML;
 using Glfw;
 using Path = System.IO.Path;

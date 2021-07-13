@@ -5,7 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using System.Threading;
 
 using static Crow.Logger;

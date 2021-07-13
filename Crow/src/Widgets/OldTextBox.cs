@@ -2,7 +2,11 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using Glfw;
 using System;
 

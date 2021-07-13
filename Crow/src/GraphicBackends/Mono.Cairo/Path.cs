@@ -30,7 +30,11 @@
 
 using System;
 using System.Runtime.InteropServices;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 namespace Crow.Cairo {
 

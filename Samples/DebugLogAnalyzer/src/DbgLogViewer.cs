@@ -10,7 +10,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using Crow.DebugLogger;
 using DebugLogAnalyzer;
 

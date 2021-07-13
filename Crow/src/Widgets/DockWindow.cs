@@ -4,7 +4,11 @@
 
 using System;
 using System.Xml.Serialization;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using Glfw;
 
 namespace Crow

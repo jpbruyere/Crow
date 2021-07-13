@@ -4,7 +4,11 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 namespace Crow
 {
