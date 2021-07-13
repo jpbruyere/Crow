@@ -36,14 +36,12 @@ namespace vkvg
 			Dispose (false);
 		}
 
-		public IntPtr Handle { get { return handle; }}
-		public IntPtr VkImage { get { return NativeMethods.vkvg_surface_get_vk_image (handle); }}
-		public int Width { get { return NativeMethods.vkvg_surface_get_width (handle); }}
-		public int Height { get { return NativeMethods.vkvg_surface_get_height (handle); }}
+		public IntPtr Handle => handle;
+		public IntPtr VkImage => NativeMethods.vkvg_surface_get_vk_image (handle);
+		public int Width => NativeMethods.vkvg_surface_get_width (handle);
+		public int Height => NativeMethods.vkvg_surface_get_height (handle);
 
-		public void AddReference () {
-			NativeMethods.vkvg_surface_reference (handle);
-		}
+		public void AddReference () => NativeMethods.vkvg_surface_reference (handle);
 		public uint References () => NativeMethods.vkvg_surface_get_reference_count (handle);
 
 //		public Surface CreateSimilar (uint width, uint height) {

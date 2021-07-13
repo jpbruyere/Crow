@@ -72,12 +72,23 @@ namespace vkvg
 				return f_extents;
 			}
 		}
-		public TextExtents TextExtents(string s)
-		{
-			TextExtents extents = default(TextExtents);
-			if (!string.IsNullOrEmpty(s))
-				NativeMethods.vkvg_text_extents(handle, TerminateUtf8(s), out extents);
+		public Antialias Antialias {
+			set;
+			get;
+		}
+		public TextExtents TextExtents (ReadOnlySpan<char> s, int tabSize = 4) {
+			TextExtents (s, tabSize, out TextExtents extents);			
 			return extents;
+		}
+		public void TextExtents (ReadOnlySpan<char> s, int tabSize, out TextExtents extents) {
+			int size = s.Length * 4 + 1;
+			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+			int encodedBytes = Crow.Text.Encoding.ToUtf8 (s, bytes, tabSize);
+			bytes[encodedBytes] = 0;
+			TextExtents (bytes.Slice (0, encodedBytes + 1), out extents);
+		}		
+		public void TextExtents (Span<byte> bytes, out TextExtents extents) {
+			NativeMethods.vkvg_text_extents (handle, ref bytes.GetPinnableReference (), out extents);
 		}
 		public Matrix Matrix
 		{
@@ -92,10 +103,17 @@ namespace vkvg
 				NativeMethods.vkvg_set_matrix(handle, ref value);
 			}
 		}
-		public void ShowText(string txt)
-		{
-			NativeMethods.vkvg_show_text(handle, TerminateUtf8(txt));
+		public void ShowText (ReadOnlySpan<char> s, int tabSize) {
+			int size = s.Length * 4 + 1;
+			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+			int encodedBytes = Crow.Text.Encoding.ToUtf8 (s, bytes, tabSize);
+			bytes[encodedBytes] = 0;
+			ShowText (bytes.Slice (0, encodedBytes + 1));
 		}
+		public void ShowText (Span<byte> bytes) {
+			NativeMethods.vkvg_show_text (handle, ref bytes.GetPinnableReference());
+		}
+
 		public void ShowText(TextRun textRun)
 		{
 			NativeMethods.vkvg_show_text_run(handle, textRun.Handle);
@@ -120,6 +138,7 @@ namespace vkvg
 		{
 			NativeMethods.vkvg_paint(handle);
 		}
+		public void PaintWithAlpha (double alpha) => Paint();
 		public void Arc(float xc, float yc, float radius, float a1, float a2)
 		{
 			NativeMethods.vkvg_arc(handle, xc, yc, radius, a1, a2);
@@ -128,6 +147,15 @@ namespace vkvg
 		{
 			NativeMethods.vkvg_arc(handle, (float)xc, (float)yc, (float)radius, (float)a1, (float)a2);
 		}
+		public void Arc (PointD center, double radius, double angle1, double angle2)
+		{
+			NativeMethods.vkvg_arc (handle, (float)center.X, (float)center.Y, (float)radius, (float)angle1, (float)angle2);
+		}
+
+		public void ArcNegative (PointD center, double radius, double angle1, double angle2)
+		{
+			NativeMethods.vkvg_arc_negative (handle, (float)center.X, (float)center.Y, (float)radius, (float)angle1, (float)angle2);
+		}		
 		public void ArcNegative(float xc, float yc, float radius, float a1, float a2)
 		{
 			NativeMethods.vkvg_arc_negative(handle, xc, yc, radius, a1, a2);
@@ -307,6 +335,7 @@ namespace vkvg
 		{
 			NativeMethods.vkvg_render_svg(handle, nsvgImage, subId);
 		}
+		public Crow.Rectangle StrokeExtents () => default;
 		internal static byte[] TerminateUtf8(string s)
 		{
 			// compute the byte count including the trailing \0
@@ -326,6 +355,15 @@ namespace vkvg
 					NativeMethods.vkvg_set_dash(handle, value, (uint)value.Length, 0);
 			}
 		}
+		
+
+		public void PushGroup () {
+
+		}
+		public void PopGroupToSource () {
+			
+		}
+
 		#region IDisposable implementation
 		public void Dispose()
 		{

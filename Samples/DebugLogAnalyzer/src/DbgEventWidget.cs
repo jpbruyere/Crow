@@ -100,6 +100,7 @@ namespace Crow
 				}
 
 				gr.LineWidth = 1;
+				
 				gr.SetDash (new double [] { 1.0, 3.0 }, 0);
 
 				Rectangle cb = ClientRectangle;

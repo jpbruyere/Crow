@@ -16,8 +16,15 @@
 		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
 		<SamplesDir>$(MSBuildThisFileDirectory)\</SamplesDir>
 		<AppConfig>$(SolutionDir)Crow\App.config</AppConfig>
+
+		<DefineConstants>$(DefineConstants);VKVG</DefineConstants>
+
 	</PropertyGroup>
-	
+
+	<PropertyGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
+		<DefineConstants>$(DefineConstants);VKVG</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />
 	</ItemGroup>

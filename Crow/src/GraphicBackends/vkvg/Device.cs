@@ -22,18 +22,12 @@ namespace vkvg
 		}
 		#endregion
 
-		public void GetDpy (out int hdpy, out int vdpy) {
-			NativeMethods.vkvg_device_get_dpy (handle, out hdpy, out vdpy);
-		}
-		public void SetDpy (int hdpy, int vdpy) {
-			NativeMethods.vkvg_device_set_dpy (handle, hdpy, vdpy);
-		}
-		public void AddReference () {
-			NativeMethods.vkvg_device_reference (handle);
-		}
+		public void GetDpy (out int hdpy, out int vdpy) => NativeMethods.vkvg_device_get_dpy (handle, out hdpy, out vdpy);
+		public void SetDpy (int hdpy, int vdpy) => NativeMethods.vkvg_device_set_dpy (handle, hdpy, vdpy);
+		public void AddReference () => NativeMethods.vkvg_device_reference (handle);
 		public uint References () => NativeMethods.vkvg_device_get_reference_count (handle);
 
-		public IntPtr Handle { get { return handle; }}
+		public IntPtr Handle => handle;
 
 		#region IDisposable implementation
 		public void Dispose ()

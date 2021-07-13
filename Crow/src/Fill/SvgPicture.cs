@@ -86,7 +86,7 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+			/*using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
 				using (Context gr = new Context (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
@@ -95,7 +95,7 @@ namespace Crow
 					hSVG.RenderCairo (gr);
 				}
 				ctx.SetSource (tmp);
-			}	
+			}*/	
 		}
 		#endregion
 

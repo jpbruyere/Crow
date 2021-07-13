@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using vkvg;
+using System;
 
 namespace Crow {
 	public enum RegionOverlap {
@@ -11,18 +12,17 @@ namespace Crow {
 		Out,
 		Part,
 	}	
-	public class Region
+	public class Region : IDisposable
     {
         public List<Rectangle> list = new List<Rectangle>();
-        public int count
-        {
-            get { return list.Count; }
-        }
+        public int count => list.Count;
+		public int NumRectangles => list.Count;
 		public bool IsEmpty => list.Count == 0;
+		public Rectangle GetRectangle(int i) => list[i];
 
         public void AddRectangle(Rectangle r)
         {
-			if (doesNotContain (r)) {
+			if (DoesNotContains (r)) {
 				list.Add (r);
 				boundsUpToDate = false;
 			}
@@ -33,13 +33,13 @@ namespace Crow {
 			_bounds = default;
 			boundsUpToDate = true;
         }
-        bool doesNotContain(Rectangle r)
+        public bool DoesNotContains(Rectangle r)
         {
             foreach (Rectangle rInList in list)
                 if (rInList.ContainsOrIsEqual(r))
                     return false;
             return true;
-        }
+        }		
 
         public bool intersect(Rectangle r)
         {
@@ -78,7 +78,9 @@ namespace Crow {
 
             ctx.Clip();
         }
-
+		public void UnionRectangle (Rectangle r) {
+			AddRectangle (r);
+		}
 		Rectangle _bounds;
 		bool boundsUpToDate = true;
 		public Rectangle Bounds {
@@ -112,5 +114,10 @@ namespace Crow {
 			}
 			return tmp;
 		}
-    }
+
+		public void Dispose()
+		{
+			
+		}
+	}
 }

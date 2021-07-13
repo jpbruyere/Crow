@@ -274,7 +274,7 @@ namespace Crow
 						foreach (Widget c in Children) {
 							if (!c.IsVisible)
 								continue;
-							if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+							if (Clipping.DoesNotContains (c.Slot + ClientRectangle.Position))
 								continue;
 							c.Paint (gr);
 						}

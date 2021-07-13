@@ -122,7 +122,11 @@ namespace Crow
 			parentElem.AppendChild (xe);
 		}
 		public Surface CreateIcon (int dragIconSize = 32) {
+#if VKVG			
+			Surface di = new Surface (IFace.vkvgDevice, dragIconSize, dragIconSize);
+#else
 			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
+#endif
 			using (Context ctx = new Context (di)) {
 				double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
 				double s = (double)dragIconSize / div;
@@ -1890,10 +1894,16 @@ namespace Crow
 		#endregion
 
 		protected void setFontForContext (Context gr) {
+#if VKVG
+			gr.FontFace = Font.Name;
+			gr.FontSize = (uint)Font.Size;
+
+#else
 			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 			gr.SetFontSize (Font.Size);
 			gr.FontOptions = Interface.FontRenderingOptions;
 			gr.Antialias = Interface.Antialias;
+#endif
 		}
 
 		#region Rendering
@@ -1923,7 +1933,11 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
+#if (VKVG)
+			bmp = new Surface (IFace.vkvgDevice, Slot.Width, Slot.Height);
+#else
 			bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
+#endif
 			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
 			using (Context gr = new Context (bmp)) {

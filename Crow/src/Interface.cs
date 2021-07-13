@@ -183,7 +183,11 @@ namespace Crow
 			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
 			Glfw3.SetWindowRefreshCallback (hWin, HandleWindowRefreshDelegate);
 		}
-
+#if VKVG
+		VulkanContext vkCtx;
+		internal Device vkvgDevice;
+		vke.Image vkvgSurfaceImage;
+#endif
 		protected void initSurface ()
 		{
 			Glfw3.Init ();
@@ -199,6 +203,12 @@ namespace Crow
 
 			registerGlfwCallbacks ();
 
+#if VKVG
+			vkCtx = new VulkanContext (hWin, (uint)clientRectangle.Width, (uint)clientRectangle.Height);
+			vkvgDevice = vkCtx.CreateVkvgDevice ();
+			surf = new Surface (vkvgDevice, clientRectangle.Width, clientRectangle.Height);
+			vkCtx.BuildBlitCommand (surf);
+#else
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.MacOSX:
 				break;
@@ -220,6 +230,7 @@ namespace Crow
 			case PlatformID.WinCE:
 				throw new PlatformNotSupportedException ("Unable to create cairo surface.");
 			}
+#endif
 		}
 
 		public void SetWindowIcon (string path) {
@@ -1135,7 +1146,7 @@ namespace Crow
 					Widget p = GraphicTree[i];
 					if (!p.IsVisible)
 						continue;
-					if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+					if (clipping.DoesNotContains (p.Slot))
 						continue;
 
 					//ctx.Save ();
@@ -1168,6 +1179,9 @@ namespace Crow
 				ctx.Stroke ();
 #endif
 
+#if VKVG
+				vkCtx.render ();
+#else
 				ctx.PopGroupToSource ();
 
 				if (!SolidBackground)
@@ -1176,13 +1190,17 @@ namespace Crow
 				ctx.Paint ();
 
 				surf.Flush ();
-
+#endif
 				
 				clipping.Reset ();
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 				IsDirty = true;
 			}
+
+#if VKVG
+				vkCtx.render ();
+#endif
 
 			drawTextCursor (ctx);
 
@@ -1364,6 +1382,12 @@ namespace Crow
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
+#if VKVG
+				vkCtx.blitSource?.Dispose ();
+				surf?.Dispose ();
+				surf = new Surface (vkvgDevice, clientRectangle.Width, clientRectangle.Height);				
+				vkCtx.BuildBlitCommand (surf);				
+#else
 				switch (Environment.OSVersion.Platform) {
 				case PlatformID.MacOSX:
 					break;
@@ -1385,7 +1409,7 @@ namespace Crow
 				case PlatformID.WinCE:
 					throw new PlatformNotSupportedException ("Unable to create cairo surface.");
 				}
-
+#endif
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 

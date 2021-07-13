@@ -85,7 +85,7 @@ namespace Crow
 
 		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{
-			Cairo.Gradient grad = null;
+			/*Cairo.Gradient grad = null;
 			switch (GradientType) {
 			case Type.Vertical:
 				grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
@@ -107,7 +107,7 @@ namespace Crow
 			}
 			
 			ctx.SetSource (grad);
-			grad.Dispose ();
+			grad.Dispose ();*/
 		}
 		#endregion
 

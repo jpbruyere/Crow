@@ -67,8 +67,10 @@
 	<PropertyGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
 		<DefineConstants>$(DefineConstants);VKVG</DefineConstants>
 	</PropertyGroup>
+
 	<ItemGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
 		<Compile Include="src\GraphicBackends\vkvg\**\*.*" />
+		<PackageReference Include="vke" Version="0.2.0-beta" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(CrowVkvgBackend)' != 'true'">

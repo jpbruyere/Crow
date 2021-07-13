@@ -116,12 +116,15 @@ namespace vkvg
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void vkvg_text_extents(IntPtr ctx, byte[] utf8, out TextExtents extents);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void vkvg_text_extents(IntPtr cr, ref byte utf8, out TextExtents extents);
+        [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void vkvg_select_font_face(IntPtr ctx, string name);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void vkvg_set_font_size(IntPtr ctx, uint size);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void vkvg_show_text(IntPtr ctx, byte [] utf8);
-
+        [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void vkvg_show_text(IntPtr cr, ref byte utf8);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void vkvg_save(IntPtr ctx);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]

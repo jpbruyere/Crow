@@ -123,14 +123,21 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+#if VKVG
+			using (Surface tmp = new Surface (iFace.vkvgDevice, bounds.Width, bounds.Height)) {
+#else
+			using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+#endif
 				using (Context gr = new Context (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
-
-					using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
-						Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
+#if VKVG
+					using (Surface imgSurf = new Surface (iFace.vkvgDevice, ref image, Dimensions.Width, Dimensions.Height)) 
+#else
+					using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) 
+#endif
+					{
 						gr.SetSource (imgSurf, 0,0);
 						gr.Paint ();
 					}
@@ -172,9 +179,13 @@ namespace Crow
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
-			
-			using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
-				Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
+
+#if VKVG
+			using (Surface imgSurf = new Surface (iFace.vkvgDevice, ref image, Dimensions.Width, Dimensions.Height)) 
+#else
+			using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) 
+#endif			
+			{
 				gr.SetSource (imgSurf, 0,0);
 				gr.Paint ();
 			}

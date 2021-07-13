@@ -10,6 +10,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
+#if VKVG
+using vkvg;
+#else
+using Crow.Cairo;
+#endif
+
 namespace Samples
 {
 	public class SampleBase : Interface
@@ -376,7 +382,7 @@ namespace Samples
 			initCommands();
 			base.OnInitialized();
 		}
-		protected override void processDrawing(Crow.Cairo.Context ctx)
+		protected override void processDrawing(Context ctx)
 		{
 			base.processDrawing(ctx);
 		}

@@ -13,6 +13,6 @@
 		<CrowDebugStatsEnabled>true</CrowDebugStatsEnabled>
 		<CrowDesignModeEnabled>true</CrowDesignModeEnabled>
 		<CrowVkvgBackend>true</CrowVkvgBackend>
-		<GlfwSharpVersion>0.2.11-beta</GlfwSharpVersion>
+		<GlfwSharpVersion>0.2.12-beta</GlfwSharpVersion>
 	</PropertyGroup>
 </Project>

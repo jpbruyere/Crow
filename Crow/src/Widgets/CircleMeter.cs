@@ -4,8 +4,11 @@
 
 using System;
 using System.ComponentModel;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
-
+#endif
 namespace Crow {
 
 public class CircleMeter : Gauge {
