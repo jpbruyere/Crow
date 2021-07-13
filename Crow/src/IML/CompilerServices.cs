@@ -412,29 +412,24 @@ namespace Crow.IML
 		{
 			foundMI = null;
 			if (assembly == null)
-				return false;
-			try
-			{
-				
-				foreach (Type t in assembly.GetExportedTypes().Where
-						(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
-					foreach (MethodInfo mi in t.GetMethods 
-						(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
-							(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
-							 m.GetParameters ().Length > 0)) {
-						Type curType = extendedType;
-						while (curType != null) {
-							if (mi.GetParameters () [0].ParameterType == curType) {
-								foundMI = mi;
-								return true;
-							}
-							curType = curType.BaseType;
-						}						
-					}
-				
-				}				
-			}
-			catch (System.Exception) {}
+				return false;		
+			foreach (Type t in assembly.GetExportedTypes().Where
+					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
+				foreach (MethodInfo mi in t.GetMethods 
+					(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
+						(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
+						 m.GetParameters ().Length > 0)) {
+					Type curType = extendedType;
+					while (curType != null) {
+						if (mi.GetParameters () [0].ParameterType == curType) {
+							foundMI = mi;
+							return true;
+						}
+						curType = curType.BaseType;
+					}						
+				}
+			
+			}				
 			return false;
 		}
 		/// <summary>
@@ -874,16 +869,14 @@ namespace Crow.IML
 				knownTypes.Add (strDataType, dataType);
 				return dataType;
 			}
-			foreach (Assembly a in Interface.crowAssemblies) {
-				try {
-					foreach (Type expT in a.GetExportedTypes ()) {
-						if (expT.Name != strDataType && expT.FullName != strDataType)
-							continue;
-						if (!knownTypes.ContainsKey(strDataType))
-							knownTypes.Add (strDataType, expT);
-						return expT;
-					}
-				}catch{}
+			foreach (Assembly a in Interface.crowAssemblies) {				
+				foreach (Type expT in a.GetExportedTypes ()) {
+					if (expT.Name != strDataType && expT.FullName != strDataType)
+						continue;
+					if (!knownTypes.ContainsKey(strDataType))
+						knownTypes.Add (strDataType, expT);
+					return expT;
+				}
 			}
 			knownTypes.Add (strDataType, null);
 			return null;
