@@ -1044,6 +1044,14 @@ namespace Crow
 						processDrawing (ctx);
 				}else
 					processDrawing (ctx);
+
+#if VKVG
+				if (IsDirty) {
+					IsDirty = false;
+					vkCtx.render ();
+				}
+#endif
+				
 			} finally {
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Update);
@@ -1128,7 +1136,13 @@ namespace Crow
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		protected virtual void processDrawing(Context ctx){
-
+			/*ctx.Rectangle (0,0,100,100);
+			ctx.SetSource (1,0,0,1);
+			ctx.Fill();
+			return;*/
+			
+			//ctx.Flush();
+			//surf.WriteToPng ("/home/jp/test.png");*/
 			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
 
 			if (DragImage != null)
@@ -1137,10 +1151,14 @@ namespace Crow
 			if (!clipping.IsEmpty) {
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);				
 
+#if VKVG				
+				clear (ctx);
+#else
 				ctx.PushGroup ();
 
 				if (SolidBackground)
 					clear (ctx);
+#endif
 				
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 					Widget p = GraphicTree[i];
@@ -1180,7 +1198,8 @@ namespace Crow
 #endif
 
 #if VKVG
-				vkCtx.render ();
+				//vkCtx.render ();
+				vkCtx.WaitIdle();
 #else
 				ctx.PopGroupToSource ();
 
@@ -1197,10 +1216,6 @@ namespace Crow
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 				IsDirty = true;
 			}
-
-#if VKVG
-				vkCtx.render ();
-#endif
 
 			drawTextCursor (ctx);
 
@@ -1383,6 +1398,7 @@ namespace Crow
 				clientRectangle = bounds;
 
 #if VKVG
+				vkCtx.WaitIdle();
 				vkCtx.blitSource?.Dispose ();
 				surf?.Dispose ();
 				surf = new Surface (vkvgDevice, clientRectangle.Width, clientRectangle.Height);				

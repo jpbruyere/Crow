@@ -126,7 +126,7 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 				
-			gr.Save ();
+			/*gr.Save ();
 
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
@@ -140,7 +140,7 @@ namespace Crow
 					hSVG.RenderCairoSub (gr, "#" + subPart);
 			}
 			
-			gr.Restore ();			
+			gr.Restore ();	*/		
 		}
 	}
 }

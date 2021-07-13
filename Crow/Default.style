@@ -328,6 +328,6 @@ MessageBox, Popper, Slider, Spinner, TextBox, NumericControl {
 	Margin="0";
 	BubbleMouseEvent="MouseWheel|Keyboard";
 }
-TemplatedControl, GenericStack {
-	CacheEnabled="true";
-}
+//TemplatedControl, GenericStack {
+//	CacheEnabled="true";
+//}

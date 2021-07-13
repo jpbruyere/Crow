@@ -52,7 +52,7 @@ namespace vkvg
 //		}
 
 		public void Flush () {
-			throw new NotImplementedException ();
+			//throw new NotImplementedException ();
 		}
 
 		public void WriteToPng (string path) {

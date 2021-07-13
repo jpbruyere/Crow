@@ -50,9 +50,13 @@ namespace vkvg {
 		string[] EnabledDeviceExtensions => new string[] { Ext.D.VK_KHR_swapchain };
 
 		uint width, height;
-
+		public void WaitIdle() => dev.WaitIdle ();
 		public VulkanContext (IntPtr hWin, uint _width, uint _height, bool vsync = false) {
 			this.hWin = hWin;
+			Instance.VALIDATION = true;
+			/*Instance.RENDER_DOC_CAPTURE = true;*/
+
+			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
 
 			List<string> instExts = new List<string> (Glfw3.GetRequiredInstanceExtensions ());
 			if (EnabledInstanceExtensions != null)
@@ -100,8 +104,9 @@ namespace vkvg {
 		internal vke.Image blitSource;
 		
 		public void BuildBlitCommand (vkvg.Surface surf) {
+			cmdPool.Reset();
 			
-			blitSource = new vke.Image (dev, new VkImage((ulong)surf.VkImage.ToInt64()), Vulkan.VkFormat.R8g8b8a8Unorm,
+			blitSource = new vke.Image (dev, new VkImage((ulong)surf.VkImage.ToInt64()), Vulkan.VkFormat.B8g8r8a8Unorm,
 				Vulkan.VkImageUsageFlags.TransferSrc | Vulkan.VkImageUsageFlags.TransferDst | Vulkan.VkImageUsageFlags.ColorAttachment,
 				width, height);
 
@@ -110,16 +115,30 @@ namespace vkvg {
 				vke.PrimaryCommandBuffer cmd = cmds[i];
 				cmd.Start();
 				
-				blitDest.SetLayout (cmd, VkImageAspectFlags.Color, VkImageLayout.TransferDstOptimal);
-				blitSource.SetLayout (cmd, VkImageAspectFlags.Color, VkImageLayout.TransferSrcOptimal);
+				blitDest.SetLayout (cmd, VkImageAspectFlags.Color,
+					VkImageLayout.Undefined, VkImageLayout.TransferDstOptimal,
+					VkPipelineStageFlags.BottomOfPipe, VkPipelineStageFlags.Transfer);
+
+				blitSource.SetLayout (cmd, VkImageAspectFlags.Color,
+					VkImageLayout.ColorAttachmentOptimal, VkImageLayout.TransferSrcOptimal,
+					VkPipelineStageFlags.ColorAttachmentOutput, VkPipelineStageFlags.Transfer);
 
 				blitSource.BlitTo (cmd, blitDest, VkFilter.Nearest);
 
-				blitDest.SetLayout (cmd, VkImageAspectFlags.Color, VkImageLayout.PresentSrcKHR);
-				blitSource.SetLayout (cmd, VkImageAspectFlags.Color, VkImageLayout.ColorAttachmentOptimal);
+				blitDest.SetLayout (cmd, VkImageAspectFlags.Color,
+					VkImageLayout.TransferDstOptimal, VkImageLayout.PresentSrcKHR,
+					VkPipelineStageFlags.Transfer, VkPipelineStageFlags.BottomOfPipe);
+
+				blitSource.SetLayout (cmd, VkImageAspectFlags.Color,
+					VkImageLayout.TransferSrcOptimal, VkImageLayout.ColorAttachmentOptimal,
+					VkPipelineStageFlags.Transfer, VkPipelineStageFlags.ColorAttachmentOutput);
 
 				cmd.End ();
 			}
+		}
+		public void WaitAndResetDrawFence () {
+			drawFence.Wait ();
+			drawFence.Reset ();
 		}
 		/// <summary>
 		/// Main render method called each frame. get next swapchain image, process resize if needed, submit and present to the presentQueue.
@@ -135,9 +154,7 @@ namespace vkvg {
 
 			if (cmds[idx] == null)
 				return;
-
-			drawFence.Wait ();
-			drawFence.Reset ();
+			WaitAndResetDrawFence();
 
 			presentQueue.Submit (cmds[idx], swapChain.presentComplete, drawComplete[idx], drawFence);
 			presentQueue.Present (swapChain, drawComplete[idx]);			

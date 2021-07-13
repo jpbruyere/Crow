@@ -11,7 +11,7 @@
 		<CrowStbSharp>true</CrowStbSharp>
 		<CrowDebugLogEnabled>false</CrowDebugLogEnabled>
 		<CrowDebugStatsEnabled>true</CrowDebugStatsEnabled>
-		<CrowDesignModeEnabled>true</CrowDesignModeEnabled>
+		<CrowDesignModeEnabled>false</CrowDesignModeEnabled>
 		<CrowVkvgBackend>true</CrowVkvgBackend>
 		<GlfwSharpVersion>0.2.12-beta</GlfwSharpVersion>
 	</PropertyGroup>
