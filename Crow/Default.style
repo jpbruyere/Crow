@@ -319,7 +319,7 @@ TableHeaderLabel {
 }
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
-MessageBox, Popper, Slider, Spinner, TextBox, NumericControl {
+MessageBox, Popper, Slider, Spinner, TextBox, NumericControl, EnumSelector {
 	//Focusable = "true";
 	Foreground="${ControlForeground}";
 	Height = "Fit";
@@ -328,6 +328,9 @@ MessageBox, Popper, Slider, Spinner, TextBox, NumericControl {
 	Margin="0";
 	BubbleMouseEvent="MouseWheel|Keyboard";
 }
-//TemplatedControl, GenericStack {
-//	CacheEnabled="true";
-//}
+TemplatedGroup {
+	UseLoadingThread = "false";
+}
+TemplatedControl, GenericStack {
+	CacheEnabled="true";
+}

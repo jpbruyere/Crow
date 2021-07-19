@@ -259,7 +259,7 @@ namespace Crow
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();
 					gr.Operator = Operator.Clear;
-					gr.Fill();
+					gr.Fill();					
 					gr.Operator = Operator.Over;
 
 					base.onDraw (gr);
@@ -274,7 +274,7 @@ namespace Crow
 						foreach (Widget c in Children) {
 							if (!c.IsVisible)
 								continue;
-							if (Clipping.DoesNotContains (c.Slot + ClientRectangle.Position))
+							if (Clipping.OverlapOut (c.Slot + ClientRectangle.Position))
 								continue;
 							c.Paint (gr);
 						}

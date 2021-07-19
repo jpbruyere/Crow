@@ -16,6 +16,7 @@ namespace vkvg
 		public Context(Surface surf)
 		{
 			handle = NativeMethods.vkvg_create(surf.Handle);
+			this.FillRule = FillRule.NonZero;
 		}
 		~Context()
 		{

@@ -64,7 +64,7 @@ namespace Crow
         }
         public static void DrawRoundedRectangle(Context gr, double x, double y, double width, double height, double radius)
         {
-            gr.Save();
+            //gr.Save();
 
             if ((radius > height / 2) || (radius > width / 2))
                 radius = min(height / 2, width / 2);
@@ -78,11 +78,11 @@ namespace Crow
             gr.LineTo(x + radius, y + height);
             gr.Arc(x + radius, y + height - radius, radius, Math.PI / 2, Math.PI);
             gr.ClosePath();
-            gr.Restore();
+            //gr.Restore();
         }
         public static void StrokeRaisedRectangle(Context gr, Rectangle r, double width = 1)
         {
-            gr.Save();
+            //gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);
             gr.LineWidth = width;
 			gr.SetSource(Colors.White);
@@ -97,11 +97,11 @@ namespace Crow
             gr.LineTo(r.BottomLeft);
             gr.Stroke();
 
-            gr.Restore();
+            //gr.Restore();
         }
         public static void StrokeLoweredRectangle(Context gr, Rectangle r, double width = 1)
         {
-            gr.Save();
+            //gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);
             gr.LineWidth = width;
 			gr.SetSource(Colors.DarkGrey);
@@ -115,7 +115,7 @@ namespace Crow
             gr.LineTo(r.BottomLeft);
             gr.Stroke();
 
-            gr.Restore();
+            //gr.Restore();
         }
     }
 }

@@ -45,7 +45,7 @@ namespace vkvg {
 		uint frameCount;
 		Stopwatch frameChrono;
 
-		string[] EnabledInstanceExtensions => null;
+		string[] EnabledInstanceExtensions => new string[] { Ext.I.VK_EXT_debug_utils };
 
 		string[] EnabledDeviceExtensions => new string[] { Ext.D.VK_KHR_swapchain };
 
@@ -53,10 +53,11 @@ namespace vkvg {
 		public void WaitIdle() => dev.WaitIdle ();
 		public VulkanContext (IntPtr hWin, uint _width, uint _height, bool vsync = false) {
 			this.hWin = hWin;
-			Instance.VALIDATION = true;
-			/*Instance.RENDER_DOC_CAPTURE = true;*/
+			//Instance.VALIDATION = true;
+			//Instance.RENDER_DOC_CAPTURE = true;
 
 			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
+			SwapChain.PREFERED_FORMAT = VkFormat.B8g8r8a8Unorm;
 
 			List<string> instExts = new List<string> (Glfw3.GetRequiredInstanceExtensions ());
 			if (EnabledInstanceExtensions != null)
@@ -99,11 +100,12 @@ namespace vkvg {
 		}
 
 		public vkvg.Device CreateVkvgDevice () => 
-			new vkvg.Device (instance.Handle, phy.Handle, dev.VkDev.Handle, presentQueue.qFamIndex);
+			new vkvg.Device (instance.Handle, phy.Handle, dev.VkDev.Handle, presentQueue.qFamIndex, SampleCount.Sample_8);
 
 		internal vke.Image blitSource;
 		
 		public void BuildBlitCommand (vkvg.Surface surf) {
+			//Console.WriteLine ($"build blit w:{width} h:{height}");
 			cmdPool.Reset();
 			
 			blitSource = new vke.Image (dev, new VkImage((ulong)surf.VkImage.ToInt64()), Vulkan.VkFormat.B8g8r8a8Unorm,
@@ -144,20 +146,26 @@ namespace vkvg {
 		/// Main render method called each frame. get next swapchain image, process resize if needed, submit and present to the presentQueue.
 		/// Wait QueueIdle after presenting.
 		/// </summary>
-		public void render () {
+		public bool render () {
+			WaitIdle();
+
 			int idx = swapChain.GetNextImage ();
 			if (idx < 0) {
 				width = swapChain.Width;
 				height = swapChain.Height;
-				return;
+				//Console.WriteLine ($"get next image failed w:{width} h:{height}");
+				return false;
 			}
 
 			if (cmds[idx] == null)
-				return;
+				return false;
 			WaitAndResetDrawFence();
 
 			presentQueue.Submit (cmds[idx], swapChain.presentComplete, drawComplete[idx], drawFence);
-			presentQueue.Present (swapChain, drawComplete[idx]);			
+			presentQueue.Present (swapChain, drawComplete[idx]);
+
+			WaitIdle();
+			return true;
 		}
 
 		#region IDisposable Support

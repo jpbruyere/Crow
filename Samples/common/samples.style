@@ -4,14 +4,14 @@ FpsLabel {
 	Width = "30";
 	Font = "droid, 10";
 	Margin = "0";
-	TextAlignment = "Center";
+	//TextAlignment = "Center";
 }
 FpsDisp {
 	Font = "droid bold, 10";
 	Width = "60";
 	Margin = "0";
-	CornerRadius = "3";
-	TextAlignment = "Center";
+	//CornerRadius = "3";
+	//TextAlignment = "Center";
 	Background = "MediumSeaGreen";
 }
 HStackMeasure {

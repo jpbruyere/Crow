@@ -1,19 +1,33 @@
 ﻿<?xml version="1.0"?>
-<Border BorderStyle="Sunken" Fit="true" Background="0.8,0.8,0.9,0.5" CornerRadius="30">
-	<VerticalStack Margin="20" Spacing="10">
-		<Image Path="#Crow.Icons.crow.svg" Width="64" Height="64" Background="WhiteSmoke" CornerRadius="5" Margin="5"/>
-<!--		<Label Font="Times bold, 60" Text="C.R.O.W"/>-->
-		<HorizontalStack Fit="true" DataSource="{CrowVersion}" Spacing="0" Background="Grey" Margin="10" CornerRadius="15">
-			<Label Foreground="Jet" Font="mono, 12" Text="version: "/>		
-			<Label Foreground="Black" Font="mono, 16" Text="{Major}"/>		
-			<Label Foreground="Black" Font="mono, 12" Text="."/>
-			<Label Foreground="Black" Font="mono, 16" Text="{Minor}"/>
-			<Label Foreground="Black" Font="mono, 12" Text="."/>
-			<Label Foreground="DarkBlue" Font="mono, 14" Text="{Build}" VerticalAlignment="Bottom"/>
+<VerticalStack>
+<ListBox Data="{PerfMeasures}" Height="Fit">
+	<Template>
+		<VerticalStack Name="ItemsContainer" Width="90%" Spacing="2"/>
+	</Template>
+	<ItemTemplate>
+		<HorizontalStack Style="HStackMeasure" Width="Stretched">
+			<Label Text="{Name}" Style="FpsLabel" Width="Stretched"/>
+			<Label Text="{current}" Style="FpsDisp" Width="25%" TextAlignment="Right" Margin="2"/>
+			<Label Text="{minimum}" Style="FpsDisp" Width="25%" TextAlignment="Right" Margin="2"/>
+			<Label Text="{maximum}" Style="FpsDisp" Width="25%" TextAlignment="Right" Margin="2"/>
+			<Button Width="Fit" Caption="reset" MouseClick="onResetClick"/>
 		</HorizontalStack>
-		<Label Font="20" Text="Press &lt;F2&gt; and &lt;F3&gt; to cycle into the examples"/>
-		<Label Font="20" Text="Those are basic tests used to validate changes,"/>
-		<Label Foreground="Onyx" Font="20" Text="&lt;F5&gt; => File dialog example"/>
-		<Label Foreground="Onyx" Font="20" Text="&lt;F6&gt; => Window example"/>
-	</VerticalStack>
-</Border>
+	</ItemTemplate>
+</ListBox>
+<ListBox Data="{PerfMeasures}" Height="Fit">
+	<Template>
+		
+			<VerticalStack Name="ItemsContainer" Width="90%" Spacing="2"/>
+		
+	</Template>
+	<ItemTemplate>
+		<HorizontalStack Style="HStackMeasure" Width="Stretched">
+			<Label Text="{Name}" Style="FpsLabel" Width="Stretched"/>
+			<Label Text="{current}" Style="FpsDisp" Width="25%" TextAlignment="Right" Margin="2"/>
+			<Label Text="{minimum}" Style="FpsDisp" Width="25%" TextAlignment="Right" Margin="2"/>
+			<Label Text="{maximum}" Style="FpsDisp" Width="25%" TextAlignment="Right" Margin="2"/>
+			<Button Width="Fit" Caption="reset" MouseClick="onResetClick"/>
+		</HorizontalStack>
+	</ItemTemplate>
+</ListBox>
+</VerticalStack>

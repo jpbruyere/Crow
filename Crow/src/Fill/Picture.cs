@@ -62,7 +62,7 @@ namespace Crow
 		/// <summary>
 		/// unscaled dimensions fetched on loading
 		/// </summary>
-		public Size Dimensions;
+		public Size Dimensions { get; protected set; }
 		/// <summary>
 		/// if true and image has to be scalled, it will be scaled in both direction
 		/// equaly
@@ -98,7 +98,8 @@ namespace Crow
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">used for svg only</param>
 		public abstract void Paint(Interface iFace, Context ctx, Rectangle rect, string subPart = "");
-
+		public abstract bool IsLoaded { get; }
+		public abstract void load (Interface iface);
 		#region Operators
 		public static implicit operator Picture(string path) => Parse (path) as Picture;
 		public static implicit operator string(Picture _pic) => _pic == null ? null : _pic.Path;

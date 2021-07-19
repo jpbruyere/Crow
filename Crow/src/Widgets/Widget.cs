@@ -1934,13 +1934,18 @@ namespace Crow
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
 #if (VKVG)
+			DbgLogger.StartEvent (DbgEvtType.GOCreateSurface, this);
 			bmp = new Surface (IFace.vkvgDevice, Slot.Width, Slot.Height);
+			DbgLogger.EndEvent (DbgEvtType.GOCreateSurface);
+			//bmp.Clear();
 #else
 			bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
 #endif
 			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
+			DbgLogger.StartEvent (DbgEvtType.GOCreateContext, this);
 			using (Context gr = new Context (bmp)) {
+				DbgLogger.EndEvent (DbgEvtType.GOCreateContext);
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
@@ -1958,8 +1963,9 @@ namespace Crow
 				ctx.Operator = Operator.Over;
 			}
 
-			ctx.SetSource (bmp, rb.X, rb.Y);
+			ctx.SetSource (bmp, rb.X, rb.Y);			
 			ctx.Paint ();
+			ctx.Flush ();
 			DbgLogger.EndEvent(DbgEvtType.GOPaintCache);	
 		}
 		protected virtual void UpdateCache(Context ctx){
@@ -2009,13 +2015,15 @@ namespace Crow
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
-					ctx.Save ();
+					//ctx.Save ();
 
 					ctx.Translate (rb.X, rb.Y);
 
 					onDraw (ctx);
 
-					ctx.Restore ();
+					ctx.Translate (-rb.X, -rb.Y);
+
+					//ctx.Restore ();
 
 					if (!IsEnabled)
 						paintDisabled (ctx, rb);

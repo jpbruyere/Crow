@@ -86,26 +86,26 @@ namespace Crow
 		//public override T FindByType<T> () => this is TemplatedControl tg ? tg : default (T);
 		public Widget FindByNameInTemplate (string nameToFind) => child?.FindByName (nameToFind);
 		/// <summary>
-		///onDraw is overrided to prevent default drawing of background, template top container
+		///onDraw is overriden to prevent default drawing of background, template top container
 		///may have a binding to root background or a fixed one.
 		///this allow applying root background to random template's component
 		/// </summary>
 		/// <param name="gr">Backend context</param>
 		protected override void onDraw (Context gr)
 		{
-			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
-
-			gr.Save ();
+			DbgLogger.StartEvent (DbgEvtType.GODraw, this);			
 
 			if (ClipToClientRect) {
 				//clip to client zone
+				gr.Save ();
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
 			}
 			
 			child?.Paint (gr);
 
-			gr.Restore ();
+			if (ClipToClientRect)
+				gr.Restore ();
 
 			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}

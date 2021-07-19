@@ -34,7 +34,7 @@ namespace Crow
 		/// <summary>
 		/// load the image for rendering from the path given as argument
 		/// </summary>
-		void load (Interface iFace) {
+		public override void load (Interface iFace) {
 			if (iFace.sharedPictures.ContainsKey (Path)) {
 				sharedPicture sp = iFace.sharedPictures[Path];
 				image = (byte[])sp.Data;
@@ -51,6 +51,9 @@ namespace Crow
 #if STB_SHARP
 			StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
 			image = new byte[stbi.Data.Length];
+	#if VKVG
+			Array.Copy (stbi.Data, image, stbi.Data.Length);
+	#else
 			//rgba to argb for cairo.
 			for (int i = 0; i < stbi.Data.Length; i += 4) {
 				image[i] = stbi.Data[i + 2];
@@ -58,17 +61,22 @@ namespace Crow
 				image[i + 2] = stbi.Data[i];
 				image[i + 3] = stbi.Data[i + 3];
 			}
+	#endif
 			Dimensions = new Size (stbi.Width, stbi.Height);
 #else
 				using (StbImage stbi = new StbImage (stream)) {
 					image = new byte [stbi.Size];
-					//rgba to argb for cairo.
+	#if VKVG
+					Marshal.Copy (stbi.Handle, image, 0, stbi.Size);
+	#else
 					for (int i = 0; i < stbi.Size; i+=4) {
+						//rgba to argb for cairo. ???? looks like bgra to me.
 						image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
 						image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
 						image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
 						image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
 					}
+	#endif
 					Dimensions = new Size (stbi.Width, stbi.Height);
 				}
 #endif
@@ -102,7 +110,7 @@ namespace Crow
 		}*/
 
 		#region implemented abstract members of Fill
-
+		public override bool IsLoaded => image != null;
 		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{
 			if (image == null)
@@ -133,7 +141,7 @@ namespace Crow
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
 #if VKVG
-					using (Surface imgSurf = new Surface (iFace.vkvgDevice, ref image, Dimensions.Width, Dimensions.Height)) 
+					using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height)) 
 #else
 					using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) 
 #endif
@@ -174,22 +182,26 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			gr.Save ();
+			//gr.Save ();
+
+			Matrix m = gr.Matrix;
 
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 
 #if VKVG
-			using (Surface imgSurf = new Surface (iFace.vkvgDevice, ref image, Dimensions.Width, Dimensions.Height)) 
+			using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height)) 
 #else
 			using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) 
 #endif			
-			{
+			{				
 				gr.SetSource (imgSurf, 0,0);
 				gr.Paint ();
 			}
-			gr.Restore ();
+
+			gr.Matrix = m;
+			//gr.Restore ();
 		}
 	}
 }

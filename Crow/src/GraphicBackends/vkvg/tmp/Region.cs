@@ -13,41 +13,49 @@ namespace Crow {
 		Part,
 	}	
 	public class Region : IDisposable
-    {
-        public List<Rectangle> list = new List<Rectangle>();
-        public int count => list.Count;
+	{
+		public List<Rectangle> list = new List<Rectangle>();
+		public int count => list.Count;
 		public int NumRectangles => list.Count;
 		public bool IsEmpty => list.Count == 0;
 		public Rectangle GetRectangle(int i) => list[i];
 
-        public void AddRectangle(Rectangle r)
-        {
+		public void AddRectangle(Rectangle r)
+		{
+			if (r == default)
+				return;
 			if (DoesNotContains (r)) {
 				list.Add (r);
 				boundsUpToDate = false;
 			}
-        }
-        public void Reset()
-        {
-            list = new List<Rectangle>();
+		}
+		public void Reset()
+		{
+			list = new List<Rectangle>();
 			_bounds = default;
 			boundsUpToDate = true;
-        }
-        public bool DoesNotContains(Rectangle r)
-        {
-            foreach (Rectangle rInList in list)
-                if (rInList.ContainsOrIsEqual(r))
-                    return false;
-            return true;
-        }		
+		}
+		public bool DoesNotContains(Rectangle r)
+		{
+			foreach (Rectangle rInList in list)
+				if (rInList.ContainsOrIsEqual(r))
+					return false;
+			return true;
+		}
+		public bool OverlapOut (Rectangle r) {
+			foreach (Rectangle rInList in list)
+				if (rInList.Intersect(r))
+					return false;
+			return true;
+		}
 
-        public bool intersect(Rectangle r)
-        {
-            foreach (Rectangle rInList in list)
-                if (rInList.Intersect(r))
-                    return true;
-            return false;
-        }
+		public bool intersect(Rectangle r)
+		{
+			foreach (Rectangle rInList in list)
+				if (rInList.Intersect(r))
+					return true;
+			return false;
+		}
 		public void stroke(Context ctx, Color c)
 		{
 			foreach (Rectangle r in list)
@@ -58,27 +66,29 @@ namespace Crow {
 			ctx.LineWidth = 2;
 			ctx.Stroke ();
 		}
-        public void clearAndClip(Context ctx)
-        {
+		public void clearAndClip(Context ctx)
+		{
 			if (list.Count == 0)
 				return;
-            foreach (Rectangle r in list)
-                ctx.Rectangle(r);
+			foreach (Rectangle r in list)
+				ctx.Rectangle(r);
 
 			ctx.ClipPreserve();
 			ctx.Operator = Operator.Clear;
-            ctx.Fill();
-            ctx.Operator = Operator.Over;
-        }
+			ctx.Fill();
+			ctx.Operator = Operator.Over;
+		}
 
-        public void clip(Context ctx)
-        {
-            foreach (Rectangle r in list)
-            	ctx.Rectangle(r);
+		public void clip(Context ctx)
+		{
+			foreach (Rectangle r in list)
+				ctx.Rectangle(r);
 
-            ctx.Clip();
-        }
+			ctx.Clip();
+		}
 		public void UnionRectangle (Rectangle r) {
+			/*if (r == default)
+				System.Diagnostics.Debugger.Break ();*/
 			AddRectangle (r);
 		}
 		Rectangle _bounds;
@@ -99,13 +109,13 @@ namespace Crow {
 			}
 		}
 		public void clear(Context ctx)
-        {
-            foreach (Rectangle r in list)
-                ctx.Rectangle(r);
-            ctx.Operator = Operator.Clear;
-            ctx.Fill();
-            ctx.Operator = Operator.Over;
-        }
+		{
+			foreach (Rectangle r in list)
+				ctx.Rectangle(r);
+			ctx.Operator = Operator.Clear;
+			ctx.Fill();
+			ctx.Operator = Operator.Over;
+		}
 		public override string ToString ()
 		{
 			string tmp = "";

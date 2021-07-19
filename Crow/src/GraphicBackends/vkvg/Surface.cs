@@ -11,15 +11,18 @@ namespace vkvg
 		IntPtr handle = IntPtr.Zero;
 		Device vkvgDev;
 
-		public Surface (Device device, int width, int heigth)
+		public Surface (Device device, int width, int height)
 		{
 			vkvgDev = device;
-			handle = NativeMethods.vkvg_surface_create (device.Handle, (uint)width, (uint)heigth);
+			if (width <= 0 || height <= 0)				
+				handle = NativeMethods.vkvg_surface_create (device.Handle, 1, 1);
+			else
+				handle = NativeMethods.vkvg_surface_create (device.Handle, (uint)width, (uint)height);
 		}
-		public Surface (Device device, ref byte[] data, int width, int heigth)
+		public Surface (Device device, Span<byte> data, int width, int heigth)
 		{
 			vkvgDev = device;
-			handle = NativeMethods.vkvg_surface_create (device.Handle, (uint)width, (uint)heigth);
+			handle = NativeMethods.vkvg_surface_create_from_bitmap (device.Handle, ref data.GetPinnableReference(), (uint)width, (uint)heigth);
 		}
 		public Surface (Device device, string imgPath) {
 			vkvgDev = device;

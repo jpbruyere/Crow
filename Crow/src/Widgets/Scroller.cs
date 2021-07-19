@@ -191,8 +191,9 @@ namespace Crow
 			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
 			gr.Fill ();
-
+		
 			gr.Save ();
+
 			if (ClipToClientRect) {
 				//clip to scrolled client zone
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
@@ -200,8 +201,12 @@ namespace Crow
 			}
 
 			gr.Translate (-ScrollX, -ScrollY);
+
 			if (child != null)
 				child.Paint (gr);
+			
+			//gr.Translate (ScrollX, ScrollY);
+
 			gr.Restore ();
 		}
 

@@ -165,6 +165,8 @@ namespace Crow
 		{
 			if (_pic == null)
 				return 2 * Margin;
+			if (!_pic.IsLoaded)
+				_pic.load (IFace);
 				//_pic = "#Crow.Images.Icons.IconAlerte.svg";
 			//TODO:take scalling in account
 			if (lt == LayoutingType.Width)

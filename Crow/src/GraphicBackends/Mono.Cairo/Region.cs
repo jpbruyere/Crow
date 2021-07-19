@@ -198,6 +198,6 @@ namespace Crow.Cairo
 			NativeMethods.cairo_region_destroy (Handle);
 			handle = NativeMethods.cairo_region_create ();			
 		}
-		public bool DoesNotContains (Crow.Rectangle rectangle) => Contains (p.Slot) == RegionOverlap.Out;
+		public bool OverlapOut (Crow.Rectangle rectangle) => Contains (p.Slot) == RegionOverlap.Out;
 	}
 }

@@ -224,7 +224,7 @@ namespace Crow
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();
 					gr.Operator = Operator.Clear;
-					gr.Fill();
+					gr.Fill();					
 					gr.Operator = Operator.Over;
 
 					onDraw (gr);

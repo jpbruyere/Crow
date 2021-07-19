@@ -17,7 +17,7 @@ namespace Crow
 	/// </summary>
 	public class SvgPicture : Picture
 	{
-		Rsvg.Handle hSVG;
+		SvgHandle hSVG;
 
 		#region CTOR
 		/// <summary>
@@ -31,45 +31,49 @@ namespace Crow
 		public SvgPicture (string path) : base(path) {}
 		#endregion
 
-		bool load (Interface iFace)
+		public override void load (Interface iFace)
 		{
-			if (string.IsNullOrEmpty(Path))
-				return false;
 			if (iFace.sharedPictures.ContainsKey (Path)) {
 				sharedPicture sp = iFace.sharedPictures [Path];
-				hSVG = (Rsvg.Handle)sp.Data;
+				hSVG = (SvgHandle)sp.Data;
 				Dimensions = sp.Dims;
-				return true;
+				return;
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path))
-				load (stream);
+				load (iFace, stream);
 			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);
-			return true;
 		}
-		void load (Stream stream) {
+		void load (Interface iface, Stream stream) {
 			using (BinaryReader sr = new BinaryReader (stream)) {
-				hSVG = new Rsvg.Handle (sr.ReadBytes ((int)stream.Length));
-				Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+#if VKVG
+				hSVG = new SvgHandle (iface.vkvgDevice, sr.ReadBytes ((int)stream.Length));
+#else
+				hSVG = new SvgHandle (sr.ReadBytes ((int)stream.Length));
+#endif
+				Dimensions = hSVG.Dimensions;
 			}
 		}
-		internal static sharedPicture CreateSharedPicture (Stream stream) {
+		internal static sharedPicture CreateSharedPicture (Interface iface, Stream stream) {
 			SvgPicture pic = new SvgPicture ();
-			pic.load (stream);
+			pic.load (iface, stream);
 			return new sharedPicture (pic.hSVG, pic.Dimensions);
 		}
 
-		public void LoadSvgFragment (string fragment) {			
-			hSVG = new Rsvg.Handle (System.Text.Encoding.Unicode.GetBytes(fragment));
+		public void LoadSvgFragment (Interface iface, string fragment) {			
+#if VKVG
+			hSVG = new SvgHandle (iface.vkvgDevice, System.Text.Encoding.Unicode.GetBytes(fragment));
+#else
+			hSVG = new SvgHandle (System.Text.Encoding.Unicode.GetBytes(fragment));
+#endif
 			Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
 		}
 
 		#region implemented abstract members of Fill
-
+		public override bool IsLoaded => hSVG != null;
 		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{
 			if (hSVG == null)
-				if (!load (iFace))
-					return;
+				load (iFace);
 
 			float widthRatio = 1f;
 			float heightRatio = 1f;
@@ -86,16 +90,20 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			/*using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+#if VKVG
+			using (Surface tmp = new Surface (iFace.vkvgDevice, bounds.Width, bounds.Height)) {
+#else
+			using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+#endif
 				using (Context gr = new Context (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
 
-					hSVG.RenderCairo (gr);
+					hSVG.Render (gr);
 				}
 				ctx.SetSource (tmp);
-			}*/	
+			}
 		}
 		#endregion
 
@@ -109,8 +117,7 @@ namespace Crow
 		public override void Paint (Interface iFace, Context gr, Rectangle rect, string subPart = "")
 		{
 			if (hSVG == null)
-				if (!load (iFace))
-					return;
+				load (iFace);
 
 			float widthRatio = 1f;
 			float heightRatio = 1f;
@@ -126,21 +133,21 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 				
-			/*gr.Save ();
+			gr.Save ();
 
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate (((float)rect.Width/widthRatio - Dimensions.Width)/2f, ((float)rect.Height/heightRatio - Dimensions.Height)/2f);
 
 			if (string.IsNullOrEmpty (subPart))
-				hSVG.RenderCairo (gr);
+				hSVG.Render (gr);
 			else {
 				string[] parts = subPart.Split (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string p in parts)                
-					hSVG.RenderCairoSub (gr, "#" + subPart);
+					hSVG.Render (gr, "#" + subPart);
 			}
 			
-			gr.Restore ();	*/		
+			gr.Restore ();
 		}
 	}
 }

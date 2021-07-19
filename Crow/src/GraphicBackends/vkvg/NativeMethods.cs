@@ -239,7 +239,7 @@ namespace vkvg
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr vkvg_surface_create_from_svg_fragment(IntPtr dev, byte[] filePath);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr vkvg_surface_create_from_bitmap(IntPtr dev, ref byte[] data, uint width, uint height);
+        internal static extern IntPtr vkvg_surface_create_from_bitmap(IntPtr dev, ref byte data, uint width, uint height);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void vkvg_surface_destroy(IntPtr surf);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
@@ -262,7 +262,7 @@ namespace vkvg
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr nsvg_load_file(IntPtr dev, string filePath);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr nsvg_load(IntPtr dev, byte[] fragment);
+        internal static extern IntPtr nsvg_load(IntPtr dev, ref byte fragment);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void nsvg_destroy(IntPtr nsvgImage);
         [DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]

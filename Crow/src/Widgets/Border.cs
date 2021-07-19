@@ -108,15 +108,15 @@ namespace Crow
 		{
 			drawborder2 (gr);
 
-			gr.Save ();
+			/*gr.Save ();
 			if (ClipToClientRect) {
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, Math.Max (0.0, CornerRadius - Margin));
 				gr.Clip ();
-			}
+			}*/
 
-			if (child != null)
-				child.Paint (gr);
-			gr.Restore ();
+			child?.Paint (gr);
+
+			//gr.Restore ();
 		}
 		void drawborder2(Context gr){
 			Rectangle rBack = new Rectangle (Slot.Size);
