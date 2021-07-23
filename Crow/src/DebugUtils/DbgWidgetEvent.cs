@@ -52,6 +52,10 @@ namespace Crow.DebugLogger
 					return Colors.MediumVioletRed;
 				case DbgEvtType.GODraw:
 					return Colors.SteelBlue;
+				case DbgEvtType.GOCreateSurface:
+					return Colors.SkyBlue;
+				case DbgEvtType.GOCreateContext:
+					return Colors.DeepSkyBlue;
 				case DbgEvtType.GORecreateCache:
 					return Colors.CornflowerBlue;
 				case DbgEvtType.GOUpdateCache:

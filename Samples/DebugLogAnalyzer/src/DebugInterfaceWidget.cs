@@ -129,6 +129,16 @@ namespace Crow
 				NotifyValueChangedAuto (value);
 			}
 		}
+		public string DebugLogFileFolder => System.IO.Path.GetDirectoryName (DebugLogFilePath);
+		public Command CMDSelectDebugLogFilePath => new Command ("...",
+			() => {				
+				FileDialog dlg = IFace.LoadIMLFragment<FileDialog> (@"
+				<FileDialog Caption='Select Log file' CurrentDirectory='{DebugLogFileFolder}'
+							ShowFiles='true' ShowHidden='true' />");
+				dlg.OkClicked += (sender, e) => DebugLogFilePath = (sender as FileDialog).SelectedFileFullPath;
+				dlg.DataSource = this;
+			}
+		);		
 		int firstWidgetIndexToSave, lastWidgetIndexToSave;
 		public int FirstWidgetIndexToSave {
 			get => firstWidgetIndexToSave;
@@ -430,7 +440,23 @@ namespace Crow
 
 		}
 		void loadLogFromDebugLogFilePath () {
+			DebugLogAnalyzer.Program dla = IFace as DebugLogAnalyzer.Program;
 
+			widgets = new List<DbgWidgetRecord>();
+			events = new List<DbgEvent>();
+
+			DbgLogger.Load(DebugLogFilePath, events, widgets);
+
+			lock (dla.UpdateMutex) {
+				for (int i = 0; i < widgets.Count; i++) {
+					widgets[i].listIndex = dla.Widgets.Count;
+					dla.Widgets.Add	(widgets[i]);
+				}
+				for (int i = 0; i < events.Count; i++) {
+					dla.Events.Add (events[i]);
+					updateWidgetEvents (dla.Widgets, events[i]);
+				}
+			}			
 		}
 
 		public virtual object GetScreenCoordinates () => ScreenCoordinates(Slot).TopLeft;

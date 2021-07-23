@@ -265,7 +265,7 @@ lock (logMutex) {
 		public static void Save(Interface iface, string dbgLogFilePath = "debug.log") {
 #if DEBUG_LOG
 			using (Stream stream = new FileStream (dbgLogFilePath, FileMode.Create, FileAccess.Write))
-				Save (iface, stream);
+				Save (iface, stream, 0);
 			Console.WriteLine ($"Crow Debug Log saved to: {System.IO.Path.GetFullPath(dbgLogFilePath)}");
 #endif
 		}

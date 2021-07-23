@@ -73,6 +73,7 @@
 				<HorizontalStack Height="Fit" Width="Stretched" Background="Onyx" Margin="5">
 					<Label Text="Debug log output file:" Fit="true"/>
 					<TextBox Text="{²../../../../dbgIfaceWidget.DebugLogFilePath}"  />
+					<Button Command="{../../../../dbgIfaceWidget.CMDSelectDebugLogFilePath}"/>
 				</HorizontalStack>
 				<EnumSelector RadioButtonStyle="CheckBox2" Template="#Dbg.EnumSelector.template"
 						Background="Grey"

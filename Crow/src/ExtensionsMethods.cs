@@ -193,8 +193,13 @@ namespace Crow
 			return null;
 		}
 
-		public static FileSystemInfo [] GetFileSystemInfosOrdered (this DirectoryInfo di)
-			=> di.GetFileSystemInfos ().OrderBy (f => f.Attributes).ThenBy (f => f.Name).ToArray ();
+		public static FileSystemInfo [] GetFileSystemInfosOrdered (this DirectoryInfo di) {
+			try {
+				return di.GetFileSystemInfos ().OrderBy (f => f.Attributes).ThenBy (f => f.Name).ToArray ();
+			} catch {
+				return null;
+			}
+		}
 
 		internal static bool IsAnyLineBreakCharacter (this char c) 
 			=> c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
