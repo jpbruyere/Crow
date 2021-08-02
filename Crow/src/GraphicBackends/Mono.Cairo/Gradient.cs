@@ -37,11 +37,6 @@ namespace Crow.Drawing {
 		{
 		}
 
-		[Obsolete]
-		protected Gradient ()
-		{
-		}
-
 		public int ColorStopCount {
 			get {
 				int cnt;
