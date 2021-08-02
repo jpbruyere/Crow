@@ -49,7 +49,7 @@ namespace Crow
 		public override void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e)
 		{
 			base.OnDataSourceChanged(sender, e);
-			NotifyValueChanged ("IsExpandable", IsExpandable);
+			//NotifyValueChanged ("IsExpandable", IsExpandable);
 
 		}
 		/// <summary>

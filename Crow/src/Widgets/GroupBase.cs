@@ -5,10 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Crow.Cairo;
+
 using System.Threading;
 
 using static Crow.Logger;
+using Crow.Drawing;
 
 namespace Crow
 {
@@ -255,7 +256,7 @@ namespace Crow
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();
 					gr.Operator = Operator.Clear;
-					gr.Fill();
+					gr.Fill();					
 					gr.Operator = Operator.Over;
 
 					base.onDraw (gr);
@@ -270,7 +271,7 @@ namespace Crow
 						foreach (Widget c in Children) {
 							if (!c.IsVisible)
 								continue;
-							if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+							if (Clipping.OverlapOut (c.Slot + ClientRectangle.Position))
 								continue;
 							c.Paint (gr);
 						}

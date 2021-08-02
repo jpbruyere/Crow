@@ -8,9 +8,10 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using Crow.Cairo;
+
 using System.Diagnostics;
 using Crow.IML;
+using Crow.Drawing;
 using System.Threading;
 using Glfw;
 using System.Linq;
@@ -118,7 +119,11 @@ namespace Crow
 			parentElem.AppendChild (xe);
 		}
 		public Surface CreateIcon (int dragIconSize = 32) {
+#if VKVG			
+			Surface di = new Surface (IFace.vkvgDevice, dragIconSize, dragIconSize);
+#else
 			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
+#endif
 			using (Context ctx = new Context (di)) {
 				double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
 				double s = (double)dragIconSize / div;
@@ -1886,10 +1891,16 @@ namespace Crow
 		#endregion
 
 		protected void setFontForContext (Context gr) {
+#if VKVG
+			gr.FontFace = Font.Name;
+			gr.FontSize = (uint)Font.Size;
+
+#else
 			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 			gr.SetFontSize (Font.Size);
 			gr.FontOptions = Interface.FontRenderingOptions;
 			gr.Antialias = Interface.Antialias;
+#endif
 		}
 
 		#region Rendering
@@ -1919,10 +1930,19 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
+#if (VKVG)
+			DbgLogger.StartEvent (DbgEvtType.GOCreateSurface, this);
+			bmp = new Surface (IFace.vkvgDevice, Slot.Width, Slot.Height);
+			DbgLogger.EndEvent (DbgEvtType.GOCreateSurface);
+			//bmp.Clear();
+#else
 			bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
+#endif
 			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
+			DbgLogger.StartEvent (DbgEvtType.GOCreateContext, this);
 			using (Context gr = new Context (bmp)) {
+				DbgLogger.EndEvent (DbgEvtType.GOCreateContext);
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
@@ -1940,8 +1960,9 @@ namespace Crow
 				ctx.Operator = Operator.Over;
 			}
 
-			ctx.SetSource (bmp, rb.X, rb.Y);
+			ctx.SetSource (bmp, rb.X, rb.Y);			
 			ctx.Paint ();
+			ctx.Flush ();
 			DbgLogger.EndEvent(DbgEvtType.GOPaintCache);	
 		}
 		protected virtual void UpdateCache(Context ctx){
@@ -1991,13 +2012,15 @@ namespace Crow
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
-					ctx.Save ();
+					//ctx.Save ();
 
 					ctx.Translate (rb.X, rb.Y);
 
 					onDraw (ctx);
 
-					ctx.Restore ();
+					ctx.Translate (-rb.X, -rb.Y);
+
+					//ctx.Restore ();
 
 					if (!IsEnabled)
 						paintDisabled (ctx, rb);

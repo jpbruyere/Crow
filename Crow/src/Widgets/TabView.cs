@@ -4,7 +4,7 @@
 
 using System;
 using System.ComponentModel;
-using Crow.Cairo;
+
 using System.Linq;
 
 namespace Crow

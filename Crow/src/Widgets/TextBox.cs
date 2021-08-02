@@ -2,11 +2,12 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using Crow.Cairo;
-using Crow.Text;
-using Glfw;
 using System;
 using System.ComponentModel;
+
+using Crow.Text;
+using Crow.Drawing;
+using Glfw;
 
 namespace Crow
 {

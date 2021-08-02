@@ -4,7 +4,8 @@
 
 using System;
 using System.ComponentModel;
-using Crow.Cairo;
+
+using Crow.Drawing;
 
 namespace Crow {
 	public class Gauge : Widget

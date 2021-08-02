@@ -29,7 +29,7 @@ namespace Crow
 		public static void InitMeasures () {
 			Measures = new PerformanceMeasure[4];
 			Measures[(int)Kind.Update] = new PerformanceMeasure (Kind.Update, 1);
-			Measures[(int)Kind.Clipping] = new PerformanceMeasure (Kind.Clipping, 1);
+			Measures[(int)Kind.Clipping] = new PerformanceMeasure (Kind.Clipping, 0);
 			Measures[(int)Kind.Layouting] = new PerformanceMeasure (Kind.Layouting, 1);
 			Measures[(int)Kind.Drawing] = new PerformanceMeasure (Kind.Drawing, 1);
 		}

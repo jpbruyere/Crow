@@ -3,7 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Cairo;
+using Crow.Drawing;
 using System.Threading;
 using Samples;
 

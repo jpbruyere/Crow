@@ -1,13 +1,14 @@
-﻿// Copyright (c) 2013-2019  Jean-Philippe Bruyère jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Cairo;
+
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 
+using Crow.Drawing;
 
 namespace Crow
 {
@@ -161,6 +162,8 @@ namespace Crow
 		{
 			if (_pic == null)
 				return 2 * Margin;
+			if (!_pic.IsLoaded)
+				_pic.load (IFace);
 				//_pic = "#Crow.Images.Icons.IconAlerte.svg";
 			//TODO:take scalling in account
 			if (lt == LayoutingType.Width)

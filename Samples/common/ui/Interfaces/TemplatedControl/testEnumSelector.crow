@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Spacing="5" Margin="5">
-	<EnumSelector Caption="Vertical Alignemnt" EnumValue="{²CurrentVAlign}" Width="200">
+	<EnumSelector Caption="Vertical Alignemnt" EnumValue="{²CurrentVAlign}" Width="200" Background="Onyx">
 		<Template>
 			<Popper Caption="{./Caption}" CornerRadius="{./CornerRadius}" Foreground="{./Foreground}" Background="{./Background}">
 				<Template>

@@ -3,8 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Cairo;
-//using FastEnumUtility;
+using Crow.Drawing;
 
 namespace Crow
 {

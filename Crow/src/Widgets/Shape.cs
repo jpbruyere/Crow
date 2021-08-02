@@ -6,7 +6,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using Crow.Cairo;
+using Crow.Drawing;
 
 namespace Crow
 {
@@ -219,7 +219,8 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			gr.Save ();
+			Matrix m = gr.Matrix;
+			//gr.Save ();
 
 			gr.Translate (cr.Left, cr.Top);
 			gr.Scale (widthRatio, heightRatio);
@@ -231,7 +232,8 @@ namespace Crow
 			using (PathParser parser = new PathParser (path))
 				parser.Draw (gr);
 
-			gr.Restore ();
+			//gr.Restore ();
+			gr.Matrix = m;
 		}
 
 

@@ -4,11 +4,10 @@
 
 using System;
 using System.ComponentModel;
-using Crow.Cairo;
+using Crow.Drawing;
 
 namespace Crow {
-
-public class CircleMeter : Gauge {
+	public class CircleMeter : Gauge {
 		#region CTOR
 		protected CircleMeter () {}
 		public CircleMeter (Interface iface, string style = null) : base (iface, style) { }

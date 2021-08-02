@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.ComponentModel;
-using Crow.Cairo;
+using Crow.Drawing;
 using Glfw;
 
 namespace Crow
@@ -187,8 +187,9 @@ namespace Crow
 			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
 			gr.Fill ();
-
+		
 			gr.Save ();
+
 			if (ClipToClientRect) {
 				//clip to scrolled client zone
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
@@ -196,8 +197,12 @@ namespace Crow
 			}
 
 			gr.Translate (-ScrollX, -ScrollY);
+
 			if (child != null)
 				child.Paint (gr);
+			
+			//gr.Translate (ScrollX, ScrollY);
+
 			gr.Restore ();
 		}
 

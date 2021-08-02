@@ -4,9 +4,10 @@
 
 using System;
 using System.Linq;
-using Crow.Cairo;
+
 using System.ComponentModel;
 using Glfw;
+using Crow.Drawing;
 using Crow.Text;
 
 namespace Crow
@@ -637,6 +638,8 @@ namespace Crow
 		
 		protected override void onDraw (Context gr)
 		{
+			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
+
 			base.onDraw (gr);
 
 			setFontForContext (gr);
@@ -657,6 +660,8 @@ namespace Crow
 			
 			if (ClipToClientRect)
 				gr.Restore ();
+
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
 		#endregion
 

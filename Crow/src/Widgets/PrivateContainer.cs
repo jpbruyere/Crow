@@ -3,7 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Cairo;
+using Crow.Drawing;
 using static Crow.Logger;
 namespace Crow
 {
@@ -220,7 +220,7 @@ namespace Crow
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();
 					gr.Operator = Operator.Clear;
-					gr.Fill();
+					gr.Fill();					
 					gr.Operator = Operator.Over;
 
 					onDraw (gr);

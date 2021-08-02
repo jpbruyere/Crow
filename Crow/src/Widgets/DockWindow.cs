@@ -4,7 +4,7 @@
 
 using System;
 using System.Xml.Serialization;
-using Crow.Cairo;
+
 using Glfw;
 
 namespace Crow
@@ -198,8 +198,8 @@ namespace Crow
 					r.Inflate (r.Width / -3, r.Height / -3);
 					break;
 				}
-	            Surface dragImg = IFace.surf.CreateSimilar (Crow.Cairo.Content.ColorAlpha,	r.Width, r.Height);
-				using (Crow.Cairo.Context gr = new Crow.Cairo.Context(dragImg)) {
+	            /*Surface dragImg = IFace.surf.CreateSimilar (Content.ColorAlpha,	r.Width, r.Height);
+				using (Context gr = new Context(dragImg)) {
 					gr.LineWidth = 1;
 					gr.Rectangle (0,0,r.Width,r.Height);
 					gr.SetSource (0.2,0.3,0.9,0.5);
@@ -207,7 +207,7 @@ namespace Crow
 					gr.SetSource (0.1,0.2,1);
 					gr.Stroke ();
 				}
-				IFace.CreateDragImage (dragImg, r, false);
+				IFace.CreateDragImage (dragImg, r, false);*/
 			}
 		}
         protected override void onDragEnter (object sender, DragDropEventArgs e) {
