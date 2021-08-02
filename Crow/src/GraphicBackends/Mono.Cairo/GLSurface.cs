@@ -38,7 +38,7 @@ namespace Crow.Drawing {
 		public GLSurface (IntPtr ptr, bool own) : base (ptr, own)
 		{}
 
-		public GLSurface (Device device, Cairo.Content content, uint tex, int width, int height)
+		public GLSurface (Device device, Content content, uint tex, int width, int height)
 			: base (NativeMethods.cairo_gl_surface_create_for_texture (device.Handle, (uint)content, tex, width, height), true)
 		{}
 

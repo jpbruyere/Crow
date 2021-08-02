@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -18,7 +18,7 @@ namespace Crow
 		public DebugInterface (IntPtr hWin) : base (hWin)
 		{
 			SolidBackground = false;
-			surf = new ImageSurface (Format.Argb32, 100, 100);
+			surf = CreateSurface (100, 100);
 		}
 
 		public override void Run()
@@ -125,7 +125,7 @@ namespace Crow
 			lock (UpdateMutex) {
 				clientRectangle = new Rectangle (0, 0, width, height);
 				surf?.Dispose();
-				surf = new ImageSurface (Format.Argb32, width, height);				
+				surf = CreateSurface (width, height);				
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 				RegisterClip (clientRectangle);

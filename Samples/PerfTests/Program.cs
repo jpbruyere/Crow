@@ -164,7 +164,7 @@ namespace PerfTests
 			if (screenOutput)
 				initSurface ();
 			else
-				surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
+				surf = CreateSurface (ClientRectangle.Width, ClientRectangle.Height);
 
 			initDictionaries ();
 			loadStyling ();			

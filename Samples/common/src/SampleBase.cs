@@ -87,7 +87,7 @@ namespace Samples
 		public int intValue = 500;
 		VerticalAlignment currentVAlign;
 
-		DirectoryInfo curDir = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+		DirectoryInfo curDir = new DirectoryInfo(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
 		public FileSystemInfo[] CurDirectory => curDir.GetFileSystemInfos();
 		public string MultilineText =
 			$"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit. Sed non risus.\n\nSuspendisse lectus tortor,\nLorem ipsum dolor sit amet,\nconsectetur adipiscing elit. Sed non risus.\n\nSuspendisse lectus tortor,";

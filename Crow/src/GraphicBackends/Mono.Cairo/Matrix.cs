@@ -114,7 +114,7 @@ namespace Crow.Drawing {
 			NativeMethods.cairo_matrix_rotate (this, radians);
 		}
 
-		public Cairo.Status Invert ()
+		public Status Invert ()
 		{
 			return NativeMethods.cairo_matrix_invert (this);
 		}

@@ -138,7 +138,7 @@ namespace Crow.Drawing {
 			set { NativeMethods.cairo_set_antialias (handle, value); }
 		}
 
-		public Cairo.Status Status {
+		public Status Status {
 			get {
 				return NativeMethods.cairo_status (handle);
 			}
@@ -170,7 +170,7 @@ namespace Crow.Drawing {
 			}
 		}
 
-		public Cairo.FillRule FillRule {
+		public FillRule FillRule {
 			set {
 				NativeMethods.cairo_set_fill_rule (handle, value);
 			}
@@ -190,7 +190,7 @@ namespace Crow.Drawing {
 			}
 		}
 
-		public Cairo.LineCap LineCap {
+		public LineCap LineCap {
 			set {
 				NativeMethods.cairo_set_line_cap (handle, value);
 			}
@@ -200,7 +200,7 @@ namespace Crow.Drawing {
 			}
 		}
 
-		public Cairo.LineJoin LineJoin {
+		public LineJoin LineJoin {
 			set {
 				NativeMethods.cairo_set_line_join (handle, value);
 			}
@@ -244,7 +244,7 @@ namespace Crow.Drawing {
 		public Pattern GetSource ()
 		{
 			var ptr = NativeMethods.cairo_get_source (handle);
-			return Cairo.Pattern.Lookup (ptr, false);
+			return Pattern.Lookup (ptr, false);
 		}
 
 		public double MiterLimit {
@@ -272,7 +272,7 @@ namespace Crow.Drawing {
 		}
 
 		[Obsolete ("Use GetTarget/SetTarget")]
-		public Cairo.Surface Target {
+		public Surface Target {
 			set {
 				if (handle != IntPtr.Zero)
 					NativeMethods.cairo_destroy (handle);
@@ -814,21 +814,6 @@ namespace Crow.Drawing {
 		public void FontFace (string family, FontSlant slant, FontWeight weight)
 		{
 			SelectFontFace (family, slant, weight);
-		}
-
-		[Obsolete("Use GetFontFace/SetFontFace")]
-		public FontFace ContextFontFace {
-			get {
-				return GetContextFontFace ();
-			}
-			set {
-				SetContextFontFace (value);
-			}
-		}
-
-		public FontFace GetContextFontFace ()
-		{
-			return Cairo.FontFace.Lookup (NativeMethods.cairo_get_font_face (handle), false);
 		}
 
 		public void SetContextFontFace (FontFace value)

@@ -49,7 +49,7 @@ namespace Crow.Drawing {
 		}
 
 		[Obsolete ("Use ImageSurface (byte[] data, Cairo.Format format, int width, int height, int stride)")]
-		public ImageSurface (ref byte[] data, Cairo.Format format, int width, int height, int stride)
+		public ImageSurface (ref byte[] data, Format format, int width, int height, int stride)
 			: this (data, format, width, height, stride)
 		{
 		}

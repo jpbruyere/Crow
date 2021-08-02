@@ -91,28 +91,28 @@ namespace Crow.Drawing {
 		}
 
 		[Obsolete ("Use an ImageSurface constructor instead.")]
-		public static Cairo.Surface CreateForImage (
-			ref byte[] data, Cairo.Format format, int width, int height, int stride)
+		public static Surface CreateForImage (
+			ref byte[] data, Format format, int width, int height, int stride)
 		{
 			IntPtr p = NativeMethods.cairo_image_surface_create_for_data (
 				data, format, width, height, stride);
 
-			return new Cairo.Surface (p, true);
+			return new Surface (p, true);
 		}
 
 		[Obsolete ("Use an ImageSurface constructor instead.")]
-		public static Cairo.Surface CreateForImage (
-			Cairo.Format format, int width, int height)
+		public static Surface CreateForImage (
+			Format format, int width, int height)
 		{
 			IntPtr p = NativeMethods.cairo_image_surface_create (
 				format, width, height);
 
-			return new Cairo.Surface (p, true);
+			return new Surface (p, true);
 		}
 
 
-		public Cairo.Surface CreateSimilar (
-			Cairo.Content content, int width, int height)
+		public Surface CreateSimilar (
+			Content content, int width, int height)
 		{
 			IntPtr p = NativeMethods.cairo_surface_create_similar (
 				this.Handle, content, width, height);

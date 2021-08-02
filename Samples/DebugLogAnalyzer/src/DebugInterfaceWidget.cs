@@ -377,9 +377,9 @@ namespace Crow
 			
 			if (initialized) {
 				delResize (Slot.Width, Slot.Height);			
-				bmp = Crow.Cairo.Surface.Lookup (delGetSurfacePointer(), false);				
+				bmp = IFace.CreateSurface (delGetSurfacePointer());
 			} else
-				bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);								
+				bmp = IFace.CreateSurface (Slot.Width, Slot.Height);								
 
 			IsDirty = false;			
 		}

@@ -1,13 +1,13 @@
-﻿using Crow.Cairo;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿// Copyright (c) 2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+//
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
+using Crow.Drawing;
 using System.ComponentModel;
-using System.Text;
 
 namespace Crow
-{	
-    public class Painter : ScrollingObject
+{
+	public class Painter : ScrollingObject
     {
 		#region CTOR
 		protected Painter () { }

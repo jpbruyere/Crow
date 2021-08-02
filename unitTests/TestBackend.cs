@@ -12,7 +12,7 @@ namespace unitTests
 	{
 		public TestInterface (int width = 800, int height = 600)
 			: base (width, height, false, false) {
-			surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
+			surf = CreateSurface (ClientRectangle.Width, ClientRectangle.Height);
 		}
 		bool isRunning;
 		public bool IsRunning {

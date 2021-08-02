@@ -326,7 +326,27 @@ namespace Crow
 		};
 
 		#endregion
-
+		public Surface CreateSurface (ref Rectangle r) {
+#if (VKVG)
+			return new Surface (vkvgDevice, r.Width, r.Height);
+#else
+			return surf.CreateSimilar (Content.ColorAlpha, r.Width, r.Height);
+#endif                  
+		}
+		public Surface CreateSurface (int width, int height) {
+#if (VKVG)
+			return new Surface (vkvgDevice, width, height);
+#else
+			return surf.CreateSimilar (Content.ColorAlpha, width, height);
+#endif                  
+		}
+		public Surface CreateSurface (IntPtr existingSurfaceHandle) {
+#if (VKVG)
+			return new Surface (vkvgDevice, existingSurfaceHandle);
+#else
+			return Surface.Lookup (existingSurfaceHandle, false);                        
+#endif                  
+				}
 		public string WindowTitle {			
 			set => Glfw3.SetWindowTitle (hWin, value);
 		}
@@ -750,7 +770,7 @@ namespace Crow
 				using (ZipArchive archive = ZipFile.Open (Theme, ZipArchiveMode.Read)) {
 					foreach (ZipArchiveEntry entry in archive.Entries.Where (e => e.FullName.StartsWith ("Images"))) {
 						Console.WriteLine (entry.FullName);
-                    }
+					}
 					foreach (ZipArchiveEntry entry in archive.Entries.Where (e => e.FullName.StartsWith ("IML"))) {
 						Console.WriteLine (entry.FullName);
 					}
@@ -762,7 +782,7 @@ namespace Crow
 		void loadThemeStyle () {
 			if (string.IsNullOrEmpty (Theme))
 				return;
-            try {
+			try {
 				if (Directory.Exists (theme)) {
 					string stylePath = Directory.GetFiles (theme, "*.style").FirstOrDefault ();
 					using (Stream s = new FileStream (stylePath, FileMode.Open, FileAccess.Read)) {
@@ -782,7 +802,7 @@ namespace Crow
 				}
 			} catch (Exception e) {
 				throw new Exception ($"[Theme] Error reading theme style ({Theme})", e);
-            }
+			}
 		}
 		#endregion
 
@@ -1075,6 +1095,7 @@ namespace Crow
 
 			PerformanceMeasure.Notify ();
 		}
+#if VKVG
 		void resizeVulkanContext () {
 			vkCtx.WaitIdle();
 			vkCtx.blitSource?.Dispose ();
@@ -1086,8 +1107,8 @@ namespace Crow
 				g.RegisterForLayouting (LayoutingType.All);
 
 			registerRefreshClientRectangle ();
-
 		}
+#endif
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
@@ -1096,7 +1117,7 @@ namespace Crow
 				if (LayoutingQueue.Count == 0) {
 					Monitor.Exit (LayoutMutex);
 					return;
-                }
+				}
 
 				DbgLogger.StartEvent (DbgEvtType.ProcessLayouting);
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Layouting);
@@ -1147,7 +1168,7 @@ namespace Crow
 			ctx.Fill ();			
 			ctx.Operator = Operator.Over;			
 		}
-        bool solidBackground = false;
+		bool solidBackground = false;
 		public bool SolidBackground {
 			get => solidBackground;
 			set {
@@ -1177,7 +1198,6 @@ namespace Crow
 
 				if (SolidBackground)
 					clear (ctx);
-				ctx.Flush();
 #endif
 				
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
@@ -1268,7 +1288,7 @@ namespace Crow
 			}
 			/*if (DragAndDropInProgress) {
 
-            }*/
+			}*/
 			surf.Flush ();
 		}
 
@@ -1421,7 +1441,6 @@ namespace Crow
 				clientRectangle = bounds;
 
 #if VKVG
-
 #else
 				switch (Environment.OSVersion.Platform) {
 				case PlatformID.MacOSX:
@@ -1545,23 +1564,23 @@ namespace Crow
 
 				currentCursor?.Dispose ();
 				switch (cursor) {
-                case MouseCursor.arrow:
+				case MouseCursor.arrow:
 				case MouseCursor.top_left_arrow:
 					currentCursor = new Cursor (CursorShape.Arrow);
 					break;
-                case MouseCursor.crosshair:
+				case MouseCursor.crosshair:
 					currentCursor = new Cursor (CursorShape.Crosshair);
 					break;
-                case MouseCursor.hand:
+				case MouseCursor.hand:
 					currentCursor = new Cursor (CursorShape.Hand);
 					break;
-                case MouseCursor.ibeam:
+				case MouseCursor.ibeam:
 					currentCursor = new Cursor (CursorShape.IBeam);
 					break;
-                default:
+				default:
 					currentCursor = XCursor.Create (this, cursor);
 					break;
-                }                                
+				}                                
 				
 				currentCursor.Set (hWin);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
@@ -1578,8 +1597,8 @@ namespace Crow
 					dragndropHover = value;
 				} else
 					HoverWidget = value;
-            }
-        }
+			}
+		}
 		/// <summary>
 		/// Ask OS to force the mouse position to the actual coordinate of Interface.MousePosition
 		/// </summary>
@@ -1634,7 +1653,7 @@ namespace Crow
 					
 					int indexOfTopContainer = GraphicTree.IndexOf (topContainer);
 					if (indexOfTopContainer != 0) {
-	                    for (int i = 0; i < indexOfTopContainer; i++) {//check all top containers that are at a higher level
+						for (int i = 0; i < indexOfTopContainer; i++) {//check all top containers that are at a higher level
 							//if logical parent of top container is the Interface, that's not a popup.
 							if (GraphicTree [i].LogicalParent is Interface) {
 								if (GraphicTree [i].MouseIsIn (e.Position)) {
@@ -1762,7 +1781,7 @@ namespace Crow
 						ActiveWidget = null;
 					}
 					return true;
-	            }
+				}
 
 				if (_activeWidget == null)
 					return false;
@@ -2067,7 +2086,7 @@ namespace Crow
 		public Rectangle ClientRectangle => clientRectangle; 
 		public Interface HostContainer => this;
 
-        public Rectangle getSlot () => ClientRectangle;
+		public Rectangle getSlot () => ClientRectangle;
 		public void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType){	}
 		#endregion
 	}

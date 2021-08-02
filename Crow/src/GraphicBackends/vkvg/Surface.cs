@@ -28,7 +28,11 @@ namespace Crow.Drawing
 			vkvgDev = device;
 			handle = NativeMethods.vkvg_surface_create_from_image (device.Handle, imgPath);
 		}
-
+		public Surface (Device device, IntPtr surfHandle) {
+			vkvgDev = device;
+			handle = surfHandle;
+			AddReference ();
+		}
 
 		Surface (IntPtr devHandle, int width, int heigth)
 		{

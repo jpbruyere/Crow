@@ -39,13 +39,13 @@ namespace Crow.Drawing
 	public static class CairoAPI {
 		static public int Version {
 			get {
-				return Cairo.NativeMethods.cairo_version ();
+				return NativeMethods.cairo_version ();
 			}
 		}
 
 		static public string VersionString {
 			get {
-				IntPtr x = Cairo.NativeMethods.cairo_version_string ();
+				IntPtr x = NativeMethods.cairo_version_string ();
 				return Marshal.PtrToStringAnsi (x);
 			}
 		}

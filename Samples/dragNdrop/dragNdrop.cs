@@ -1,5 +1,6 @@
 using Crow;
 using Samples;
+using Crow.Drawing;
 
 namespace tests
 {
@@ -29,9 +30,8 @@ namespace tests
 			Rectangle r = e.DragSource.LastPaintedSlot;
             startGroup = e.DragSource.Parent as Group;
 
-            Crow.Cairo.Surface dragImg = surf.CreateSimilar (Crow.Cairo.Content.ColorAlpha,
-				r.Width, r.Height);
-            using (Crow.Cairo.Context gr = new Crow.Cairo.Context(dragImg)) {
+            Surface dragImg = CreateSurface (ref r);
+            using (Context gr = new Context(dragImg)) {
                 gr.SetSource (e.DragSource.bmp, 0, 0);
                 gr.Paint ();
             }

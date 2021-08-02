@@ -4,6 +4,7 @@
 
 using System;
 using System.Text;
+using System.Linq;
 using Crow;
 
 namespace Crow.Drawing
@@ -104,7 +105,8 @@ namespace Crow.Drawing
 				NativeMethods.vkvg_set_matrix(handle, ref value);
 			}
 		}
-		public void ShowText (ReadOnlySpan<char> s, int tabSize) {
+		public void ShowText (string text) => ShowText (text.AsSpan());
+		public void ShowText (ReadOnlySpan<char> s, int tabSize = 4) {
 			int size = s.Length * 4 + 1;
 			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 			int encodedBytes = Crow.Text.Encoding.ToUtf8 (s, bytes, tabSize);
@@ -345,7 +347,14 @@ namespace Crow.Drawing
 			Encoding.UTF8.GetBytes(s, 0, s.Length, bytes, 0);
 			return bytes;
 		}
-
+		public void SetDash (double [] dashes, double offset = 0) {
+			if (dashes == null)
+				NativeMethods.vkvg_set_dash(handle, null, 0, 0);
+			else {
+				float[] floats = dashes.Cast<float> ().ToArray ();
+				NativeMethods.vkvg_set_dash(handle, floats, (uint)dashes.Length, (float)offset);
+			}
+		}
 		public float[] Dashes
 		{
 			set
