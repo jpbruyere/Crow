@@ -14,22 +14,81 @@ using Device = vke.Device;
 
 namespace Crow.Drawing {
 	/// <summary>
+	/// Base class for offscreen vulkan context without swapchain
+	/// </summary>
+	public class VulkanContextBase : IDisposable {
+		protected Instance instance;	
+		protected PhysicalDevice phy;
+		protected vke.Device dev;		
+		protected Queue graphicQueue;//for vkvg, we must have at least a graphic queue
+
+		public void WaitIdle() => dev.WaitIdle ();
+
+		public VulkanContextBase () {}		
+		public VulkanContextBase (ref byte[] pBitmap) {
+#if DEBUG
+			instance = new Instance (Ext.I.VK_EXT_debug_utils);
+#else
+			instance = new Instance ();
+#endif
+			phy = instance.GetAvailablePhysicalDevice ().FirstOrDefault ();
+			VkPhysicalDeviceFeatures enabledFeatures = default;
+			dev = new vke.Device (phy);
+			graphicQueue = new Queue (dev, VkQueueFlags.Graphics);
+			dev.Activate (enabledFeatures);
+		}
+
+		public Crow.Drawing.Device CreateVkvgDevice () => 
+			new Crow.Drawing.Device (instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, SampleCount.Sample_8);
+		public virtual void CreateSurface (Device vkvgDevice, int width, int height, ref Surface surf) {
+			surf?.Dispose ();
+			surf = new Surface (vkvgDevice, width, height);			
+		}
+
+		#region IDisposable Support
+		protected bool isDisposed;
+		protected virtual void Dispose (bool disposing) {
+			if (!isDisposed) {
+				dev.WaitIdle ();
+
+				if (disposing) {
+					dev.Dispose ();
+					instance.Dispose ();
+				} else
+					Debug.WriteLine ("a VulkanContext has not been correctly disposed");
+
+				isDisposed = true;
+			}
+		}
+		~VulkanContextBase () {
+			Dispose (false);
+		}
+		public void Dispose () {
+			Dispose (true);
+			GC.SuppressFinalize (this);
+		}
+		#endregion
+	}
+	/// <summary>
 	/// Base class to build vulkan application.
 	/// Provide default swapchain with its command pool and buffers per image and the main present queue
 	/// </summary>
-	public class VulkanContext : IDisposable {
+	public class VulkanContext : VulkanContextBase {
+		public override void CreateSurface (Device vkvgDevice, int width, int height, ref Surface surf) {
+			WaitIdle();
 
-		/** GLFW window native pointer. */
-		IntPtr hWin;
+			blitSource?.Dispose ();
+			surf?.Dispose ();
+			surf = new Surface (vkvgDevice, width, height);
+			buildBlitCommand (surf);
+
+			WaitIdle();
+		}
+
+		uint width, height;
+		IntPtr hWin;/** GLFW window native pointer. */
 		/**Vulkan Surface */
 		protected VkSurfaceKHR hSurf;
-		/**vke Instance encapsulating a VkInstance. */
-		protected Instance instance;	
-		/**vke Physical device associated with this window*/
-		protected PhysicalDevice phy;
-		/**vke logical device */			
-		protected vke.Device dev;
-		protected PresentQueue presentQueue;
 		protected SwapChain swapChain;
 		protected CommandPool cmdPool;
 		protected PrimaryCommandBuffer[] cmds;
@@ -45,23 +104,18 @@ namespace Crow.Drawing {
 		uint frameCount;
 		Stopwatch frameChrono;
 
-		string[] EnabledInstanceExtensions => new string[] { Ext.I.VK_EXT_debug_utils };
-
-		string[] EnabledDeviceExtensions => new string[] { Ext.D.VK_KHR_swapchain };
-
-		uint width, height;
-		public void WaitIdle() => dev.WaitIdle ();
 		public VulkanContext (IntPtr hWin, uint _width, uint _height, bool vsync = false) {
 			this.hWin = hWin;
-			//Instance.VALIDATION = true;
-			//Instance.RENDER_DOC_CAPTURE = true;
 
 			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
 			SwapChain.PREFERED_FORMAT = VkFormat.B8g8r8a8Unorm;
 
+			//Instance.VALIDATION = true;
+			//Instance.RENDER_DOC_CAPTURE = true;
 			List<string> instExts = new List<string> (Glfw3.GetRequiredInstanceExtensions ());
-			if (EnabledInstanceExtensions != null)
-				instExts.AddRange (EnabledInstanceExtensions);
+#if DEBUG
+			instExts.Add (Ext.I.VK_EXT_debug_utils);
+#endif
 
 			instance = new Instance (instExts.ToArray());
 			hSurf = instance.CreateSurface (hWin);
@@ -73,19 +127,19 @@ namespace Crow.Drawing {
 			//First create the c# device class
 			dev = new vke.Device (phy);
 
-			presentQueue = new PresentQueue (dev, VkQueueFlags.Graphics, hSurf);
+			graphicQueue = new PresentQueue (dev, VkQueueFlags.Graphics, hSurf);
 
 			//activate the device to have effective queues created accordingly to what's available
-			dev.Activate (enabledFeatures, EnabledDeviceExtensions);
+			dev.Activate (enabledFeatures, Ext.D.VK_KHR_swapchain);
 
-			swapChain = new SwapChain (presentQueue as PresentQueue, _width, _height, SwapChain.PREFERED_FORMAT,
+			swapChain = new SwapChain (graphicQueue as PresentQueue, _width, _height, SwapChain.PREFERED_FORMAT,
 				vsync ? VkPresentModeKHR.FifoKHR : VkPresentModeKHR.ImmediateKHR);
 			swapChain.Activate ();
 
 			width = swapChain.Width;
 			height = swapChain.Height;
 
-			cmdPool = new CommandPool (dev, presentQueue.qFamIndex, VkCommandPoolCreateFlags.ResetCommandBuffer);
+			cmdPool = new CommandPool (dev, graphicQueue.qFamIndex, VkCommandPoolCreateFlags.ResetCommandBuffer);
 			cmds = cmdPool.AllocateCommandBuffer (swapChain.ImageCount);
 
 			drawComplete = new VkSemaphore[swapChain.ImageCount];
@@ -99,12 +153,10 @@ namespace Crow.Drawing {
 			cmdPool.SetName ("main CmdPool");			
 		}
 
-		public Crow.Drawing.Device CreateVkvgDevice () => 
-			new Crow.Drawing.Device (instance.Handle, phy.Handle, dev.VkDev.Handle, presentQueue.qFamIndex, SampleCount.Sample_8);
 
 		internal vke.Image blitSource;
 		
-		public void BuildBlitCommand (Crow.Drawing.Surface surf) {
+		void buildBlitCommand (Crow.Drawing.Surface surf) {
 			//Console.WriteLine ($"build blit w:{width} h:{height}");
 			cmdPool.Reset();
 			
@@ -161,17 +213,13 @@ namespace Crow.Drawing {
 				return false;
 			WaitAndResetDrawFence();
 
-			presentQueue.Submit (cmds[idx], swapChain.presentComplete, drawComplete[idx], drawFence);
-			presentQueue.Present (swapChain, drawComplete[idx]);
+			graphicQueue.Submit (cmds[idx], swapChain.presentComplete, drawComplete[idx], drawFence);
+			(graphicQueue as PresentQueue).Present (swapChain, drawComplete[idx]);
 
 			WaitIdle();
 			return true;
 		}
-
-		#region IDisposable Support
-		protected bool isDisposed;
-
-		protected virtual void Dispose (bool disposing) {
+		protected override void Dispose (bool disposing) {
 			if (!isDisposed) {
 				dev.WaitIdle ();
 
@@ -184,24 +232,11 @@ namespace Crow.Drawing {
 
 				vkDestroySurfaceKHR (instance.Handle, hSurf, IntPtr.Zero);
 
-				if (disposing) {
+				if (disposing)
 					cmdPool.Dispose ();
-					dev.Dispose ();
-					instance.Dispose ();
-				} else
-					Debug.WriteLine ("a VkWindow has not been correctly disposed");
 
-				isDisposed = true;
+				base.Dispose (disposing);
 			}
 		}
-
-		~VulkanContext () {
-			Dispose (false);
-		}
-		public void Dispose () {
-			Dispose (true);
-			GC.SuppressFinalize (this);
-		}
-		#endregion
 	}
 }

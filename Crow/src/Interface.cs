@@ -136,6 +136,11 @@ namespace Crow
 			hWin = glfwWindowHandle;
 			PerformanceMeasure.InitMeasures ();
 		}
+#if VKVG		
+		public const bool HaveVkvgBackend = true;
+#else
+		public const bool HaveVkvgBackend = false;
+#endif
 		public Interface (int width = 800, int height = 600, bool startUIThread = true, bool createSurface = true)
 		{
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
@@ -188,7 +193,6 @@ namespace Crow
 #if VKVG
 		VulkanContext vkCtx;
 		internal Device vkvgDevice;
-		vke.Image vkvgSurfaceImage;
 #endif
 		protected void initSurface ()
 		{
@@ -208,8 +212,7 @@ namespace Crow
 #if VKVG
 			vkCtx = new VulkanContext (hWin, (uint)clientRectangle.Width, (uint)clientRectangle.Height);
 			vkvgDevice = vkCtx.CreateVkvgDevice ();
-			surf = new Surface (vkvgDevice, clientRectangle.Width, clientRectangle.Height);			
-			vkCtx.BuildBlitCommand (surf);
+			vkCtx.CreateSurface (vkvgDevice, clientRectangle.Width, clientRectangle.Height, ref surf);			
 #else
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.MacOSX:
@@ -1097,12 +1100,9 @@ namespace Crow
 		}
 #if VKVG
 		void resizeVulkanContext () {
-			vkCtx.WaitIdle();
-			vkCtx.blitSource?.Dispose ();
-			surf?.Dispose ();
-			surf = new Surface (vkvgDevice, clientRectangle.Width, clientRectangle.Height);				
-			vkCtx.BuildBlitCommand (surf);
-			vkCtx.WaitIdle();
+
+			vkCtx.CreateSurface (vkvgDevice, clientRectangle.Width, clientRectangle.Height, ref surf);
+
 			foreach (Widget g in GraphicTree)
 				g.RegisterForLayouting (LayoutingType.All);
 
