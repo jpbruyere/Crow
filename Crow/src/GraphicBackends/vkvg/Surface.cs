@@ -65,6 +65,9 @@ namespace Crow.Drawing
 		public void WriteToPng (string path) {
 			NativeMethods.vkvg_surface_write_to_png (handle, path);
 		}
+		public void WriteTo (IntPtr bitmap) {
+			NativeMethods.vkvg_surface_write_to_memory (handle, bitmap);
+		}
 		public void Clear () {
 			NativeMethods.vkvg_surface_clear (handle);
 		}

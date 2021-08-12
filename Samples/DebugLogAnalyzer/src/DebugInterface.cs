@@ -6,6 +6,7 @@ using System;
 using Crow.Drawing;
 using System.Threading;
 using Samples;
+using System.Runtime.InteropServices;
 
 namespace Crow
 {
@@ -18,7 +19,11 @@ namespace Crow
 		public DebugInterface (IntPtr hWin) : base (hWin)
 		{
 			SolidBackground = false;
-			surf = CreateSurface (100, 100);
+			initBackend (true);
+			
+			clientRectangle = new Rectangle (0, 0, 100, 100);
+			CreateMainSurface (ref clientRectangle);
+
 		}
 
 		public override void Run()
@@ -30,14 +35,14 @@ namespace Crow
 			};
 			t.Start ();
 		}
-		public bool Terminate;
+		public bool ShutDown;
 		string source;
 		Action delRegisterForRepaint;//call RegisterForRepaint in the container widget (DebugInterfaceWidget)
 		Action<Exception> delSetCurrentException;
 		Func<object> delGetScreenCoordinate;
 
 		void interfaceThread () {
-			while (!Terminate) {
+			while (!ShutDown) {
 				try
 				{
 					Update();	
@@ -70,18 +75,10 @@ namespace Crow
 					Thread.Sleep(1000);	
 				}
 				
-				if (IsDirty) {
+				if (IsDirty) 
 					delRegisterForRepaint();
-					//Console.WriteLine ("[DbgIFace]RegisterForRepaint");
-				}
-					
+
 				Thread.Sleep (UPDATE_INTERVAL);
-			}
-		}
-		public IntPtr SurfacePointer {
-			get {
-				lock(UpdateMutex)
-					return surf.Handle;
 			}
 		}
 		public void RegisterDebugInterfaceCallback (object w){
@@ -121,13 +118,18 @@ namespace Crow
 			}
 		}
 		public void Resize (int width, int height) {
-			
+			if (!HaveVkvgBackend)
+				ProcessResize (new Rectangle(0,0,width, height));
+		}
+		public override void ProcessResize(Rectangle bounds) {
 			lock (UpdateMutex) {
-				clientRectangle = new Rectangle (0, 0, width, height);
-				surf?.Dispose();
-				surf = CreateSurface (width, height);				
+				clientRectangle = bounds.Size;
+				
+				CreateMainSurface (ref clientRectangle);
+
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
+
 				RegisterClip (clientRectangle);
 			}				
 		}

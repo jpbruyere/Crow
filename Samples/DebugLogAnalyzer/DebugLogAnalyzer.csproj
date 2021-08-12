@@ -11,8 +11,5 @@
 			<LogicalName>Dbg.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>	
 	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\..\CrowDbgShared\CrowDbgShared.csproj" />
-	</ItemGroup>
 
 </Project>

@@ -187,13 +187,27 @@ namespace Crow
 			Glfw3.SetCursorPosCallback (hWin, HandleCursorPosDelegate);
 			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
 			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
+#if !VKVG//resize is processed on context.Render failing
 			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
+#endif
 			Glfw3.SetWindowRefreshCallback (hWin, HandleWindowRefreshDelegate);
 		}
 #if VKVG
-		VulkanContext vkCtx;
-		internal Device vkvgDevice;
+		protected VulkanContextBase vkCtx;
+		internal Device vkvgDevice => vkCtx.VkvgDevice;
+
+		/// <summary>
+		/// Create the VulkanContext with swapchain support. Override it to use another vulkan backend.
+		/// </summary>
 #endif
+		protected void initBackend (bool offscreen = false) {
+#if VKVG
+			if (offscreen)
+				vkCtx = new OffscreenVulkanContext (this);
+			else
+				vkCtx = new VulkanContext (this, hWin, (uint)clientRectangle.Width, (uint)clientRectangle.Height);
+#endif
+		}
 		protected void initSurface ()
 		{
 			Glfw3.Init ();
@@ -210,9 +224,8 @@ namespace Crow
 			registerGlfwCallbacks ();
 
 #if VKVG
-			vkCtx = new VulkanContext (hWin, (uint)clientRectangle.Width, (uint)clientRectangle.Height);
-			vkvgDevice = vkCtx.CreateVkvgDevice ();
-			vkCtx.CreateSurface (vkvgDevice, clientRectangle.Width, clientRectangle.Height, ref surf);			
+			initBackend ();
+			vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
 #else
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.MacOSX:
@@ -237,7 +250,52 @@ namespace Crow
 			}
 #endif
 		}
-
+		public void CreateMainSurface (ref Rectangle r) {
+			surf?.Dispose();
+#if (VKVG)
+			vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
+#else
+			surf = new ImageSurface (Format.Argb32, r.Width, r.Height);
+#endif
+		}		
+		public Surface CreateSurface (ref Rectangle r) {
+#if (VKVG)
+			return new Surface (vkvgDevice, r.Width, r.Height);
+#else
+			return surf.CreateSimilar (Content.ColorAlpha, r.Width, r.Height);
+#endif
+		}
+		public Surface CreateSurface (int width, int height) {
+#if (VKVG)
+			return new Surface (vkvgDevice, width, height);
+#else
+			return surf.CreateSimilar (Content.ColorAlpha, width, height);
+#endif     
+		}
+		public Surface CreateSurface (IntPtr existingSurfaceHandle) {
+#if (VKVG)
+			return new Surface (vkvgDevice, existingSurfaceHandle);
+#else
+			return Surface.Lookup (existingSurfaceHandle, false);                        
+#endif
+		}
+		public Surface CreateSurfaceForData (IntPtr data, int width, int height) {
+#if (VKVG)
+			throw new NotImplementedException ();
+#else
+			return new ImageSurface (data, Format.Argb32, width, height, width * 4);
+#endif
+		}
+		public IntPtr SurfacePointer {
+			get {
+				lock(UpdateMutex)
+#if (VKVG)
+					return (vkCtx as OffscreenVulkanContext).bitmap;
+#else
+					return surf.Handle;
+#endif
+			}
+		}
 		public void SetWindowIcon (string path) {
 			using (Stream stream = GetStreamFromPath (path)) {
 #if STB_SHARP
@@ -329,27 +387,7 @@ namespace Crow
 		};
 
 		#endregion
-		public Surface CreateSurface (ref Rectangle r) {
-#if (VKVG)
-			return new Surface (vkvgDevice, r.Width, r.Height);
-#else
-			return surf.CreateSimilar (Content.ColorAlpha, r.Width, r.Height);
-#endif                  
-		}
-		public Surface CreateSurface (int width, int height) {
-#if (VKVG)
-			return new Surface (vkvgDevice, width, height);
-#else
-			return surf.CreateSimilar (Content.ColorAlpha, width, height);
-#endif                  
-		}
-		public Surface CreateSurface (IntPtr existingSurfaceHandle) {
-#if (VKVG)
-			return new Surface (vkvgDevice, existingSurfaceHandle);
-#else
-			return Surface.Lookup (existingSurfaceHandle, false);                        
-#endif                  
-				}
+		
 		public string WindowTitle {			
 			set => Glfw3.SetWindowTitle (hWin, value);
 		}
@@ -449,6 +487,9 @@ namespace Crow
 				if (disposing)
 				{
 					// TODO: dispose managed state (managed objects).
+#if VKVG
+					vkCtx.Dispose ();
+#endif
 				}
 
 				currentCursor?.Dispose ();
@@ -1080,11 +1121,8 @@ namespace Crow
 
 #if VKVG
 				if (IsDirty) {
-					if (vkCtx.render ())
-						IsDirty = false;
-					else {
-						resizeVulkanContext();
-					}
+					if (!vkCtx.render ())
+						ProcessResize (new Rectangle (0,0,(int)vkCtx.width, (int)vkCtx.height));
 				}
 #endif			
 				
@@ -1100,13 +1138,9 @@ namespace Crow
 		}
 #if VKVG
 		void resizeVulkanContext () {
+			
 
-			vkCtx.CreateSurface (vkvgDevice, clientRectangle.Width, clientRectangle.Height, ref surf);
 
-			foreach (Widget g in GraphicTree)
-				g.RegisterForLayouting (LayoutingType.All);
-
-			registerRefreshClientRectangle ();
 		}
 #endif
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
@@ -1436,11 +1470,12 @@ namespace Crow
 		/// when window resize event occurs. 
 		/// </summary>
 		/// <param name="bounds">bounding box of the interface</param>
-		public virtual void ProcessResize(Rectangle bounds){			
+		public virtual void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
 #if VKVG
+				vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
 #else
 				switch (Environment.OSVersion.Platform) {
 				case PlatformID.MacOSX:
@@ -1463,11 +1498,11 @@ namespace Crow
 				case PlatformID.WinCE:
 					throw new PlatformNotSupportedException ("Unable to create cairo surface.");
 				}
+#endif
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 
 				registerRefreshClientRectangle ();
-#endif
 			}
 		}
 

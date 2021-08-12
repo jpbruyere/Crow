@@ -34,12 +34,12 @@ namespace Crow
 		Action delResetDirtyState;
 		Action delResetDebugger;
 		Action<object, string> delSaveDebugLog;		
-		Func<IntPtr> delGetSurfacePointer;
+		Func<IntPtr> delGetSurfacePointer;		
 		Action<string> delSetSource;
 
 		FieldInfo fiDbg_IncludeEvents, fiDbg_DiscardEvents, fiDbg_ConsoleOutput;
 		
-		bool initialized, recording;
+		bool initialized, recording, hasVkvgBackend;
 		string crowDbgAssemblyLocation;
 		DbgEvtType recordedEvents, discardedEvents;
 
@@ -198,6 +198,11 @@ namespace Crow
 			}
 			
 			crowLoadCtx = new AssemblyLoadContext("CrowDebuggerLoadContext");
+			crowLoadCtx.Resolving += (context, assemblyName) => {
+				return crowLoadCtx.LoadFromAssemblyPath (
+					System.IO.Path.Combine (
+						System.IO.Path.GetDirectoryName(crowDbgAssemblyLocation), assemblyName.Name + ".dll"));
+			};
 		
 			//using (crowLoadCtx.EnterContextualReflection()) {
 				crowAssembly = crowLoadCtx.LoadFromAssemblyPath (crowDbgAssemblyLocation);
@@ -210,7 +215,6 @@ namespace Crow
 				}				
 
 				dbgIfaceType = thisAssembly.GetType("Crow.DebugInterface");
-				
 				dbgIFace = Activator.CreateInstance (dbgIfaceType, new object[] {IFace.WindowHandle});
 
 				delResize = (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>),
@@ -252,6 +256,7 @@ namespace Crow
 											null, debuggerType.GetMethod("Reset"));
 				/*delSaveDebugLog = (Action<object, string>)Delegate.CreateDelegate(typeof(Action<object, string>),
 											null, debuggerType.GetMethod("Save", new Type[] {dbgIfaceType, typeof(string)}));*/
+				hasVkvgBackend = (bool)dbgIfaceType.GetField ("HaveVkvgBackend", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy).GetValue (null);
 
 				dbgIfaceType.GetMethod("RegisterDebugInterfaceCallback").Invoke (dbgIFace, new object[] {this} );				
 				dbgIfaceType.GetMethod("Run").Invoke (dbgIFace, null);
@@ -265,7 +270,6 @@ namespace Crow
 
 		protected override void onDraw(Context gr)
 		{
-			Console.WriteLine("onDraw");
 			gr.SetSource(Colors.RoyalBlue);
 			gr.Paint();
 		}
@@ -376,8 +380,12 @@ namespace Crow
 			bmp?.Dispose ();		
 			
 			if (initialized) {
-				delResize (Slot.Width, Slot.Height);			
-				bmp = IFace.CreateSurface (delGetSurfacePointer());
+				delResize (Slot.Width, Slot.Height);
+				if (hasVkvgBackend)		
+					bmp = IFace.CreateSurfaceForData (delGetSurfacePointer(), Slot.Width, Slot.Height);
+				else
+					bmp = IFace.CreateSurface (delGetSurfacePointer());
+					
 			} else
 				bmp = IFace.CreateSurface (Slot.Width, Slot.Height);								
 

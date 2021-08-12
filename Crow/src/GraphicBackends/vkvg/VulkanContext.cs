@@ -16,40 +16,37 @@ namespace Crow.Drawing {
 	/// <summary>
 	/// Base class for offscreen vulkan context without swapchain
 	/// </summary>
-	public class VulkanContextBase : IDisposable {
+	public abstract class VulkanContextBase : IDisposable {
+		protected Interface iface;
+		public uint width { get; protected set; }
+		public uint height { get; protected set; }
+
 		protected Instance instance;	
 		protected PhysicalDevice phy;
 		protected vke.Device dev;		
 		protected Queue graphicQueue;//for vkvg, we must have at least a graphic queue
+		public Crow.Drawing.Device VkvgDevice { get; protected set; }
 
 		public void WaitIdle() => dev.WaitIdle ();
 
-		public VulkanContextBase () {}		
-		public VulkanContextBase (ref byte[] pBitmap) {
-#if DEBUG
-			instance = new Instance (Ext.I.VK_EXT_debug_utils);
-#else
-			instance = new Instance ();
-#endif
-			phy = instance.GetAvailablePhysicalDevice ().FirstOrDefault ();
-			VkPhysicalDeviceFeatures enabledFeatures = default;
-			dev = new vke.Device (phy);
-			graphicQueue = new Queue (dev, VkQueueFlags.Graphics);
-			dev.Activate (enabledFeatures);
-		}
+		public VulkanContextBase (Interface iface) {
+			this.iface = iface;
+		}		
 
-		public Crow.Drawing.Device CreateVkvgDevice () => 
+
+		protected void createVkvgDevice () => VkvgDevice =
 			new Crow.Drawing.Device (instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, SampleCount.Sample_8);
-		public virtual void CreateSurface (Device vkvgDevice, int width, int height, ref Surface surf) {
-			surf?.Dispose ();
-			surf = new Surface (vkvgDevice, width, height);			
-		}
+
+		public abstract void CreateSurface (int width, int height, ref Surface surf);
+		public abstract bool render ();
 
 		#region IDisposable Support
 		protected bool isDisposed;
 		protected virtual void Dispose (bool disposing) {
 			if (!isDisposed) {
 				dev.WaitIdle ();
+
+				VkvgDevice.Dispose ();
 
 				if (disposing) {
 					dev.Dispose ();
@@ -69,23 +66,63 @@ namespace Crow.Drawing {
 		}
 		#endregion
 	}
+	//vulkan context rendering to preallocated bitmap
+	public class OffscreenVulkanContext : VulkanContextBase {
+		public IntPtr bitmap { get; private set; }
+		Surface surface;
+		/// <summary>
+		/// Preallocated Pointer to output bitmap
+		/// </summary>
+		/// <param name="pBitmap"></param>
+		public OffscreenVulkanContext (Interface iface) : base (iface) {
+#if DEBUG
+			instance = new Instance (Ext.I.VK_EXT_debug_utils);
+#else
+			instance = new Instance ();
+#endif
+			phy = instance.GetAvailablePhysicalDevice ().FirstOrDefault ();
+			VkPhysicalDeviceFeatures enabledFeatures = default;
+			dev = new vke.Device (phy);
+			graphicQueue = new Queue (dev, VkQueueFlags.Graphics);
+			dev.Activate (enabledFeatures);
+
+			createVkvgDevice ();
+		}
+		public override void CreateSurface (int width, int height, ref Surface surf) {
+			surf?.Dispose ();
+			surface = new Surface (VkvgDevice, width, height);
+			surf = surface;
+
+			this.width = (uint)width;
+			this.height = (uint)height;
+
+			if (bitmap != IntPtr.Zero)
+				Marshal.FreeHGlobal (bitmap);
+			bitmap = Marshal.AllocHGlobal (height * width * 4);
+			Console.WriteLine($"vkCtx.CreateOffscreenSurface: w:{width} h:{height}");
+		}
+		public override bool render () {
+			surface.WriteTo (bitmap);
+			Console.WriteLine($"vkCtx.Render(WriteTo): w:{width} h:{height}");
+			return true;
+		}
+		protected override void Dispose (bool disposing) {
+			if (!isDisposed) {
+				dev.WaitIdle ();
+
+				surface?.Dispose ();
+				if (bitmap != IntPtr.Zero)
+					Marshal.FreeHGlobal (bitmap);
+
+				base.Dispose (disposing);
+			}
+		}
+	}
 	/// <summary>
 	/// Base class to build vulkan application.
 	/// Provide default swapchain with its command pool and buffers per image and the main present queue
 	/// </summary>
 	public class VulkanContext : VulkanContextBase {
-		public override void CreateSurface (Device vkvgDevice, int width, int height, ref Surface surf) {
-			WaitIdle();
-
-			blitSource?.Dispose ();
-			surf?.Dispose ();
-			surf = new Surface (vkvgDevice, width, height);
-			buildBlitCommand (surf);
-
-			WaitIdle();
-		}
-
-		uint width, height;
 		IntPtr hWin;/** GLFW window native pointer. */
 		/**Vulkan Surface */
 		protected VkSurfaceKHR hSurf;
@@ -104,7 +141,7 @@ namespace Crow.Drawing {
 		uint frameCount;
 		Stopwatch frameChrono;
 
-		public VulkanContext (IntPtr hWin, uint _width, uint _height, bool vsync = false) {
+		public VulkanContext (Interface iface, IntPtr hWin, uint _width, uint _height, bool vsync = false) : base (iface) {
 			this.hWin = hWin;
 
 			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
@@ -150,9 +187,21 @@ namespace Crow.Drawing {
 				drawComplete[i].SetDebugMarkerName (dev, "Semaphore DrawComplete" + i);
 			}
 
-			cmdPool.SetName ("main CmdPool");			
+			cmdPool.SetName ("main CmdPool");
+
+			createVkvgDevice ();
 		}
 
+		public override void CreateSurface (int width, int height, ref Surface surf) {
+			WaitIdle();
+
+			blitSource?.Dispose ();
+			surf?.Dispose ();
+			surf = new Surface (VkvgDevice, width, height);
+			buildBlitCommand (surf);
+
+			WaitIdle();
+		}
 
 		internal vke.Image blitSource;
 		
@@ -190,15 +239,11 @@ namespace Crow.Drawing {
 				cmd.End ();
 			}
 		}
-		public void WaitAndResetDrawFence () {
-			drawFence.Wait ();
-			drawFence.Reset ();
-		}
 		/// <summary>
 		/// Main render method called each frame. get next swapchain image, process resize if needed, submit and present to the presentQueue.
 		/// Wait QueueIdle after presenting.
 		/// </summary>
-		public bool render () {
+		public override bool render () {
 			WaitIdle();
 
 			int idx = swapChain.GetNextImage ();
@@ -211,12 +256,15 @@ namespace Crow.Drawing {
 
 			if (cmds[idx] == null)
 				return false;
-			WaitAndResetDrawFence();
+
+			drawFence.Wait ();
+			drawFence.Reset ();
 
 			graphicQueue.Submit (cmds[idx], swapChain.presentComplete, drawComplete[idx], drawFence);
 			(graphicQueue as PresentQueue).Present (swapChain, drawComplete[idx]);
 
 			WaitIdle();
+			iface.IsDirty = false;
 			return true;
 		}
 		protected override void Dispose (bool disposing) {
