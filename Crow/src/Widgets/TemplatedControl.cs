@@ -5,6 +5,7 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Xml;
 using Crow.Drawing;
 
 namespace Crow
