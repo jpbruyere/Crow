@@ -15,11 +15,11 @@
 		</HorizontalStack>
 	</VerticalStack>
 	<HorizontalStack Margin="20" Name="zone1" Height="100" Width="Stretched" Background="Grey" AllowDrop="true" DragEnter="W_DragEnter" DragLeave="W_DragLeave">
-		<Widget Name="w1" Background="Blue" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>
-		<Widget Name="w2" Background="Red" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
-		<Widget Name="w3" Background="Green" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
-		<Widget Name="w4" Background="Yellow" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
-		<Widget Name="w5" Background="DimGrey" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+		<Widget CacheEnabled="True" Name="w1" Background="Blue" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>
+		<Widget CacheEnabled="True" Name="w2" Background="Red" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+		<Widget CacheEnabled="True" Name="w3" Background="Green" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+		<Widget CacheEnabled="True" Name="w4" Background="Yellow" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+		<Widget CacheEnabled="True" Name="w5" Background="DimGrey" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
 	</HorizontalStack>
 	<Widget Height="20" Focusable="true"/>
 	<HorizontalStack Margin="20" Name="zone2" Height="150" Width="Stretched" Background="Grey" AllowDrop="true" DragEnter="W_DragEnter" DragLeave="W_DragLeave">

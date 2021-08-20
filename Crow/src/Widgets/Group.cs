@@ -49,6 +49,7 @@ namespace Crow
 				searchTallestChild ();
 
 			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+			this.RegisterForGraphicUpdate();
 
 		}
 		public override void InsertChild (int idx, Widget g) {

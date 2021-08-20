@@ -1,3 +1,4 @@
+using System;
 using Crow;
 using Samples;
 using Crow.Drawing;
@@ -29,6 +30,10 @@ namespace tests
         private void W_StartDrag (object sender, DragDropEventArgs e) {
 			Rectangle r = e.DragSource.LastPaintedSlot;
             startGroup = e.DragSource.Parent as Group;
+			if (e.DragSource.bmp == null) {
+				Console.WriteLine ($"DragSource surface is null: {e.DragSource}");
+				return;
+			}
 
             Surface dragImg = CreateSurface (ref r);
             using (Context gr = new Context(dragImg)) {
@@ -41,7 +46,8 @@ namespace tests
         }
         private void W_EndDrag (object sender, DragDropEventArgs e) {
             lock (UpdateMutex)
-                startGroup.AddChild (e.DragSource);            
+                startGroup.AddChild (e.DragSource);
+			ClearDragImage ();
         }
 
         private void W_DragEnter (object sender, DragDropEventArgs e) {
@@ -54,6 +60,7 @@ namespace tests
         }
         private void W_Drop (object sender, DragDropEventArgs e) {
             //(e.DropTarget as Group).AddChild (e.DragSource);            
+			ClearDragImage ();
         }
 
 

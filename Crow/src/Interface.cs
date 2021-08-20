@@ -22,8 +22,8 @@ using Path = System.IO.Path;
 namespace Crow
 {
 	/// <summary>
-	/// The Interface Class is the root of crow graphic trees. It is thread safe allowing
-	/// application to run multiple interfaces in different threads.
+	/// The Interface Class is the root of crow graphic trees.
+	/// It is thread safe allowing application to run multiple interfaces in different threads.
 	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen.
 	/// </summary>
 	/// <remarks>
@@ -486,14 +486,13 @@ namespace Crow
 			{
 				if (disposing)
 				{
-					// TODO: dispose managed state (managed objects).
+					disposeContextMenus ();
 #if VKVG
 					vkCtx.Dispose ();
 #endif
 				}
 
 				currentCursor?.Dispose ();
-				disposeContextMenus ();
 
 				if (ownWindow) {
 					Glfw3.DestroyWindow (hWin);
@@ -503,31 +502,16 @@ namespace Crow
 				disposedValue = true;
 			}
 		}
-
-		// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
 		~Interface() {
-			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 			Dispose(false);
 		}
 
-		// This code added to correctly implement the disposable pattern.
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 		#endregion
-
-		/*public void ProcessEvents ()
-		{
-			//if (armedClick != null) {
-			//	if (lastClickTime.ElapsedMilliseconds > DOUBLECLICK_TRESHOLD) {
-			//		//cancel double click and 
-			//		armedClick.onMouseClick (armedClick, armedClickEventArgs);
-			//		armedClick = null;
-			//	}
-			//}
-		}*/
 
 		#region Static and constants
 		//initial capacity for layouting and clipping queues.
@@ -655,16 +639,16 @@ namespace Crow
 		internal Widget dragndropHover;
 
 		public Surface DragImage = null;
-		public Rectangle DragImageBounds;
+		public Rectangle DragImageBounds, lastDragImageBounds;
 		public bool DragImageFolowMouse;//prevent dragImg to be moved by mouse
 		public void ClearDragImage () {
 			lock (UpdateMutex) {
 				if (DragImage == null)
 					return;
-				clipping.UnionRectangle (DragImageBounds);				
+				clipping.UnionRectangle (lastDragImageBounds);				
 				DragImage.Dispose();
 				DragImage = null;
-				DragImageBounds = default;
+				DragImageBounds = lastDragImageBounds = default;
 			}
 		}
 		public void CreateDragImage (Surface img, Rectangle bounds, bool followMouse = true) {
@@ -673,6 +657,7 @@ namespace Crow
 					ClearDragImage ();
 				DragImage = img;
 				DragImageBounds = bounds;
+				lastDragImageBounds = default;
 				DragImageFolowMouse = followMouse;
 			}
 		}
@@ -1110,6 +1095,13 @@ namespace Crow
 
 				clippingRegistration ();
 
+				if (DragAndDropOperation != null &&	DragImageFolowMouse && DragImage != null) {
+					lastDragImageBounds = DragImageBounds;
+					DragImageBounds.X = MousePosition.X - DragImageBounds.Width / 2;
+					DragImageBounds.Y = MousePosition.Y - DragImageBounds.Height / 2;
+					if (DragImageBounds != lastDragImageBounds)
+						clipping.UnionRectangle(lastDragImageBounds);
+				}
 
 				if (!clipping.IsEmpty) {
 					if (ctx == null) {
@@ -1218,79 +1210,69 @@ namespace Crow
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		protected virtual void processDrawing(Context ctx){
 			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
-
-			if (DragImage != null)
-				clipping.UnionRectangle(DragImageBounds);
-
 			
-				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);				
+			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);				
 
 #if VKVG				
-				clear (ctx);
+			clear (ctx);
 #else
-				ctx.PushGroup ();
+			ctx.PushGroup ();
 
-				if (SolidBackground)
-					clear (ctx);
+			if (SolidBackground)
+				clear (ctx);
 #endif
-				
-				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-					Widget p = GraphicTree[i];
-					if (!p.IsVisible)
-						continue;
-					if (clipping.OverlapOut (p.Slot))
-						continue;
+			
+			for (int i = GraphicTree.Count -1; i >= 0 ; i--){
+				Widget p = GraphicTree[i];
+				if (!p.IsVisible)
+					continue;
+				if (clipping.OverlapOut (p.Slot))
+					continue;
 
-					//ctx.Save ();
-					p.Paint (ctx);
-					//ctx.Restore ();
-				}
+				ctx.Save ();
+				p.Paint (ctx);
+				ctx.Restore ();
+			}
 
-				if (DragAndDropOperation != null) {
-					if (DragImage != null) {
-						DirtyRect += DragImageBounds;
-						if (DragImageFolowMouse) {
-							DragImageBounds.X = MousePosition.X - DragImageBounds.Width / 2;
-							DragImageBounds.Y = MousePosition.Y - DragImageBounds.Height / 2;
-						}
-						ctx.Save ();
-						ctx.ResetClip ();
-						ctx.SetSource (DragImage, DragImageBounds.X, DragImageBounds.Y);
-						ctx.PaintWithAlpha (0.8);
-						ctx.Restore ();
-						DirtyRect += DragImageBounds;
-						IsDirty = true;
-					}
-				}
+			
+			if (lastDragImageBounds != DragImageBounds) {
+				DirtyRect += lastDragImageBounds;
+				ctx.Save ();
+				ctx.ResetClip ();
+				ctx.SetSource (DragImage, DragImageBounds.X, DragImageBounds.Y);
+				ctx.PaintWithAlpha (0.8);
+				ctx.Restore ();
+				DirtyRect += DragImageBounds;
+				IsDirty = true;
+			}
+	
 
 #if DEBUG_CLIP_RECTANGLE
-				ctx.LineWidth = 1;
-				ctx.SetSource(1,1,0,0.5);
-				for (int i = 0; i < clipping.NumRectangles; i++)
-					ctx.Rectangle(clipping.GetRectangle(i));
-				ctx.Stroke ();
-				
+			ctx.LineWidth = 1;
+			ctx.SetSource(1,1,0,0.5);
+			for (int i = 0; i < clipping.NumRectangles; i++)
+				ctx.Rectangle(clipping.GetRectangle(i));
+			ctx.Stroke ();
+			
 #endif
 
 #if VKVG
-				ctx.Flush();
-				//vkCtx.render ();
-				//vkCtx.WaitIdle();
+			ctx.Flush();
 #else
-				ctx.PopGroupToSource ();
+			ctx.PopGroupToSource ();
 
-				if (!SolidBackground)
-					clear (ctx);
+			if (!SolidBackground)
+				clear (ctx);
 
-				ctx.Paint ();
+			ctx.Paint ();
 
-				surf.Flush ();
+			surf.Flush ();
 #endif
-				
-				clipping.Reset ();
+			
+			clipping.Reset ();
 
-				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
-				IsDirty = true;
+			PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
+			IsDirty = true;
 			
 #if !VKVG
 			drawTextCursor (ctx);

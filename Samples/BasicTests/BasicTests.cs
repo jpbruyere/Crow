@@ -94,7 +94,7 @@ namespace Samples
 			} catch (Exception ex) {
 				//(LoadIMLFragment ($"<Label Background='Red' Foreground='White' Height='Fit' Width='Stretched' Multiline='true' VerticalAlignment='Bottom' Margin='5' />") as OldLabel).Text = ex.ToString();
 				Console.WriteLine (ex);
-																														 //MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message).Modal = true;
+				//MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message).Modal = true;
 			}
 			return false;
 		}
