@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netcoreapp3.1</TargetFrameworks>
 		<!--<TargetFrameworks>net5</TargetFrameworks>-->
-		<OutputType>Exe</OutputType>
+		<OutputType>WinExe</OutputType>
 		
 		<SolutionDir>$(MSBuildThisFileDirectory)..\</SolutionDir>
 		<OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>

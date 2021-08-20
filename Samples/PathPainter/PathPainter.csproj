@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-	<ItemGroup>
-		<EmbeddedResource Include="ui\**\*.*">
-			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
-		</EmbeddedResource>
-	</ItemGroup>
-</Project>

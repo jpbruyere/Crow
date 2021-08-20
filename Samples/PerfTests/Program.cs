@@ -161,10 +161,15 @@ namespace PerfTests
 				writer.WriteLine ("Path;MinEllapsed;MaxEllapsed;MeanEllapsed;MedianEllapsed;sigmaEllapsed;MinMem;MaxMem;MeanMem;MedianMem;sigmaMem;MinAlloc;MaxAlloc;MeanAlloc;MedianAlloc;sigmaAlloc");
 			}
 
-			if (screenOutput)
+			if (screenOutput) {
+				initBackend ();
 				initSurface ();
-			else
-				surf = CreateSurface (ClientRectangle.Width, ClientRectangle.Height);
+			} else {
+				SolidBackground = false;
+				initBackend (true);
+				
+				CreateMainSurface (ref clientRectangle);
+			}
 
 			initDictionaries ();
 			loadStyling ();			
@@ -519,7 +524,10 @@ namespace PerfTests
 					else
 						iface.PerformTests ();
 				}
-			} catch (Exception) {
+			} catch (Exception e) {
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.WriteLine (e);
+				Console.ResetColor ();
             }
 		}
 	}
