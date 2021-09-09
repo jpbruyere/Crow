@@ -91,7 +91,10 @@ namespace Crow
 		/// <param name="defaultConf"></param>
 		public Configuration (Stream defaultConf = null) {			
 			load (defaultConf);
-		}		
+		}
+		public static string AppConfigPath => Path.Combine (
+			Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".config") ,
+			Assembly.GetEntryAssembly ().GetName().Name);
 
 		static Configuration ()
 		{
