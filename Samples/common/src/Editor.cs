@@ -155,7 +155,7 @@ namespace Crow
 			lock (IFace.UpdateMutex) {
 				if (overlay == null) {
 					overlay = IFace.LoadIMLFragment<ListBox>(@"
-						<ListBox Style='suggestionsListBox' Data='{Suggestions}' >
+						<ListBox Style='suggestionsListBox' Data='{Suggestions}' UseLoadingThread='False' >
 							<ItemTemplate>
 								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left' 
 												Selected = '{Background=${ControlHighlight}}'
@@ -163,7 +163,7 @@ namespace Crow
 									<Label Text='{}' HorizontalAlignment='Left' />
 								</ListItem>							
 							</ItemTemplate>
-							<ItemTemplate DataType='MemberInfo'>
+							<ItemTemplate DataType='System.Reflection.MemberInfo'>
 								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left' 
 												Selected = '{Background=${ControlHighlight}}'
 												Unselected = '{Background=Transparent}'>
@@ -172,7 +172,7 @@ namespace Crow
 										<Label Text='{Name}' HorizontalAlignment='Left' />
 									</HorizontalStack>
 								</ListItem>							
-							</ItemTemplate>
+							</ItemTemplate>							
 							<ItemTemplate DataType='Colors'>
 								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left' 
 												Selected = '{Background=${ControlHighlight}}'

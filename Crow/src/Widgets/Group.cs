@@ -58,7 +58,7 @@ namespace Crow
 				return;
 			}
 			childrenRWLock.EnterWriteLock ();
-			try {	
+			try {
 				g.Parent = this;
 				Children.Insert (idx, g);
 			} finally {
@@ -74,8 +74,8 @@ namespace Crow
 				tallestChild = g;
 				contentSize.Height = g.LastSlots.Height;
 			}
-			
-			g.LayoutChanged += OnChildLayoutChanges;			
+
+			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
 		public override void ClearChildren()
@@ -106,10 +106,10 @@ namespace Crow
 				if (Children.Count > 0) {
 					if (lt == LayoutingType.Width) {
 						//if (largestChild == null)
-							searchLargestChild ();					
+							searchLargestChild ();
 					} else {
 						//if (tallestChild == null)
-							searchTallestChild ();					
+							searchTallestChild ();
 					}
 				}
 				return base.measureRawSize (lt);
@@ -119,7 +119,7 @@ namespace Crow
 		}
 
 		public override void OnLayoutChanges (LayoutingType layoutType)
-		{			
+		{
 			/*if (!IsVisible)
 				return;*/
 			base.OnLayoutChanges (layoutType);
@@ -223,7 +223,7 @@ namespace Crow
 				if (largestChild == null && !forceMeasure)
 					searchLargestChild (true);
 			} finally {
-				childrenRWLock.ExitReadLock ();				
+				childrenRWLock.ExitReadLock ();
 				DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
 			}
 		}
@@ -270,8 +270,8 @@ namespace Crow
 						total += 1 + child.ChildCount;
 					return total;
 				} finally {
-					childrenRWLock.ExitReadLock ();				
-				}				
+					childrenRWLock.ExitReadLock ();
+				}
 			}
 		}
 #endif

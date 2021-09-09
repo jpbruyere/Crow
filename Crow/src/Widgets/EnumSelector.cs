@@ -39,7 +39,7 @@ namespace Crow
 		Enum enumValue;
 		UInt32 bitFieldExcludeMask;
 		Type enumType;
-		bool enumTypeIsBitsfield;
+		bool enumTypeIsBitsfield, forceRadioButton;
 		string rbStyle, iconsPrefix, iconsExtension;		
 		#endregion
 
@@ -72,13 +72,28 @@ namespace Crow
 		/// </summary>
 		[DefaultValue (null)]
 		public string RadioButtonStyle {
-			get { return rbStyle; }
+			get => rbStyle;
 			set {
 				if (rbStyle == value)
 					return;
 				rbStyle = value;				
 				forceRefresh ();
 				NotifyValueChangedAuto (rbStyle);
+			}
+		}
+		/// <summary>
+		/// if enum has the 'Flag' attribte, CheckBox will be used. RadioButton may still be forced by
+		/// setting 'ForceRadioButton'='true'
+		/// </summary>
+		/// <value></value>
+		[DefaultValue (false)]
+		public bool ForceRadioButton {
+			get => forceRadioButton;
+			set {
+				if (forceRadioButton == value)
+					return;
+				forceRadioButton = value;
+				NotifyValueChangedAuto (forceRadioButton);
 			}
 		}
 		/// <summary>

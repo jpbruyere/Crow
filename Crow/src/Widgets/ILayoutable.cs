@@ -16,6 +16,7 @@ namespace Crow
 		ILayoutable LogicalParent { get; set; }
 
 		Rectangle ClientRectangle { get; }
+		Rectangle GetClientRectangleForChild (ILayoutable child);
 		Rectangle getSlot();
 
 		bool ArrangeChildren { get; }

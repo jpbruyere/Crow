@@ -172,7 +172,6 @@ namespace Crow
 			CMDMaximize = new Command ("Maximize", () => CurrentState = Status.Maximized, "#Crow.Icons.maximize.svg", allowedStates.HasFlag (Status.Maximized));
 			CMDNormalize = new Command ("Normalize", () => CurrentState = Status.Normal, "#Crow.Icons.normalize.svg", false);
 			CMDClose = new Command ("Close", close, "#Crow.Icons.exit2.svg", true);
-
 			Commands = new CommandGroup(CMDMinimize, CMDNormalize, CMDMaximize, CMDClose);
 		}
 

@@ -40,33 +40,33 @@ namespace Crow
 	/// excedental child (above grid sizing) are ignored
 	/// and invisible child keep their place in the grid
 	/// </summary>
-    public class Grid : Group
-    {
+	public class Grid : Group
+	{
 		#region CTOR
 		protected Grid () : base(){}
 		public Grid(Interface iface) : base(iface)
-		{            
+		{
 		}
 		#endregion
 
 		#region Private fields
-        int _spacing;
+		int _spacing;
 		int _columnCount;
 		int _rowCount;
 		#endregion
 
 		#region Public Properties
-        [DefaultValue(2)]
-        public int Spacing
-        {
+		[DefaultValue(2)]
+		public int Spacing
+		{
 			get { return _spacing; }
-            set { _spacing = value; }
-        }
-        [DefaultValue(2)]
-        public virtual int ColumnCount
-        {
-            get { return _columnCount; }
-            set { 
+			set { _spacing = value; }
+		}
+		[DefaultValue(2)]
+		public virtual int ColumnCount
+		{
+			get { return _columnCount; }
+			set {
 				if (_columnCount == value)
 					return;
 
@@ -75,12 +75,12 @@ namespace Crow
 				NotifyValueChangedAuto (ColumnCount);
 				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
-        }
+		}
 		[DefaultValue(2)]
 		public virtual int RowCount
 		{
 			get { return _rowCount; }
-			set { 
+			set {
 				if (_rowCount == value)
 					return;
 
@@ -91,10 +91,10 @@ namespace Crow
 			}
 		}
 		public virtual int CaseWidth {
-			get { return (Slot.Width - (ColumnCount - 1) * Spacing) / ColumnCount; }
+			get => (Slot.Width - (ColumnCount - 1) * Spacing) / ColumnCount;
 		}
 		public virtual int CaseHeight {
-			get { return (Slot.Height - (RowCount - 1) * Spacing) / RowCount; }
+			get => (Slot.Height - (RowCount - 1) * Spacing) / RowCount;
 		}
 
 		#endregion
@@ -151,14 +151,14 @@ namespace Crow
 		{
 			RegisteredLayoutings &= (~layoutType);
 
-			if (layoutType == LayoutingType.ArrangeChildren) {				
+			if (layoutType == LayoutingType.ArrangeChildren) {
 
 				ComputeChildrenPositions ();
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
 					IFace.EnqueueForRepaint (this);
-				
+
 				return true;
 			}
 
@@ -166,6 +166,6 @@ namespace Crow
 		}
 		#endregion
 
-    
+
 	}
 }

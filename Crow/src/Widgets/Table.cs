@@ -49,7 +49,7 @@ namespace Crow
 
 		public static Column Parse (string str) {
 			if (string.IsNullOrEmpty (str))
-				return null;				
+				return null;
 			Column c = new Column();
 			string[] tmp = str.Split (',');
 			c.Caption = tmp[0];
@@ -95,7 +95,7 @@ namespace Crow
 			for (int i = 0; i < HeaderRow.Children.Count; i++) {
 				if (row.Children.Count <= i)
 					continue;
-				setRowCellWidth (row.Children[i], HeaderRow.Children[i].Slot.Width);				
+				setRowCellWidth (row.Children[i], HeaderRow.Children[i].Slot.Width);
 				row.Children[i].Slot.X = HeaderRow.Children[i].Slot.X;
 			}
 		}
@@ -158,8 +158,8 @@ namespace Crow
 					row.Margin = rowsMargin;
 				childrenRWLock.ExitReadLock ();
 			}
-		}		
-		//int lineWidth;		
+		}
+		//int lineWidth;
 		public ObservableList<Column> Columns {
 			get => columns;
 			set {
@@ -174,7 +174,7 @@ namespace Crow
 				columns = value;
 
 				if (columns != null) {
-					createHeaderRow ();					
+					createHeaderRow ();
 					columns.ListAdd += Ol_AddColumn;
 					columns.ListAdd += Ol_RemoveColumn;
 				}
@@ -192,7 +192,7 @@ namespace Crow
 			if (Columns == null || headerCellITor == null)
 				return;
 			HeaderRow = new HorizontalStack(IFace, "TableHeaderRow") {Spacing = ColumnSpacing};
-			InsertChild (0, HeaderRow);			
+			InsertChild (0, HeaderRow);
 			foreach (Column c in Columns) {
 				Widget cell = headerCellITor.CreateInstance();
 				cell.LayoutChanged += onHeaderCell_LayoutChanges;
@@ -200,7 +200,7 @@ namespace Crow
 				cell.DataSource = c;
 			}
 		}
-		
+
 		void Ol_AddColumn (object sender, ListChangedEventArg e) {
 			HeaderRow.InsertChild (e.Index, headerCellITor.CreateInstance());
 			HeaderRow.DataSource = e.Element;
@@ -217,7 +217,7 @@ namespace Crow
 				Widget g = sender as Widget;
 				int cIdx = HeaderRow.Children.IndexOf (g);
 				if (cIdx < Columns.Count &&  Columns[cIdx].Width.IsFit)
-					searchLargestChildInColumn (cIdx);				
+					searchLargestChildInColumn (cIdx);
 				childrenRWLock.EnterReadLock ();
 				for (int i = 1; i < Children.Count; i++) {
 					TableRow row = Children[i] as TableRow;
@@ -244,13 +244,13 @@ namespace Crow
 		}
 		protected void setRowCellWidth (Widget w, int newW) {
 			if (newW == w.Slot.Width)
-				return;			
+				return;
 			w.Slot.Width = newW;
 			w.IsDirty = true;
 			w.OnLayoutChanges (LayoutingType.Width);
 			w.LastSlots.Width = w.Slot.Width;
 			w.RegisterForRedraw ();
-		}		
+		}
 
 		public override void ClearChildren()
 		{
@@ -267,7 +267,7 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 			try {
 				c.LargestChild = null;
-				int largestWidth = 0;	
+				int largestWidth = 0;
 				for (int i = 1; i < Children.Count; i++) {
 					TableRow row = Children[i] as TableRow;
 					if (!row.IsVisible || row.Children.Count <= i)
@@ -290,15 +290,15 @@ namespace Crow
 			//HeaderRow.adjustStretchedGo (LayoutingType.Width);
 
 		}
-		int splitIndex = -1;		
-		const int minColumnSize = 10;		
+		int splitIndex = -1;
+		const int minColumnSize = 10;
 		public override void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			
+
 			if (Columns != null && ColumnSpacing > 0 && Columns.Count > 0) {
 				Point m = ScreenPointToLocal (e.Position);
-				if (IFace.IsDown (Glfw.MouseButton.Left) && splitIndex >= 0) {					
-					int splitPos = (int)(0.5 * ColumnSpacing + m.X);					
+				if (IFace.IsDown (Glfw.MouseButton.Left) && splitIndex >= 0) {
+					int splitPos = (int)(0.5 * ColumnSpacing + m.X);
 					if (splitPos > HeaderRow.Children[splitIndex].Slot.Left + minColumnSize && splitPos < HeaderRow.Children[splitIndex+1].Slot.Right - minColumnSize) {
 						Columns[splitIndex+1].Width = HeaderRow.Children[splitIndex+1].Slot.Right - splitPos;
 						splitPos -= ColumnSpacing;
@@ -306,9 +306,9 @@ namespace Crow
 						HeaderRow.RegisterForLayouting (LayoutingType.ArrangeChildren);
 						e.Handled = true;
 					}
-					//Console.WriteLine ($"left:{HeaderRow.Children[splitIndex].Slot.Left} right:{HeaderRow.Children[splitIndex+1].Slot.Right} splitPos:{splitPos} m:{m}");				
+					//Console.WriteLine ($"left:{HeaderRow.Children[splitIndex].Slot.Left} right:{HeaderRow.Children[splitIndex+1].Slot.Right} splitPos:{splitPos} m:{m}");
 				} else {
-					splitIndex = -1;					
+					splitIndex = -1;
 					for (int i = 0; i < Columns.Count - 1; i++)
 					{
 						Rectangle r = HeaderRow.Children[i].Slot;
@@ -327,7 +327,7 @@ namespace Crow
 				}
 			}
 			base.onMouseMove(sender, e);
-		}		
+		}
 
 
 		protected override void onDraw (Context gr) {
@@ -338,7 +338,7 @@ namespace Crow
 			if (Columns != null && columns.Count > 0 && HeaderRow != null) {
 
 				Rectangle cb = ClientRectangle;
-							
+
 				Foreground.SetAsSource (IFace, gr, cb);
 				if (BorderLineWidth > 0) {
 					gr.LineWidth = BorderLineWidth;
@@ -348,7 +348,7 @@ namespace Crow
 				double x = 0;
 				if (VerticalLineWidth > 0) {
 					gr.LineWidth = VerticalLineWidth;
-					x = cb.Left + HeaderRow.Margin + 0.5 * ColumnSpacing + HeaderRow.Children[0].Slot.Width;// - 0.5 * VerticalLineWidth;				
+					x = cb.Left + HeaderRow.Margin + 0.5 * ColumnSpacing + HeaderRow.Children[0].Slot.Width;// - 0.5 * VerticalLineWidth;
 					for (int i = 1; i < HeaderRow.Children.Count ; i++)
 					{
 						gr.MoveTo (x, cb.Y);
@@ -369,11 +369,11 @@ namespace Crow
 					}
 					gr.Stroke ();
 				}
-				
+
 			}
 
 			DbgLogger.EndEvent (DbgEvtType.GODraw);
-		}			
+		}
 
 	}
 }

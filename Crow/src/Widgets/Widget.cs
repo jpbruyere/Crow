@@ -48,7 +48,7 @@ namespace Crow
 			BindingFlags.Instance | BindingFlags.NonPublic);
 		static MethodInfo miDesignAddValLoc = typeof(Widget).GetMethod("design_add_iml_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
-		
+
 		public volatile bool design_HasChanged = false;
 		public string design_id;
 		public int design_line;
@@ -60,7 +60,7 @@ namespace Crow
 		//public Dictionary<string,FileLocation> design_iml_locations = new Dictionary<string, FileLocation>();
 		public Dictionary<string,FileLocation> design_style_locations = new Dictionary<string, FileLocation>();
 
-		internal void design_add_style_location (string memberName, string path, int line, int col) {			
+		internal void design_add_style_location (string memberName, string path, int line, int col) {
 			if (design_style_locations.ContainsKey(memberName)){
 				System.Diagnostics.Debug.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 				return;
@@ -74,7 +74,7 @@ namespace Crow
 //			}
 //			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
 //		}
-			
+
 		public virtual bool FindByDesignID(string designID, out Widget go){
 			go = null;
 			if (this.design_id == designID){
@@ -107,7 +107,7 @@ namespace Crow
 		public virtual void getIML(XmlDocument doc, XmlNode parentElem) {
 			if (this.design_isTGItem)
 				return;
-			
+
 			XmlElement xe = doc.CreateElement(this.GetType().Name);
 
 			foreach (KeyValuePair<string,string> kv in design_iml_values) {
@@ -119,7 +119,7 @@ namespace Crow
 			parentElem.AppendChild (xe);
 		}
 		public Surface CreateIcon (int dragIconSize = 32) {
-#if VKVG			
+#if VKVG
 			Surface di = new Surface (IFace.vkvgDevice, dragIconSize, dragIconSize);
 #else
 			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
@@ -140,19 +140,19 @@ namespace Crow
 			}
 			return di;
 		}
-        public string DesignName {
-            get { return GetType ().Name + design_id; }
-        }
+		public string DesignName {
+			get { return GetType ().Name + design_id; }
+		}
 #endif
 
 		#region IDisposable implementation
 		protected bool disposed = false;
 
-		public void Dispose(){  
-			Dispose(true);  
-			GC.SuppressFinalize(this);  
-		}  
-		~Widget(){			
+		public void Dispose(){
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		~Widget(){
 			Dispose(false);
 		}
 		protected virtual void Dispose(bool disposing){
@@ -180,7 +180,7 @@ namespace Crow
 			disposed = true;
 #if DEBUG_STATS
 			TotalWidgetDisposed++;
-#endif			
+#endif
 
 			DbgLogger.EndEvent (DbgEvtType.Disposing);
 		}
@@ -205,7 +205,7 @@ namespace Crow
 		#region IValueChange implementation
 		/// <summary>
 		/// Raise to notify that the value of a property has changed, the binding system
-		/// rely mainly on this event. the member name may not be present in the class, this is 
+		/// rely mainly on this event. the member name may not be present in the class, this is
 		/// used in **propertyless** bindings, this allow to raise custom named events without needing
 		/// to create an new one in the class or a new property.
 		/// </summary>
@@ -368,14 +368,14 @@ namespace Crow
 				parent = value;
 				Slot = LastSlots = default(Rectangle);
 				parentRWLock.ExitWriteLock();
-									
+
 				onParentChanged (this, e);
 			}
 		}
 		/// <summary>
 		/// Mouse routing need to go back to logical parent for popups
 		/// </summary>
-		internal Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget; 
+		internal Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget;
 
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
@@ -399,6 +399,7 @@ namespace Crow
 				return cb;
 			}
 		}
+		public virtual Rectangle GetClientRectangleForChild (ILayoutable child) => ClientRectangle;
 		/// <summary>
 		/// Compute rectangle position on surface of the context. It ma be the first cached surface in parenting chain,
 		/// or the top backend surface if no cached widget is part of the current widget tree.
@@ -423,7 +424,7 @@ namespace Crow
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
 			try {
 				return
-					Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;				
+					Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 			} catch (Exception ex) {
 				Debug.WriteLine (ex);
 				return default(Rectangle);
@@ -700,7 +701,7 @@ namespace Crow
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
 				return Height.IsFit ? Measure.Fit : Measure.Stretched; } }
 		/// <summary>
-		/// Indicate that this object may received focus or not, if not focusable all the descendants are 
+		/// Indicate that this object may received focus or not, if not focusable all the descendants are
 		/// affected.
 		/// </summary>
 		[DesignCategory ("Behaviour")][DefaultValue(false)]
@@ -730,9 +731,9 @@ namespace Crow
 					onUnfocused (this, null);
 				NotifyValueChangedAuto (hasFocus);
 			}
-		}		
+		}
 		/// <summary>
-		/// true if this control is active, this means that mouse has been pressed in it and not yet released. It could 
+		/// true if this control is active, this means that mouse has been pressed in it and not yet released. It could
 		/// be used for other two states periferic action.
 		/// </summary>
 		[XmlIgnore]public virtual bool IsActive {
@@ -760,8 +761,8 @@ namespace Crow
 				isHover = value;
 
 				if (isHover) {
-					if (stickyMouseEnabled && stickyMouse > 0) 
-						IFace.stickedWidget = this;											
+					if (stickyMouseEnabled && stickyMouse > 0)
+						IFace.stickedWidget = this;
 					Hover.Raise (this, null);
 				}
 
@@ -807,8 +808,8 @@ namespace Crow
 					return;
 				stickyMouse = value;
 				NotifyValueChangedAuto (stickyMouse);
-            }
-        }
+			}
+		}
 		/// <summary>
 		/// Boolean for enabling or not the sticky mouse mechanic
 		/// </summary>
@@ -820,8 +821,8 @@ namespace Crow
 					return;
 				stickyMouseEnabled = value;
 				NotifyValueChangedAuto (stickyMouseEnabled);
-            }
-        }
+			}
+		}
 		/// <summary>
 		/// Determine Cursor when mouse is Hover.
 		/// </summary>
@@ -858,7 +859,7 @@ namespace Crow
 				NotifyValueChangedAuto (background);
 				RegisterForRedraw ();
 				if (background is SolidColor sc && sc.Equals (Colors.Clear))
-					clearBackground = true;				
+					clearBackground = true;
 			}
 		}
 		/// <summary>
@@ -931,23 +932,23 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool IsVisible {
-			get => isVisible; 
+			get => isVisible;
 			set {
 				if (value == isVisible)
 					return;
 
-				isVisible = value;				
-				
+				isVisible = value;
+
 				/*if (!isVisible)
 					unshownPostActions ();
 				RegisterForLayouting (LayoutingType.Sizing);*/
 
-				if (isVisible){										
+				if (isVisible){
 					IsDirty = true;
 				} else {
-					unshownPostActions ();					
+					unshownPostActions ();
 				}
-				RegisterForLayouting(LayoutingType.Sizing);				
+				RegisterForLayouting(LayoutingType.Sizing);
 
 				NotifyValueChangedAuto (isVisible);
 			}
@@ -1164,7 +1165,7 @@ namespace Crow
 			string styleKey = style;
 			if (!string.IsNullOrEmpty (style)) {
 				if (IFace.Styling.ContainsKey (style))
-					styling.Add (IFace.Styling [style]);				
+					styling.Add (IFace.Styling [style]);
 			}
 			//check the whole type hierarchy for styling
 			Type styleType = thisType;
@@ -1196,7 +1197,7 @@ namespace Crow
 
 			dm = new DynamicMethod("dyn_loadDefValues", null, new Type[] { typeof (object) }, thisType, true);
 
-            il = dm.GetILGenerator(256);
+			il = dm.GetILGenerator(256);
 			il.DeclareLocal(typeof (object));//store root
 			il.Emit(OpCodes.Nop);
 			//set local GraphicObject to root object passed as 1st argument
@@ -1208,9 +1209,9 @@ namespace Crow
 				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
 				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciator class holding the styling delegate and bound to it.
-				foreach (string exp in expression.Split (';')) {					
+				foreach (string exp in expression.Split (';')) {
 				//foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
-					
+
 					string trimed = exp.Trim();
 					if (trimed.StartsWith ("{", StringComparison.Ordinal)){
 						il.Emit (OpCodes.Ldloc_0);//load this as 1st arg of event Add
@@ -1338,9 +1339,9 @@ namespace Crow
 #endregion
 
 		public virtual Widget FindByName(string nameToFind)
-			=> string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;		
+			=> string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;
 		public virtual T FindByType<T> () //where T : Widget
-			=> this is T t? t : default(T);		
+			=> this is T t? t : default(T);
 		public virtual bool Contains(Widget goToFind){
 			return false;
 		}
@@ -1386,7 +1387,7 @@ namespace Crow
 				allowDrop = value;
 				NotifyValueChanged ("AllowDrop", allowDrop);
 			}
-		}		
+		}
 		/// <summary>
 		/// Semicolon separated list of accepted types as dropped widget.
 		/// </summary>
@@ -1443,17 +1444,17 @@ namespace Crow
 			IsDragged = true;
 			StartDrag.Raise (this, IFace.DragAndDropOperation);
 			#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());			
+			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
 			#endif
 		}
-		protected virtual void onDragEnter (object sender, DragDropEventArgs e){			
-			e.DropTarget = this;			
+		protected virtual void onDragEnter (object sender, DragDropEventArgs e){
+			e.DropTarget = this;
 			DragEnter.Raise (this, e);
 			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DRAG Enter => " + e.ToString());
 			#endif
 		}
-		public virtual void onDragLeave (object sender, DragDropEventArgs e){			
+		public virtual void onDragLeave (object sender, DragDropEventArgs e){
 			DragLeave.Raise (this, e);
 #if DEBUG_DRAGNDROP
 			Debug.WriteLine (this.ToString () + " : DRAG Leave => " + e.ToString ());
@@ -1470,7 +1471,7 @@ namespace Crow
 			Debug.WriteLine(this.ToString() + " : END DRAG => " + e.ToString());
 #endif
 		}
-		public virtual void onDrop (object sender, DragDropEventArgs e){			
+		public virtual void onDrop (object sender, DragDropEventArgs e){
 			IsDragged = false;
 			Drop.Raise (this, e);
 			//e.DropTarget.onDragLeave (this, e);//raise drag leave in target
@@ -1478,7 +1479,7 @@ namespace Crow
 			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
 #endif
 		}
-		public bool IsDropTarget => IFace.DragAndDropOperation?.DropTarget == this;		
+		public bool IsDropTarget => IFace.DragAndDropOperation?.DropTarget == this;
 		#endregion
 
 		#region Queuing
@@ -1489,7 +1490,7 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.GOClippingRegistration, this);
 
 			parentRWLock.EnterReadLock ();
-			if (parent != null) {					
+			if (parent != null) {
 				parent.RegisterClip (LastPaintedSlot);
 				parent.RegisterClip (Slot);
 			}else {
@@ -1513,7 +1514,7 @@ namespace Crow
 				//we register clip in the parent, if it's dirty, all children will be redrawn
 				if (IsDirty && CacheEnabled) {
 					DbgLogger.SetMsg (DbgEvtType.GORegisterClip, $"regclip canceled Dirty:{IsDirty} Cached:{CacheEnabled}");
-					return;			
+					return;
 				}
 				Rectangle cb = ClientRectangle;
 				Rectangle  r = clip + cb.Position;
@@ -1523,18 +1524,18 @@ namespace Crow
 					r.Height -= r.Bottom - cb.Bottom;*/
 				if (r.Width < 0 || r.Height < 0){
 					DbgLogger.SetMsg (DbgEvtType.GORegisterClip, $"regclip canceled size w:{r.Width} h:{r.Height}");
-					return;			
+					return;
 				}
 				if (cacheEnabled)
 					Clipping.UnionRectangle (r);
 				if (Parent == null){
 					DbgLogger.SetMsg (DbgEvtType.GORegisterClip, "clip chain aborded (no parent)");
-					return;			
+					return;
 				}
 				/*Widget p = Parent as Widget;
 				if (p?.IsDirty == true && p?.CacheEnabled == true){
 					Console.WriteLine ($"parent.regclip canceled p.Dirty:{p?.IsDirty} Cached:{p?.CacheEnabled}: {this.ToString()}");
-					return;			
+					return;
 				}*/
 				Parent.RegisterClip (r + Slot.Position);
 			} finally {
@@ -1551,7 +1552,7 @@ namespace Crow
 			}
 			DbgLogger.StartEvent(DbgEvtType.GORegisterForGraphicUpdate, this);
 
-			IsDirty = true;			
+			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else
@@ -1579,7 +1580,7 @@ namespace Crow
 		/// of the drawing could take place in the onDraw method, and the markers (single line, rectangle, ...)
 		/// could be drawn in the Paint method. Such widget must have 'CacheEnabled=true' and to simply update the
 		/// markers without a full redraw, just call 'RegisterForRepaint'.
-		/// 
+		///
 		/// </remark>
 		public void RegisterForRepaint () {
 			if (RequiredLayoutings == LayoutingType.None)// && !IsDirty)
@@ -1597,7 +1598,7 @@ namespace Crow
 				return lt == LayoutingType.Width ?
 					contentSize.Width + 2 * margin : contentSize.Height + 2 * margin;
 			} finally {
-				DbgLogger.EndEvent(DbgEvtType.GOMeasure);	
+				DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			}
 		}
 
@@ -1614,14 +1615,14 @@ namespace Crow
 			}
 			return false;
 		}
-		protected bool stretchedInFit (LayoutingType lt) {			
-			
+		protected bool stretchedInFit (LayoutingType lt) {
+
 			if (Parent == null)
 				return false;
 			Widget p = Parent as Widget;
 			if (lt == LayoutingType.Width) {
 				if (!Width.IsRelativeToParent)
-					return false;				
+					return false;
 				while (p.Width.IsRelativeToParent) {
 					p = p.Parent as Widget;
 					if (p == null)
@@ -1630,7 +1631,7 @@ namespace Crow
 				return p.Width.IsFit;
 			}
 			if (!Height.IsRelativeToParent)
-				return false;			
+				return false;
 			while (p.Height.IsRelativeToParent) {
 				p = p.Parent as Widget;
 				if (p == null)
@@ -1646,10 +1647,10 @@ namespace Crow
 		/// arrange children in the x direction.
 		/// </summary>
 		/// <param name="layoutable">The children that is calling the constraints</param>
-		/// <param name="layoutType">The currently registering layouting types</param>		
+		/// <param name="layoutType">The currently registering layouting types</param>
 		public virtual void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType){	}
 		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
-		
+
 		internal ReaderWriterLockSlim layoutMutex = new ReaderWriterLockSlim (LockRecursionPolicy.SupportsRecursion);
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (disposed) {
@@ -1657,7 +1658,7 @@ namespace Crow
 				return;
 			}
 
-			parentRWLock.EnterReadLock ();			
+			parentRWLock.EnterReadLock ();
 
 			try {
 				if (Parent == null)
@@ -1666,14 +1667,14 @@ namespace Crow
 				layoutMutex.EnterWriteLock ();
 
 				try {
-						
-				
+
+
 					//prevent queueing same LayoutingType for this
 					layoutType &= (~RegisteredLayoutings);
 
 					if (layoutType == LayoutingType.None)
 						return;
-					
+
 					//dont set position for stretched item
 					if (Width == Measure.Stretched)
 						layoutType &= (~LayoutingType.X);
@@ -1694,7 +1695,7 @@ namespace Crow
 
 					RequiredLayoutings |= layoutType;
 				} finally {
-					layoutMutex.ExitWriteLock ();					
+					layoutMutex.ExitWriteLock ();
 				}
 
 				DbgLogger.StartEvent (DbgEvtType.GOLockLayouting, this);
@@ -1760,7 +1761,7 @@ namespace Crow
 				if (left == 0) {
 
 					if (Parent.RequiredLayoutings.HasFlag (LayoutingType.Width) ||
-					    RequiredLayoutings.HasFlag (LayoutingType.Width))
+						RequiredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 
 					switch (horizontalAlignment) {
@@ -1768,10 +1769,10 @@ namespace Crow
 						Slot.X = 0;
 						break;
 					case HorizontalAlignment.Right:
-						Slot.X = Parent.ClientRectangle.Width - Slot.Width;
+						Slot.X = Parent.GetClientRectangleForChild(this).Width - Slot.Width;
 						break;
 					case HorizontalAlignment.Center:
-						Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
+						Slot.X = Parent.GetClientRectangleForChild(this).Width / 2 - Slot.Width / 2;
 						break;
 					}
 				} else
@@ -1790,7 +1791,7 @@ namespace Crow
 				if (top == 0) {
 
 					if (Parent.RequiredLayoutings.HasFlag (LayoutingType.Height) ||
-					    RequiredLayoutings.HasFlag (LayoutingType.Height))
+						RequiredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 
 					switch (verticalAlignment) {
@@ -1798,10 +1799,10 @@ namespace Crow
 						Slot.Y = 0;
 						break;
 					case VerticalAlignment.Bottom:
-						Slot.Y = Parent.ClientRectangle.Height - Slot.Height;
+						Slot.Y = Parent.GetClientRectangleForChild(this).Height - Slot.Height;
 						break;
 					case VerticalAlignment.Center:
-						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
+						Slot.Y = Parent.GetClientRectangleForChild(this).Height / 2 - Slot.Height / 2;
 						break;
 					}
 				} else
@@ -1825,19 +1826,19 @@ namespace Crow
 					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 					else if (Width == Measure.Stretched)
-						Slot.Width = Parent.ClientRectangle.Width;
+						Slot.Width = Parent.GetClientRectangleForChild(this).Width;
 					else
-  						Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
+  						Slot.Width = (int)Math.Round ((double)(Parent.GetClientRectangleForChild(this).Width * Width) / 100.0);
 
 					if (Slot.Width < 0)
 						return false;
 
 					//size constrain
 					if (Slot.Width < minimumSize.Width)
-						Slot.Width = minimumSize.Width;						
+						Slot.Width = minimumSize.Width;
 					else if (maximumSize.Width > 0 && Slot.Width > maximumSize.Width)
 						Slot.Width = maximumSize.Width;
-					
+
 				} else
 					Slot.Width = 0;
 
@@ -1859,9 +1860,9 @@ namespace Crow
 					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 					else if (Height == Measure.Stretched)
-						Slot.Height = Parent.ClientRectangle.Height;
+						Slot.Height = Parent.GetClientRectangleForChild(this).Height;
 					else
-						Slot.Height = (int)Math.Round ((double)(Parent.ClientRectangle.Height * Height) / 100.0);
+						Slot.Height = (int)Math.Round ((double)(Parent.GetClientRectangleForChild(this).Height * Height) / 100.0);
 
 					if (Slot.Height < 0)
 						return false;
@@ -1871,7 +1872,7 @@ namespace Crow
 						Slot.Height = minimumSize.Height;
 					 else if (maximumSize.Height > 0 && Slot.Height > maximumSize.Height)
 						Slot.Height = maximumSize.Height;
-					
+
 				} else
 					Slot.Height = 0;
 
@@ -1906,7 +1907,7 @@ namespace Crow
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
 		protected virtual void onDraw(Context gr)
-		{			
+		{
 			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
 
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -1947,12 +1948,12 @@ namespace Crow
 				onDraw (gr);
 			}
 
-			IsDirty = false;			
+			IsDirty = false;
 
 			DbgLogger.EndEvent (DbgEvtType.GORecreateCache);
 		}
 		protected void paintCache(Context ctx, Rectangle rb) {
-			DbgLogger.StartEvent(DbgEvtType.GOPaintCache, this);	
+			DbgLogger.StartEvent(DbgEvtType.GOPaintCache, this);
 			if (clearBackground) {
 				ctx.Operator = Operator.Clear;
 				ctx.Rectangle (rb);
@@ -1960,18 +1961,18 @@ namespace Crow
 				ctx.Operator = Operator.Over;
 			}
 
-			ctx.SetSource (bmp, rb.X, rb.Y);			
+			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 #if VKVG
 			ctx.Flush ();
 #endif
-			DbgLogger.EndEvent(DbgEvtType.GOPaintCache);	
+			DbgLogger.EndEvent(DbgEvtType.GOPaintCache);
 		}
 		protected virtual void UpdateCache(Context ctx){
-			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);			
+			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
 			DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
-			Clipping.Reset ();			
+			Clipping.Reset ();
 			DbgLogger.EndEvent (DbgEvtType.GOUpdateCache);
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
@@ -1996,13 +1997,13 @@ namespace Crow
 #endif
 				DbgLogger.AddEvent (DbgEvtType.Warning);
 				DbgLogger.EndEvent (DbgEvtType.GOPaint);
-				return; 
+				return;
 			}
 			//lock (this) {
 				if (cacheEnabled) {
 					if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
 						cacheEnabled = false;
-				}				
+				}
 
 				if (cacheEnabled) {
 					if (IsDirty) {
@@ -2010,8 +2011,8 @@ namespace Crow
 						paintCache (ctx, Slot + Parent.ClientRectangle.Position);
 					}else
 						UpdateCache (ctx);
-					if (!IsEnabled)						
-						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
+					if (!IsEnabled)
+						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
 					//ctx.Save ();
@@ -2027,7 +2028,7 @@ namespace Crow
 					if (!IsEnabled)
 						paintDisabled (ctx, rb);
 
-				}				
+				}
 
 				LastPaintedSlot = Slot;
 			//}
@@ -2044,7 +2045,7 @@ namespace Crow
 		}
 		#endregion
 
-        #region Keyboard handling
+		#region Keyboard handling
 		public virtual void onKeyDown(object sender, KeyEventArgs e){
 			if (KeyDown != null)
 				KeyDown.Invoke (this, e);
@@ -2063,7 +2064,7 @@ namespace Crow
 			else if (!e.Handled)
 				FocusParent?.onKeyPress (sender, e);
 		}
-        #endregion
+		#endregion
 
 		#region Mouse handling
 		/// <summary>
@@ -2081,7 +2082,7 @@ namespace Crow
 			if (!parent.PointIsIn(ref m))
 				return false;
 			m -= (parent.getSlot().Position + parent.ClientRectangle.Position) ;
-			return Slot.ContainsOrIsEqual (m);					
+			return Slot.ContainsOrIsEqual (m);
 		}
 		public virtual bool MouseIsIn(Point m)
 			=> (!(isVisible & IsEnabled) || IsDragged) ? false : PointIsIn (ref m);
@@ -2091,7 +2092,7 @@ namespace Crow
 				if (IFace.dragndropHover != this) {
 					IFace.dragndropHover = this;
 #if DEBUG_DRAGNDROP
-					Debug.WriteLine($"DragNDropHover = {this.ToString()} AllowDrop:{AllowDrop}, {IFace.DragAndDropOperation.DragSource.AllowedDropTypes}");			
+					Debug.WriteLine($"DragNDropHover = {this.ToString()} AllowDrop:{AllowDrop}, {IFace.DragAndDropOperation.DragSource.AllowedDropTypes}");
 #endif
 
 					if (AllowDrop && AcceptDrop (IFace.DragAndDropOperation.DragSource))
@@ -2100,17 +2101,17 @@ namespace Crow
 			} else if (IFace.HoverWidget != this) {
 				onMouseEnter (this, e);
 				IFace.HoverWidget = this;
-			}			
+			}
 		}
 		public virtual void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (AllowDrag & IFace.IsDown (MouseButton.Left)) {				
+			if (AllowDrag & IFace.IsDown (MouseButton.Left)) {
 				onStartDrag (this, new DragDropEventArgs (this, FocusParent));
 				return;
 			}
 
 			if (MouseMove != null)
-				MouseMove.Invoke (this, e);			
+				MouseMove.Invoke (this, e);
 			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.MouseMove))
 				FocusParent?.onMouseMove (sender, e);
 		}
@@ -2171,7 +2172,7 @@ namespace Crow
 		/// <param name="sender">The Sender of the event</param>
 		/// <param name="e">event arguments</param>
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
-			if (MouseDoubleClick != null)			
+			if (MouseDoubleClick != null)
 				MouseDoubleClick.Invoke (this, e);
 			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.MouseClick))
 				FocusParent?.onMouseDoubleClick (sender, e);
@@ -2203,14 +2204,14 @@ namespace Crow
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
-		{			
+		{
 			MouseLeave.Raise (this, e);
 		}
 
 		#endregion
 
 		protected virtual void onFocused(object sender, EventArgs e){
-			DbgLogger.AddEvent (DbgEvtType.FocusedWidget, this);			
+			DbgLogger.AddEvent (DbgEvtType.FocusedWidget, this);
 			Focused.Raise (this, e);
 		}
 		protected virtual void onUnfocused(object sender, EventArgs e){
@@ -2256,7 +2257,7 @@ namespace Crow
 			string tmp ="";
 
 			if (Parent != null)
-				tmp = Parent.ToString () + tmp;			
+				tmp = Parent.ToString () + tmp;
 			return string.IsNullOrEmpty(Name) ? tmp + "." + LogName : tmp + "." + Name;
 			//#endif
 		}
@@ -2264,7 +2265,7 @@ namespace Crow
 		/// Checks to handle when widget is removed from the visible graphic tree
 		/// </summary>
 		void unshownPostActions () {
-			IsDirty = true;			
+			IsDirty = true;
 
 			/*if (parent is Widget p)
 				p.RegisterForGraphicUpdate();
@@ -2278,7 +2279,7 @@ namespace Crow
 			{
 				Debug.WriteLine($"[ERR]:unshownPostActions:{e}");
 			}
-				
+
 
 			/*if (IFace.ActiveWidget != null) {
 				if (IsActive) {
@@ -2304,7 +2305,7 @@ namespace Crow
 					IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
 				}
 			}
-			
+
 			/*Slot = default;
 			try
 			{
@@ -2313,7 +2314,7 @@ namespace Crow
 				if (LastSlots.Height > 0)
 					OnLayoutChanges (LayoutingType.Height);
 				OnLayoutChanges (LayoutingType.X);
-				OnLayoutChanges (LayoutingType.Y);				
+				OnLayoutChanges (LayoutingType.Y);
 			}
 			catch (System.Exception ex)
 			{
@@ -2321,7 +2322,8 @@ namespace Crow
 			}
 			LastSlots = default;
 			LastPaintedSlot = default;*/
-			//Slot = LastSlots = default;			
+			//Slot = LastSlots = LastPaintedSlot = default;
+			Slot = LastPaintedSlot = default;
 		}
 	}
 }

@@ -104,7 +104,7 @@ namespace Crow {
 					}
 					d += c.Slot.Height + Spacing;
 				}
-			}			
+			}
 			DbgLogger.EndEvent(DbgEvtType.GOComputeChildrenPositions);
 		}
 		Widget stretchedGO = null;
@@ -126,10 +126,10 @@ namespace Crow {
 		protected void setChildWidth (Widget w, int newW) {
 			if (w.MaximumSize.Width > 0)
 				newW = Math.Min (newW, w.MaximumSize.Width);
-				
+
 			if (newW == w.Slot.Width)
 				return;
-			
+
 			w.Slot.Width = newW;
 			w.IsDirty = true;
 			w.LayoutChanged -= OnChildLayoutChanges;
@@ -141,7 +141,7 @@ namespace Crow {
 		protected void setChildHeight (Widget w, int newH) {
 			if (w.MaximumSize.Height > 0)
 				newH = Math.Min (newH, w.MaximumSize.Height);
-				
+
 			if (newH == w.Slot.Height)
 				return;
 
@@ -153,14 +153,14 @@ namespace Crow {
 			w.LastSlots.Height = w.Slot.Height;
 			DbgLogger.SetMsg(DbgEvtType.GOAdjustStretchedGo, $"new height={newH}");
 		}
-		internal void adjustStretchedGo (LayoutingType lt) {			
+		internal void adjustStretchedGo (LayoutingType lt) {
 			if (stretchedGO == null)
 				return;
 			//Console.WriteLine ($"adjust stretched go: {stretchedGO} {lt}");
 			DbgLogger.StartEvent(DbgEvtType.GOAdjustStretchedGo, this);
 			if (lt == LayoutingType.Width)
 				setChildWidth (stretchedGO, Math.Max (
-					ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),	stretchedGO.MinimumSize.Width));				
+					ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),	stretchedGO.MinimumSize.Width));
 			else
 				setChildHeight (stretchedGO, Math.Max (
 					ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1), stretchedGO.MinimumSize.Height));
@@ -248,7 +248,7 @@ namespace Crow {
 			}else if (child.Height == Measure.Stretched)
 				child.RegisterForLayouting (LayoutingType.Height);
 			else
-				contentSize.Height += child.LastSlots.Height;			
+				contentSize.Height += child.LastSlots.Height;
 		}
 		public override void RemoveChild (Widget child) {
 			if (child != stretchedGO) {

@@ -33,15 +33,15 @@ namespace Crow
 	/// 	- global static constants and variables of CROW
 	/// 	- Keyboard and Mouse logic
 	/// 	- the resulting bitmap of the interface
-	/// 
+	///
 	/// the master branch and the nuget package includes an OpenTK renderer which allows
 	/// the creation of multiple threaded interfaces.
-	/// 
+	///
 	/// If you intend to create another renderer (GDK, vulkan, etc) the minimal step is to
 	/// put an interface instance as member of your root object and call (optionally in another thread) the update function
 	/// at regular interval. Then you have to call
 	/// mouse, keyboard and resize functions of the interface when those events occurs in the host app.
-	/// 
+	///
 	/// The resulting surface (a byte array in the OpenTK renderer) is made available and protected with the
 	/// RenderMutex of the interface.
 	/// </remarks>
@@ -61,6 +61,13 @@ namespace Crow
 		#endregion
 
 		internal static List<Assembly> crowAssemblies = new List<Assembly> ();
+		/// <summary>
+		/// Add Assembly that may contains CROW ui stuf like widgets or iml.
+		/// Styling fond in that assembly are automatically loaded on addition;
+		/// This assembly will be searched for embedded ressource resolution, extension methods, and custom widgets.
+		/// For those assembly to be added by simple name, see 'CrowAssemblyNames'.
+		/// </summary>
+		/// <param name="a">The assembly to add.</param>
 		public void AddCrowAssembly (Assembly a) {
 			lock (UpdateMutex) {
 				if (crowAssemblies.Contains (a))
@@ -69,6 +76,10 @@ namespace Crow
 				loadStylingFromAssembly (a);
 			}
 		}
+		/// <summary>
+		/// Remove Assembly from the CrowAssembly list. See 'AddCrowAssembly' for details.
+		/// </summary>
+		/// <param name="a"></param>
 		public void RemoveCrowAssembly (Assembly a) {
 			lock (UpdateMutex) {
 				if (!crowAssemblies.Contains (a))
@@ -94,9 +105,12 @@ namespace Crow
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
-
-			
 		}
+		/// <summary>
+		/// Each time this array is set, the resolved Assemblies will be
+		/// added to the CrowAssemblies list, see 'AddCrowAssembly' for details.
+		/// </summary>
+		/// <value></value>
 		public static string [] CrowAssemblyNames {
 			set {
 				if (value == null)
@@ -117,7 +131,7 @@ namespace Crow
 						crowAssemblies.Add (a);
 				} catch {
 
-				}											
+				}
 			}*/
 			foreach (string assemblyName in crowAssemblyNames) {
 				try {
@@ -126,21 +140,37 @@ namespace Crow
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine ($"Unable to preload CrowAssembly: {assemblyName}: {ex}");
 					Console.ResetColor();
-				}											
+				}
 			}
 
 		}
-
+		/// <summary>
+		/// Create a new Crow Interface by providing an existing valid GLFW window handle.
+		/// UI thread will not be started, and the main surface will not be initialized.
+		/// This is used to give crow support to existing glfw application by providing
+		/// a custom suface creation, and a custom update thread.
+		/// </summary>
+		/// <param name="width">the width of the window</param>
+		/// <param name="height">the height of the window</param>
+		/// <param name="glfwWindowHandle">A valid GLFW window handle</param>
+		/// <returns></returns>
 		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, false, false)
 		{
 			hWin = glfwWindowHandle;
 			PerformanceMeasure.InitMeasures ();
 		}
-#if VKVG		
+#if VKVG
 		public const bool HaveVkvgBackend = true;
 #else
 		public const bool HaveVkvgBackend = false;
 #endif
+		/// <summary>
+		/// Create a standard Crow interface
+		/// </summary>
+		/// <param name="width">the width of the native window</param>
+		/// <param name="height">the height of the native window</param>
+		/// <param name="startUIThread">If 'yes' start the ui update (InterfaceThread method) in a dedicated thread</param>
+		/// <param name="createSurface">If 'yes', create the main rendering surface on the native window</param>
 		public Interface (int width = 800, int height = 600, bool startUIThread = true, bool createSurface = true)
 		{
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
@@ -219,7 +249,7 @@ namespace Crow
 			hWin = Glfw3.CreateWindow (clientRectangle.Width, clientRectangle.Height, "win name", MonitorHandle.Zero, IntPtr.Zero);
 			if (hWin == IntPtr.Zero)
 				throw new Exception ("[GLFW3] Unable to create vulkan Window");
-			ownWindow = true;			
+			ownWindow = true;
 
 			registerGlfwCallbacks ();
 
@@ -257,7 +287,7 @@ namespace Crow
 #else
 			surf = new ImageSurface (Format.Argb32, r.Width, r.Height);
 #endif
-		}		
+		}
 		public Surface CreateSurface (ref Rectangle r) {
 #if (VKVG)
 			return new Surface (vkvgDevice, r.Width, r.Height);
@@ -270,13 +300,13 @@ namespace Crow
 			return new Surface (vkvgDevice, width, height);
 #else
 			return surf.CreateSimilar (Content.ColorAlpha, width, height);
-#endif     
+#endif
 		}
 		public Surface CreateSurface (IntPtr existingSurfaceHandle) {
 #if (VKVG)
 			return new Surface (vkvgDevice, existingSurfaceHandle);
 #else
-			return Surface.Lookup (existingSurfaceHandle, false);                        
+			return Surface.Lookup (existingSurfaceHandle, false);
 #endif
 		}
 		public Surface CreateSurfaceForData (IntPtr data, int width, int height) {
@@ -311,7 +341,7 @@ namespace Crow
 				Glfw.Image icon = new Glfw.Image ((uint)stbi.Width, (uint)stbi.Height, image);
 				Glfw3.SetWindowIcon (hWin, 1, ref icon);
 				icon.Dispose();
-				
+
 #else
 				using (StbImage stbi = new StbImage (stream)) {
 					byte[] image = new byte [stbi.Size];
@@ -387,8 +417,8 @@ namespace Crow
 		};
 
 		#endregion
-		
-		public string WindowTitle {			
+
+		public string WindowTitle {
 			set => Glfw3.SetWindowTitle (hWin, value);
 		}
 
@@ -428,9 +458,9 @@ namespace Crow
 			disposeContextMenus ();
 			initDictionaries ();
 			loadStyling ();
-			loadThemeFiles ();					
+			loadThemeFiles ();
 			initContextMenus ();
-		}		
+		}
 		/// <summary>
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
 		/// </summary>
@@ -441,7 +471,7 @@ namespace Crow
 				Glfw3.PollEvents ();
 				UpdateFrame ();
 			}
-			
+
 			Terminate ();
 		}
 		public virtual void Terminate () {}
@@ -598,7 +628,7 @@ namespace Crow
 		/// <summary>Sync mutex between host and Crow for rendering operations (bmp, dirtyBmp,...)</summary>
 		public object RenderMutex = new object();
 		/// <summary>Global lock of the update cycle</summary>
-		public object UpdateMutex = new object();		
+		public object UpdateMutex = new object();
 		/// <summary>Global lock of the clipping queue</summary>
 		public object ClippingMutex = new object();
 		//TODO:share resource instances
@@ -620,7 +650,7 @@ namespace Crow
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
 		/// </summary>
-		public Dictionary<String, Instantiator> Instantiators;		
+		public Dictionary<String, Instantiator> Instantiators;
 		/// <summary>
 		/// default templates dic by metadata token
 		/// </summary>
@@ -645,7 +675,7 @@ namespace Crow
 			lock (UpdateMutex) {
 				if (DragImage == null)
 					return;
-				clipping.UnionRectangle (lastDragImageBounds);				
+				clipping.UnionRectangle (lastDragImageBounds);
 				DragImage.Dispose();
 				DragImage = null;
 				DragImageBounds = lastDragImageBounds = default;
@@ -699,7 +729,7 @@ namespace Crow
 			loadThemeStyle ();
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 			foreach (Assembly a in crowAssemblies)
-				loadStylingFromAssembly (a);			
+				loadStylingFromAssembly (a);
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 		}
 		/// <summary> Search for .style resources in assembly </summary>
@@ -709,7 +739,7 @@ namespace Crow
 			foreach (string s in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
-				using (StyleReader sr = new StyleReader (assembly.GetManifestResourceStream (s))) 
+				using (StyleReader sr = new StyleReader (assembly.GetManifestResourceStream (s)))
 					sr.Parse (StylingConstants, Styling, s);
 			}
 		}
@@ -749,7 +779,7 @@ namespace Crow
 			Styling = new Dictionary<string, Style> (initCapacity);
 			DefaultValuesLoader = new Dictionary<string, LoaderInvoker> (initCapacity);
 			Instantiators = new Dictionary<string, Instantiator> (initCapacity);
-			DefaultTemplates = new Dictionary<string, Instantiator> (initCapacity);			
+			DefaultTemplates = new Dictionary<string, Instantiator> (initCapacity);
 			ItemTemplates = new Dictionary<string, ItemTemplate> (initCapacity);
 		}
 		void loadThemeFiles () {
@@ -864,11 +894,11 @@ namespace Crow
 					if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
 						.FirstOrDefault (aa => aa.GetName ().Name == $"{assemblyNames[0]}.{assemblyNames[1]}"), resId, out stream))
 						return stream;
-				foreach (Assembly ca in crowAssemblies) 
+				foreach (Assembly ca in crowAssemblies)
 					if (tryGetResource (ca, resId, out stream))
 						return stream;
 				throw new Exception ("Resource not found: " + path);
-			} 
+			}
 			if (!File.Exists (path))
 				throw new FileNotFoundException ($"File not found: {path}", path);
 			return new FileStream (path, FileMode.Open, FileAccess.Read);
@@ -898,7 +928,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>return the new instantiator</returns>
 		/// <param name="imlFragment">a valid IML string</param>
-		public Instantiator CreateITorFromIMLFragment (string imlFragment) {			
+		public Instantiator CreateITorFromIMLFragment (string imlFragment) {
 			return Instantiator.CreateFromImlFragment (this, imlFragment);
 		}
 		/// <summary>
@@ -1034,7 +1064,7 @@ namespace Crow
 				}
 				_focusedWidget = value;
 
-				NotifyValueChanged ("FocusedWidget", _focusedWidget);				
+				NotifyValueChanged ("FocusedWidget", _focusedWidget);
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = true;
 			}
@@ -1047,7 +1077,7 @@ namespace Crow
 		/// Once in that queue, that means that the layouting of obj and childs have succeed,
 		/// the next step when dequeued will be clipping registration</summary>
 		public void EnqueueForRepaint(Widget g)
-		{			
+		{
 			lock (ClippingMutex) {
 				if (g.IsQueueForClipping)
 					return;
@@ -1086,7 +1116,7 @@ namespace Crow
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
-			
+
 			DbgLogger.StartEvent (DbgEvtType.Update);
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Update);
 
@@ -1105,7 +1135,7 @@ namespace Crow
 
 				if (!clipping.IsEmpty) {
 					if (ctx == null) {
-						using (ctx = new Context (surf)) 
+						using (ctx = new Context (surf))
 							processDrawing (ctx);
 					}else
 						processDrawing (ctx);
@@ -1116,8 +1146,8 @@ namespace Crow
 					if (!vkCtx.render ())
 						ProcessResize (new Rectangle (0,0,(int)vkCtx.width, (int)vkCtx.height));
 				}
-#endif			
-				
+#endif
+
 			} finally {
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Update);
@@ -1130,7 +1160,7 @@ namespace Crow
 		}
 #if VKVG
 		void resizeVulkanContext () {
-			
+
 
 
 		}
@@ -1191,8 +1221,8 @@ namespace Crow
 
 			ctx.ClipPreserve ();
 			ctx.Operator = Operator.Clear;
-			ctx.Fill ();			
-			ctx.Operator = Operator.Over;			
+			ctx.Fill ();
+			ctx.Operator = Operator.Over;
 		}
 		bool solidBackground = false;
 		public bool SolidBackground {
@@ -1210,10 +1240,10 @@ namespace Crow
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		protected virtual void processDrawing(Context ctx){
 			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
-			
-			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);				
 
-#if VKVG				
+			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
+
+#if VKVG
 			clear (ctx);
 #else
 			ctx.PushGroup ();
@@ -1221,7 +1251,7 @@ namespace Crow
 			if (SolidBackground)
 				clear (ctx);
 #endif
-			
+
 			for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 				Widget p = GraphicTree[i];
 				if (!p.IsVisible)
@@ -1234,7 +1264,7 @@ namespace Crow
 				ctx.Restore ();
 			}
 
-			
+
 			if (lastDragImageBounds != DragImageBounds) {
 				DirtyRect += lastDragImageBounds;
 				ctx.Save ();
@@ -1245,7 +1275,7 @@ namespace Crow
 				DirtyRect += DragImageBounds;
 				IsDirty = true;
 			}
-	
+
 
 #if DEBUG_CLIP_RECTANGLE
 			ctx.LineWidth = 1;
@@ -1253,7 +1283,7 @@ namespace Crow
 			for (int i = 0; i < clipping.NumRectangles; i++)
 				ctx.Rectangle(clipping.GetRectangle(i));
 			ctx.Stroke ();
-			
+
 #endif
 
 #if VKVG
@@ -1268,18 +1298,18 @@ namespace Crow
 
 			surf.Flush ();
 #endif
-			
+
 			clipping.Reset ();
 
 			PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 			IsDirty = true;
-			
+
 #if !VKVG
 			drawTextCursor (ctx);
 #endif
 
 			debugHighlightFocus (ctx);
-			
+
 			DbgLogger.EndEvent (DbgEvtType.ProcessDrawing, true);
 		}
 		#endregion
@@ -1359,14 +1389,14 @@ namespace Crow
 						break;
 					if (newW.AlwaysOnTop || !w.AlwaysOnTop)
 						break;
-					
+
 					ptr++;
 				}
 			}
 
 			lock (UpdateMutex)
 				GraphicTree.Insert (ptr, g);
-			
+
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 
 			return g;
@@ -1449,7 +1479,7 @@ namespace Crow
 
 		/// <summary>
 		/// Resize the interface. This function should be called by the host
-		/// when window resize event occurs. 
+		/// when window resize event occurs.
 		/// </summary>
 		/// <param name="bounds">bounding box of the interface</param>
 		public virtual void ProcessResize(Rectangle bounds){
@@ -1574,7 +1604,7 @@ namespace Crow
 		public MouseCursor MouseCursor {
 			get => cursor;
 			set {
-			
+
 				if (value == cursor)
 					return;
 				cursor = value;
@@ -1597,13 +1627,13 @@ namespace Crow
 				default:
 					currentCursor = XCursor.Create (this, cursor);
 					break;
-				}                                
-				
+				}
+
 				currentCursor.Set (hWin);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
-		
+
 		Point stickyMouseDelta = default;
 		internal Widget stickedWidget = null;
 
@@ -1663,11 +1693,11 @@ namespace Crow
 				if (HoverOrDropTarget != null) {
 					resetTooltip ();
 
-					//check topmost graphicobject first				
+					//check topmost graphicobject first
 					Widget topContainer = HoverOrDropTarget;
 					while (topContainer.LogicalParent is Widget w)
-						topContainer = w;					
-					
+						topContainer = w;
+
 					int indexOfTopContainer = GraphicTree.IndexOf (topContainer);
 					if (indexOfTopContainer != 0) {
 						for (int i = 0; i < indexOfTopContainer; i++) {//check all top containers that are at a higher level
@@ -1704,7 +1734,7 @@ namespace Crow
 					} else {
 						if (DragAndDropInProgress && dragndropHover == DragAndDropOperation.DropTarget)
 							DragAndDropOperation.DropTarget.onDragLeave (this, DragAndDropOperation);
-						//seek upward from last focused graph obj's	
+						//seek upward from last focused graph obj's
 						while (HoverOrDropTarget.FocusParent != null) {
 							if (!DragAndDropInProgress)
 								HoverWidget.onMouseLeave (this, e);
@@ -1716,7 +1746,7 @@ namespace Crow
 								else
 									HoverWidget.onMouseMove (this, e);
 								return true;
-							}						
+							}
 						}
 					}
 				}
@@ -1762,7 +1792,7 @@ namespace Crow
 
 				lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
 
-				if (HoverWidget == null) 
+				if (HoverWidget == null)
 					return false;
 
 				HoverWidget.onMouseDown (this, lastMouseDownEvent);
@@ -1787,7 +1817,7 @@ namespace Crow
 				mouseRepeatTimer.Reset ();
 				lastMouseDownEvent = null;
 
-				if (DragAndDropInProgress) {				
+				if (DragAndDropInProgress) {
 					if (DragAndDropOperation.DropTarget != null)
 						DragAndDropOperation.DragSource.onDrop (this, DragAndDropOperation);
 					else
@@ -1805,7 +1835,7 @@ namespace Crow
 
 				_activeWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
 
-				if (_activeWidget == null) {					
+				if (_activeWidget == null) {
 					DbgLogger.SetMsg (DbgEvtType.MouseUp, "[BUG]Mystery reset of _activeWidget");
 					return true;
 				}
@@ -1819,7 +1849,7 @@ namespace Crow
 				//			if (!lastActive.MouseIsIn (Mouse.Position)) {
 				//				ProcessMouseMove (Mouse.X, Mouse.Y);
 				//			}
-				
+
 				return true;
 			} finally {
 				DbgLogger.EndEvent (DbgEvtType.MouseUp);
@@ -1879,7 +1909,7 @@ namespace Crow
 		<HorizontalStack Height='Fit'>
 			<Label Text='TotalWidgetActive:' Width='50%'/>
 			<Label Text='{TotalWidgetActive}' TextAlignment='Right'/>
-		</HorizontalStack>		
+		</HorizontalStack>
 		<HorizontalStack Height='Fit'>
 			<Label Text='TotalWidgetInGraphicTree:' Width='50%'/>
 			<Label Text='{TotalWidgetInGraphicTree}' TextAlignment='Right'/>
@@ -1889,7 +1919,7 @@ namespace Crow
 				").DataSource = this;
 			}
 #endif
-			
+
 			//Keyboard.SetKeyState((Crow.Key)Key,true);
 			lastKeyDownEvt = new KeyEventArgs (key, true);
 
@@ -1965,8 +1995,8 @@ namespace Crow
 		}
 		void ToolTipContainer_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
-			Widget ttc = sender as Widget;				
-					
+			Widget ttc = sender as Widget;
+
 			//tooltip container datasource is the widget triggering the tooltip
 			Rectangle r = ttc?.DataSource is Widget w ? ScreenCoordinates (w.Slot) : ClientRectangle;
 
@@ -2037,7 +2067,7 @@ namespace Crow
 				ctxMenuContainer.BubbleMouseEvent = DeviceEventType.None;
 				ctxMenuContainer.LogicalParent = go;
 				ctxMenuContainer.DataSource = go;
-				
+
 
 				PutOnTop (ctxMenuContainer, true);
 			}
@@ -2046,7 +2076,7 @@ namespace Crow
 
 			//OnMouseMove (MousePosition.X, MousePosition.Y);
 			HoverWidget = ctxMenuContainer;
-			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (MousePosition.X, MousePosition.Y, 0, 0));						
+			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (MousePosition.X, MousePosition.Y, 0, 0));
 		}
 		#endregion
 
@@ -2100,7 +2130,8 @@ namespace Crow
 			set { throw new NotImplementedException (); }
 		}
 
-		public Rectangle ClientRectangle => clientRectangle; 
+		public Rectangle ClientRectangle => clientRectangle;
+		public Rectangle GetClientRectangleForChild (ILayoutable child) => clientRectangle;
 		public Interface HostContainer => this;
 
 		public Rectangle getSlot () => ClientRectangle;

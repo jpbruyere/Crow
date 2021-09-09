@@ -35,7 +35,7 @@ namespace Crow
 		public event EventHandler<EventArgs> ChildrenCleared;
 		#endregion
 		public override void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType)
-			=> layoutType &= (~(LayoutingType.X|LayoutingType.Width));		
+			=> layoutType &= (~(LayoutingType.X|LayoutingType.Width));
 
 		public Table Table => Parent as Table;
 		internal Widget tallestChild = null;
@@ -46,10 +46,10 @@ namespace Crow
 			}
 			childrenRWLock.EnterWriteLock ();
 
-			try {				
+			try {
 				g.Parent = this;
 				Children.Insert (idx, g);
-			} finally {			
+			} finally {
 				childrenRWLock.ExitWriteLock ();
 			}
 
@@ -58,7 +58,7 @@ namespace Crow
 				contentSize.Height = g.LastSlots.Height;
 			}
 
-			
+
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
@@ -76,7 +76,7 @@ namespace Crow
 				Children.Remove(child);
 				child.Parent = null;
 				child.LogicalParent = null;
-			} finally {			
+			} finally {
 				childrenRWLock.ExitWriteLock ();
 			}
 
@@ -108,14 +108,14 @@ namespace Crow
 		public override int measureRawSize (LayoutingType lt)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this);
-			try {			
+			try {
 				if (lt == LayoutingType.Height && Children.Count > 0 && tallestChild == null)
-					searchTallestChild ();					
+					searchTallestChild ();
 				return base.measureRawSize (lt);
 			} finally {
-				DbgLogger.EndEvent(DbgEvtType.GOMeasure);	
+				DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			}
-		}		
+		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
@@ -134,7 +134,7 @@ namespace Crow
 					childrenRWLock.ExitReadLock ();
 				}
 			}
-		}		
+		}
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOOnChildLayoutChange, this);
