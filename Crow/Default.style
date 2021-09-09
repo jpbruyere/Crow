@@ -159,7 +159,9 @@ winBorder {
 	BorderWidth = "${WindowBorderWidth}";
 	Foreground = "${WindowBorderColor}";
 	Background = "${WindowBackgroundColor}";	
-	Margin = "1";	
+	Margin = "1";
+	StickyMouseEnabled="true";
+	StickyMouse="10";
 }
 WindowIconBorder {
 	BorderWidth="1";
