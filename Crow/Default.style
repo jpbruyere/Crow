@@ -42,10 +42,10 @@ GroupBox {
 
 Control {
 	Margin="${ControlInsideMargin}";
-	Spacing="3";	
+	Spacing="3";
 	Foreground  = "${ControlForeground}";
 	//MouseEnter	= "{Foreground=${ControlCaptionHoverColor}}";
-	//MouseLeave	= "{Foreground=${ControlForeground}}";	
+	//MouseLeave	= "{Foreground=${ControlForeground}}";
 }
 ControlBorder {
 	BorderWidth	= "${ControlBorderWidth}";
@@ -86,7 +86,7 @@ Label {
 OldLabel {
 	Height = "Fit";
 	Width = "Fit";
-	Margin = "0";	
+	Margin = "0";
 }
 TextBox {
 	Background = "White";
@@ -112,7 +112,7 @@ MenuItem {
 	Caption = "MenuItem";
 	Width = "Stretched";
 	Height = "Fit";
-	Background = "${MenuBackground}";	
+	Background = "${MenuBackground}";
 	Foreground = "${ControlForeground}";
 	MouseEnter = "{Background=${ControlHighlight}}";
 	MouseLeave = "{Background=${MenuBackground}}";
@@ -158,10 +158,10 @@ Window {
 winBorder {
 	BorderWidth = "${WindowBorderWidth}";
 	Foreground = "${WindowBorderColor}";
-	Background = "${WindowBackgroundColor}";	
+	Background = "${WindowBackgroundColor}";
 	Margin = "1";
 	StickyMouseEnabled="true";
-	StickyMouse="10";
+	StickyMouse="5";
 }
 WindowIconBorder {
 	BorderWidth="1";
@@ -216,7 +216,7 @@ FileDialog {
 }
 ProgressBar {
 	Background = "Jet";
-	Foreground = "RoyalBlue";	
+	Foreground = "RoyalBlue";
 	Orientation = "Horizontal";
 	Height = "10";
 }
@@ -251,14 +251,14 @@ CheckBoxAlt {
 }
 
 ArrowBut {
-	MouseRepeat="true";		
-	
+	MouseRepeat="true";
+
 	Foreground="Grey";
 	Background="Transparent";
-		
+
 	MouseEnter="{Foreground=${ControlHighlight}}";
 	MouseLeave="{Foreground=Grey}";
-	
+
 	Margin="2";
 	KeepProportions="true";
 }
@@ -269,7 +269,7 @@ ScrollBar {
 	Value = "0";
 	Foreground="Transparent";
 	Background="Onyx";
-	Width = "14";    
+	Width = "14";
 	Height = "Inherit";
 	CornerRadius = "0";
 }
@@ -283,14 +283,14 @@ HScrollBar {
 }
 EnumSelector {
     Width = "Fit";
-    Height = "Fit";    
+    Height = "Fit";
 }
 labColor {
-	Margin="2";	
+	Margin="2";
 	Width="Fit";
 }
 labColorV {
-	Margin="1";		
+	Margin="1";
 	Width="Fit";
 }
 ColorSlider {
@@ -300,11 +300,11 @@ ColorSlider {
 }
 ColorPicker {
 	Height="Fit";
-	MinimumSize="200,100";	
+	MinimumSize="200,100";
 }
 Table {
 	Spacing="1";
-	Foreground="Grey";	
+	Foreground="Grey";
 }
 TableRow {
 	Width="Stretched";
