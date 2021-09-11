@@ -30,10 +30,11 @@ namespace ShowCase
 				app.SetWindowIcon ("#Crow.Icons.crow.png");
 				//app.Theme = @"C:\Users\Jean-Philippe\source\Crow\Themes\TestTheme";
 				CurrentProgramInstance = app;
+
 				app.Run ();
 			}
-		}		
-		public Container crowContainer;		
+		}
+		public Container crowContainer;
 
 		Stopwatch reloadChrono = new Stopwatch ();
 
@@ -45,11 +46,11 @@ namespace ShowCase
 				source = value;
 				CMDSave.CanExecute = IsDirty;
 				if (!reloadChrono.IsRunning)
-					reloadChrono.Restart ();				
+					reloadChrono.Restart ();
 				NotifyValueChanged (source);
 				NotifyValueChanged ("IsDirty", IsDirty);
 			}
-		}	
+		}
 
 		void reloadFromSource () {
 			hideError ();
@@ -63,7 +64,7 @@ namespace ShowCase
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				}
-			} catch (InstantiatorException itorex) {				
+			} catch (InstantiatorException itorex) {
 				showError (itorex);
 			} catch (Exception ex) {
 				showError (ex);

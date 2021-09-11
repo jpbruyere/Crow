@@ -40,7 +40,7 @@ namespace Crow
 		UInt32 bitFieldExcludeMask;
 		Type enumType;
 		bool enumTypeIsBitsfield, forceRadioButton;
-		string rbStyle, iconsPrefix, iconsExtension;		
+		string itemStyle, iconsPrefix, iconsExtension;
 		#endregion
 
 		#region public properties
@@ -67,18 +67,33 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// Enum values are presented with RadioButton controls. Here you may specify a template to use
+		/// Enum values are presented with RadioButton or CheckBox controls. Here you may specify a template to use
+		/// for the radio buttons.
+		/// </summary>
+		[DefaultValue (null)][Obsolete("Use ItemStyle instead")]
+		public string RadioButtonStyle {
+			get => itemStyle;
+			set {
+				if (itemStyle == value)
+					return;
+				itemStyle = value;
+				forceRefresh ();
+				NotifyValueChangedAuto (itemStyle);
+			}
+		}
+		/// <summary>
+		/// Enum values are presented with RadioButton or CheckBox controls. Here you may specify a template to use
 		/// for the radio buttons.
 		/// </summary>
 		[DefaultValue (null)]
-		public string RadioButtonStyle {
-			get => rbStyle;
+		public string ItemStyle {
+			get => itemStyle;
 			set {
-				if (rbStyle == value)
+				if (itemStyle == value)
 					return;
-				rbStyle = value;				
+				itemStyle = value;
 				forceRefresh ();
-				NotifyValueChangedAuto (rbStyle);
+				NotifyValueChangedAuto (itemStyle);
 			}
 		}
 		/// <summary>
@@ -97,7 +112,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// use to define the colors of the 3d border
+		/// Current Selected Value(s).
 		/// </summary>
 		[DefaultValue(null)]
 		public virtual Enum EnumValue {
@@ -106,19 +121,19 @@ namespace Crow
 				if (enumValue == value)
 					return;
 
-				enumValue = value;									
+				enumValue = value;
 
 				if (enumValue != null) {
 
 					if (enumType != enumValue.GetType ()) {
 						enumValueContainer.ClearChildren ();
-						enumType = enumValue.GetType ();						
-												
+						enumType = enumValue.GetType ();
+
 						enumTypeIsBitsfield = enumType.CustomAttributes.Any (ca => ca.AttributeType == typeof(FlagsAttribute));
 
-						if (enumTypeIsBitsfield) {
-							IML.Instantiator iTor = IFace.CreateITorFromIMLFragment ($"<CheckBox Style='{rbStyle}'/>");
-							UInt32 currentValue = Convert.ToUInt32 (EnumValue);							
+						if (enumTypeIsBitsfield && !forceRadioButton) {
+							IML.Instantiator iTor = IFace.CreateITorFromIMLFragment ($"<CheckBox Style='{itemStyle}'/>");
+							UInt32 currentValue = Convert.ToUInt32 (EnumValue);
 							currentValue &= ~bitFieldExcludeMask;
 							enumValue = (Enum)Enum.ToObject(enumType, currentValue);
 
@@ -130,19 +145,19 @@ namespace Crow
 								CheckBox rb = iTor.CreateInstance<CheckBox> ();
 								rb.Caption = en.ToString();
 								rb.LogicalParent = this;
-								rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";								
+								rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";
 								rb.Tooltip = $"0x{eni:x8}";
 
 								if (eni == 0) {
 									rb.IsChecked = currentValue == 0;
 									rb.Checked += (sender, e) => EnumValue = (Enum)Enum.ToObject(enumType, 0);
-								} else {								
+								} else {
 									rb.IsChecked = currentValue == 0 ? false : EnumValue.HasFlag (en);
 									rb.Checked += onChecked;
 									rb.Unchecked += onUnchecked;
 								}
 								/*rb.Checked += (sender, e) => (((CheckBox)sender).LogicalParent as EnumSelector).EnumValue = (Enum)(object)
-											(Convert.ToUInt32 ((((CheckBox)sender).LogicalParent as EnumSelector).EnumValue) | Convert.ToUInt32 (en));						
+											(Convert.ToUInt32 ((((CheckBox)sender).LogicalParent as EnumSelector).EnumValue) | Convert.ToUInt32 (en));
 								rb.Unchecked += (sender, e) => (((CheckBox)sender).LogicalParent as EnumSelector).EnumValue = (Enum)(object)
 											(Convert.ToUInt32 ((((CheckBox)sender).LogicalParent as EnumSelector).EnumValue) & ~Convert.ToUInt32 (en));						*/
 
@@ -150,23 +165,28 @@ namespace Crow
 							}
 
 						} else {
-							IML.Instantiator iTor = IFace.CreateITorFromIMLFragment ($"<RadioButton Style='{rbStyle}'/>");
+							IML.Instantiator iTor = IFace.CreateITorFromIMLFragment ($"<RadioButton Style='{itemStyle}'/>");
 							foreach (var en in enumType.GetEnumValues ()) {
+								if (enumTypeIsBitsfield) {
+									UInt32 eni = Convert.ToUInt32 (en);
+									if ((eni & bitFieldExcludeMask) != 0)
+										continue;
+								}
 								RadioButton rb = iTor.CreateInstance<RadioButton> ();
 								rb.Caption = en.ToString();
 								rb.LogicalParent = this;
 								rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";
-								if (enumValue == en)
-									rb.IsChecked = true;								
+								if (enumValue.Equals (en))
+									rb.IsChecked = true;
 								rb.Checked += (sender, e) => (((RadioButton)sender).LogicalParent as EnumSelector).EnumValue = (Enum)en;
 								enumValueContainer.AddChild (rb);
 							}
 						}
-							
 
 
-					} else if (enumTypeIsBitsfield) {
-						UInt32 currentValue = Convert.ToUInt32 (EnumValue);						
+
+					} else if (enumTypeIsBitsfield && !forceRadioButton) {
+						UInt32 currentValue = Convert.ToUInt32 (EnumValue);
 						currentValue &= ~bitFieldExcludeMask;
 						enumValue = (Enum)Enum.ToObject(enumType, currentValue);
 
@@ -219,17 +239,17 @@ namespace Crow
 				forceRefresh();
 			}
 		}
-		void onChecked (object sender, EventArgs e) {			
+		void onChecked (object sender, EventArgs e) {
 			Enum en =(Enum)Enum.Parse (enumType, (sender as CheckBox).Caption);
 			UInt32 newVal = Convert.ToUInt32 (en);
 			if (newVal == 0)
-				EnumValue = (Enum)Enum.ToObject(enumType, 0);			 
+				EnumValue = (Enum)Enum.ToObject(enumType, 0);
 			else
-				EnumValue = (Enum)Enum.ToObject(enumType, newVal | Convert.ToUInt32 (EnumValue));			 
+				EnumValue = (Enum)Enum.ToObject(enumType, newVal | Convert.ToUInt32 (EnumValue));
 		}
-		void onUnchecked (object sender, EventArgs e) {			
+		void onUnchecked (object sender, EventArgs e) {
 			Enum en =(Enum)Enum.Parse (enumType, (sender as CheckBox).Caption);
-			EnumValue = (Enum)Enum.ToObject(enumType, Convert.ToUInt32 (EnumValue) & ~Convert.ToUInt32 (en));			 
+			EnumValue = (Enum)Enum.ToObject(enumType, Convert.ToUInt32 (EnumValue) & ~Convert.ToUInt32 (en));
 		}
 
 		//force refresh to use new template if values are already displayed

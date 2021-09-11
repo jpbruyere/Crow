@@ -3,9 +3,9 @@
 		<OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
 		<IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)\</IntermediateOutputPath>
 		<License>MIT</License>
-		<Authors>Jean-Philippe Bruyère</Authors>	    
+		<Authors>Jean-Philippe Bruyère</Authors>
 		<LangVersion>7.3</LangVersion>
-		
+
 		<CrowVersion>0.9.6</CrowVersion>
 		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
 

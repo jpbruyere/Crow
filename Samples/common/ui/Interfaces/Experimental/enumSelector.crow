@@ -1,0 +1,6 @@
+﻿<Window Width="500" >
+	<VerticalStack>
+		<EnumSelector EnumValue="{²../../AllowedStates}"/>
+		<EnumSelector ForceRadioButton="true" EnumValue="{²../../CurrentState}"/>
+	</VerticalStack>
+</Window>

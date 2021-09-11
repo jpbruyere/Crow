@@ -32,12 +32,12 @@ namespace Crow
 		string _icon;
 		bool resizable;
 		bool movable;
-		bool modal;		
+		bool modal;
 		bool alwaysOnTop = false;
 
 		Rectangle savedBounds;
 		bool wasResizable;
-		
+
 		Status currentState, allowedStates;
 
 		protected Direction currentDirection = Direction.None;
@@ -54,7 +54,7 @@ namespace Crow
 			get => allowedStates;
 			set {
 				if (allowedStates == value)
-					return;				
+					return;
 				allowedStates = value;
 				NotifyValueChangedAuto (allowedStates);
 
@@ -80,7 +80,7 @@ namespace Crow
 		[DefaultValue("Normal")]
 		public Status CurrentState {
 			get => currentState;
-			set {			
+			set {
 				Status newState = value;
 				if (!allowedStates.HasFlag (newState)) {
 					if (allowedStates.HasFlag (Status.Normal))
@@ -97,7 +97,7 @@ namespace Crow
 				if (currentState == Status.Normal) {
 					savedBounds = LastPaintedSlot;
 					wasResizable = Resizable;
-				}				
+				}
 
 				currentState = value;
 				NotifyValueChangedAuto (currentState);
@@ -117,7 +117,7 @@ namespace Crow
 				case Status.Minimized:
 					Width = 200;
 					Height = 20;
-					Resizable = false;					
+					Resizable = false;
 					CMDNormalize.CanExecute = allowedStates.HasFlag (Status.Normal);
 					CMDMinimize.CanExecute = false;
 					CMDMaximize.CanExecute = allowedStates.HasFlag (Status.Maximized);
@@ -157,11 +157,11 @@ namespace Crow
 		}
 		/*public Command CMDMinimize = new Command ("Minimize", (sender) =>
 			{(sender as Window).CurrentState = Status.Minimized;}, "#Crow.Icons.minimize.svg", false);
-		public Command CMDMaximize = new Command ("Maximize", (sender) => 
+		public Command CMDMaximize = new Command ("Maximize", (sender) =>
 			{(sender as Window).CurrentState = Status.Maximized;}, "#Crow.Icons.maximize.svg", false);
-		public Command CMDNormalize = new Command ("Normalize", (sender) => 
+		public Command CMDNormalize = new Command ("Normalize", (sender) =>
 			{(sender as Window).CurrentState = Status.Normal;}, "#Crow.Icons.normalize.svg", false);
-		public Command CMDClose = new Command ("Close", (sender) => 
+		public Command CMDClose = new Command ("Close", (sender) =>
 			{(sender as Window).close ();}, "#Crow.Icons.exit2.svg", true);*/
 
 
@@ -196,9 +196,9 @@ namespace Crow
 				sizingHandle.MouseDown += setResizeOn;
 				sizingHandle.MouseUp += setResizeOff;
 			}
-				
-			if (moveHandle != null) {				
-				moveHandle.MouseDown += setMoveOn;				
+
+			if (moveHandle != null) {
+				moveHandle.MouseDown += setMoveOn;
 				moveHandle.MouseUp += setMoveOff;
 			}
 		}
@@ -208,9 +208,9 @@ namespace Crow
 				sizingHandle.MouseDown -= setResizeOn;
 				sizingHandle.MouseUp -= setResizeOff;
 			}
-				
-			if (moveHandle != null) {				
-				moveHandle.MouseDown -= setMoveOn;				
+
+			if (moveHandle != null) {
+				moveHandle.MouseDown -= setMoveOn;
 				moveHandle.MouseUp -= setMoveOff;
 			}
 			moveHandle = null;
@@ -240,7 +240,7 @@ namespace Crow
 				_icon = value;
 				NotifyValueChangedAuto (_icon);
 			}
-		} 
+		}
 		[DefaultValue(true)]
 		public bool Resizable {
 			get => resizable;
@@ -263,7 +263,7 @@ namespace Crow
 		}
 		[DefaultValue(false)]
 		public bool Modal {
-			get => modal;			
+			get => modal;
 			set {
 				if (modal == value)
 					return;
@@ -273,11 +273,11 @@ namespace Crow
 		}
 		[DefaultValue(false)]
 		public bool AlwaysOnTop {
-			get => modal ? true : alwaysOnTop;			
+			get => modal ? true : alwaysOnTop;
 			set {
 				if (alwaysOnTop == value)
 					return;
-				
+
 				alwaysOnTop = value;
 
 				if (AlwaysOnTop && Parent != null)
@@ -319,7 +319,7 @@ namespace Crow
 					currentHeight = this.Slot.Height;
 
 				if (move) {
-					this.Left = currentLeft + XDelta;				
+					this.Left = currentLeft + XDelta;
 					this.Top = currentTop + YDelta;
 					return;
 				}
@@ -368,7 +368,7 @@ namespace Crow
 					this.Height = currentHeight + YDelta;
 					this.Width = currentWidth + XDelta;
 					break;
-				}				
+				}
 			//}
 		}
 
@@ -479,7 +479,7 @@ namespace Crow
 		protected void onMinimized (){
 			lock (IFace.LayoutMutex) {
 				if (IsNormal)
-					
+
 			}
 
 			Minimize.Raise (this, null);

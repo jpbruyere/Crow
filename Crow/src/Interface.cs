@@ -478,8 +478,8 @@ namespace Crow
 		public virtual void UpdateFrame () {
 #if VKVG
 			Update ();
-			Thread.Sleep (UPDATE_INTERVAL);
 #endif
+			Thread.Sleep (UPDATE_INTERVAL);
 		}
 
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
