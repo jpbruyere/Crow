@@ -55,6 +55,10 @@ namespace Crow {
 
 				maxValue = value;
 				NotifyValueChangedAuto (maxValue);
+
+				if (Value > maxValue)
+					Value = maxValue;
+
 				registerUpdate ();
 			}
 		}
@@ -68,6 +72,10 @@ namespace Crow {
 
 				smallStep = value;
 				NotifyValueChangedAuto (smallStep);
+
+				if (Value < minValue)
+					Value = minValue;
+
 				registerUpdate ();
 			}
 		}
@@ -97,7 +105,7 @@ namespace Crow {
 					actualValue = minValue;
 				else if (value > maxValue)
 					actualValue = maxValue;
-				else                    
+				else
 					actualValue = value;
 
 				actualValue = Math.Round (actualValue, decimals);
@@ -110,7 +118,7 @@ namespace Crow {
 
 		protected virtual void registerUpdate ()
 			=> RegisterForRedraw ();
-		
+
 		protected virtual void onUp (object sender, MouseButtonEventArgs e)
 		{
 			if (IFace.Ctrl)

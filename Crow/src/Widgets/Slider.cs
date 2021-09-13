@@ -56,10 +56,10 @@ namespace Crow
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
-			set { 
+			set {
 				if (_orientation == value)
 					return;
-				_orientation = value; 
+				_orientation = value;
 
 				RegisterForLayouting (LayoutingType.All);
 				NotifyValueChangedAuto (_orientation);
@@ -110,9 +110,9 @@ namespace Crow
 		public override bool ArrangeChildren => true;
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
-			if (layoutType == LayoutingType.ArrangeChildren) 
+			if (layoutType == LayoutingType.ArrangeChildren)
 				computeCursorPosition ();
-			
+
 			return base.UpdateLayout (layoutType);
 		}
 
@@ -192,13 +192,13 @@ namespace Crow
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (holdCursor) {				
+			if (holdCursor) {
 				Point m = ScreenPointToLocal (e.Position) - mouseDownInit;
 				Rectangle r = cursor.Parent.ClientRectangle;
 
 				if (_orientation == Orientation.Horizontal) {
 					if (r.Width - cursorSize == 0)
-						return;					
+						return;
 					double unit = (Maximum - Minimum) / (double)(r.Width - cursorSize);
 					if (inverted)
 						unit = -unit;
@@ -207,17 +207,17 @@ namespace Crow
 					Value = tmp;
 				} else {
 					if (r.Height - cursorSize == 0)
-						return;					
+						return;
 					double unit = (Maximum - Minimum) / (double)(r.Height - cursorSize);
 					if (inverted)
 						unit = -unit;
 					double tmp = mouseDownInitValue + (double)m.Y * unit;
 					tmp -= tmp % SmallIncrement;
 					Value = tmp;
-				}				
+				}
 			}
 			e.Handled = true;
-			
+
 			base.onMouseMove (sender, e);
 		}
 		#endregion
