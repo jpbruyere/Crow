@@ -246,7 +246,7 @@ namespace Crow.IML {
 		/// <returns>the string triplet dataType, itemTmpID read as attribute of this tag</returns>
 		/// <param name="reader">current xml text reader</param>
 		/// <param name="itemTemplatePath">file containing the templates if its a dedicated one</param>
-		string[] parseItemTemplateTag (XmlReader reader, string itemTemplatePath = "") {
+		static string[] parseItemTemplateTag (Interface iface, XmlReader reader, string itemTemplatePath = "") {
 			string dataType = "default", datas = "", path = "", dataTest = "TypeOf";
 			while (reader.MoveToNextAttribute ()) {
 				if (reader.Name == "DataType")
@@ -263,11 +263,11 @@ namespace Crow.IML {
 			string itemTmpID = itemTemplatePath;
 
 			if (string.IsNullOrEmpty (path)) {
-				itemTmpID += Guid.NewGuid ().ToString ();
+				itemTmpID += Guid.NewGuid ().ToString ();//inline item template
 				iface.ItemTemplates [itemTmpID] =
 					new ItemTemplate (iface, new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataTest, dataType, datas);
 
-			} else {
+			} else {//separate iml file
 				if (!reader.IsEmptyElement)
 					throw new Exception ("ItemTemplate with Path attribute set may not include sub nodes");
 				itemTmpID += $"{path}{dataType}{datas}";
@@ -308,7 +308,7 @@ namespace Crow.IML {
 						reader.Read ();
 						readChildren (reader, ctx, -1);
 					} else if (reader.Name == NT_iTemp)
-						itemTemplateIds.Add (parseItemTemplateTag (reader));
+						itemTemplateIds.Add (parseItemTemplateTag (iface, reader));
 				}
 
 				if (!inlineTemplate) {//load from path or default template
@@ -322,41 +322,17 @@ namespace Crow.IML {
 					}
 				}
 				if (itemTemplateIds.Count == 0) {
-					//try to load ItemTemplate(s) from ItemTemplate attribute of TemplatedGroup
+					//try to load ItemTemplate(s) from ItemTemplate property of TemplatedGroup
 					if (!string.IsNullOrEmpty (itemTemplatePath)) {
 						//check if it is already loaded in cache as a single itemTemplate instantiator
-						if (iface.ItemTemplates.ContainsKey (itemTemplatePath)) {
+						if (iface.ItemTemplates.ContainsKey (itemTemplatePath))
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
-						} else {
-							using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
-								//itemtemplate files may have multiple root nodes
-								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
-								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {
-									while (itr.Read ()) {
-										if (!itr.IsStartElement ())
-											continue;
-										if (itr.NodeType == XmlNodeType.Element) {
-											if (itr.Name != NT_iTemp) {
-												//the file contains a single template to use as default
-												iface.ItemTemplates [itemTemplatePath] =
-													new ItemTemplate (iface, itr);
-												itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "", "TypeOf" });
-												break;//we should be at the end of the file
-											}
-											itemTemplateIds.Add (parseItemTemplateTag (itr, itemTemplatePath));
-										}
-									}
-								}
-							}
-						}
+						else
+							itemTemplateIds.AddRange (loadItemTemplatesFromTemplatedGroupProperty (iface, itemTemplatePath));
 					}
 				}
 				if (!ctx.nodesStack.Peek ().IsTemplatedGroup)
 					return;
-				//add the default item template if no default is defined
-				if (!itemTemplateIds.Any(ids=>ids[0] == "default"))
-					itemTemplateIds.Add (new string [] { "default", "#Crow.DefaultItem.template", "", "TypeOf"});
-				//get item templates
 				foreach (string [] iTempId in itemTemplateIds) {
 					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
 					ctx.il.Emit (OpCodes.Ldfld, CompilerServices.fldItemTemplates);//load ItemTemplates dic field
@@ -375,13 +351,33 @@ namespace Crow.IML {
 						ctx.il.Emit (OpCodes.Ldfld, CompilerServices.fldItemTemplates);
 						ctx.il.Emit (OpCodes.Ldstr, iTempId [0]);//load key
 						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miGetITempFromDic);
-						ctx.il.Emit (OpCodes.Ldloc_0);//load root of treeView
+						ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
 						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miCreateExpDel);
 					}
 				}
 			}
 		}
-
+		public static IEnumerable<string[]> loadItemTemplatesFromTemplatedGroupProperty (Interface iface, string itemTemplatePath) {
+			using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
+				//itemtemplate files may have multiple root nodes
+				XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
+				using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {
+					while (itr.Read ()) {
+						if (!itr.IsStartElement ())
+							continue;
+						if (itr.NodeType == XmlNodeType.Element) {
+							if (itr.Name != NT_iTemp) {
+								//the file contains a single template to use as default
+								iface.ItemTemplates [itemTemplatePath] = new ItemTemplate (iface, itr);
+								yield return new string [] { "default", itemTemplatePath, "", "TypeOf" };
+								break;//we should be at the end of the file
+							}
+							yield return parseItemTemplateTag (iface, itr, itemTemplatePath);
+						}
+					}
+				}
+			}
+		}
 		#if DESIGN_MODE
 		void emitSetDesignAttribute (IMLContext ctx, string name, string value){
 			//store member value in iml

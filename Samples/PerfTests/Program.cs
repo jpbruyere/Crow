@@ -14,9 +14,9 @@ namespace PerfTests
 {
 	class TestInterface : Interface
 	{
-#if NETCOREAPP		
+#if NETCOREAPP
 		static IntPtr resolveUnmanaged (Assembly assembly, String libraryName) {
-			
+
 			switch (libraryName)
 			{
 				case "glfw3":
@@ -24,15 +24,15 @@ namespace PerfTests
 				case "rsvg-2.40":
 					return  NativeLibrary.Load("rsvg-2", assembly, null);
 			}
-			Console.WriteLine ($"[UNRESOLVE] {assembly} {libraryName}");			
+			Console.WriteLine ($"[UNRESOLVE] {assembly} {libraryName}");
 			return IntPtr.Zero;
 		}
 
 		static TestInterface () {
 			System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll+=resolveUnmanaged;
 		}
-#endif		
-		readonly int count = 10, updateCycles = 0;			
+#endif
+		readonly int count = 10, updateCycles = 0;
 		readonly bool screenOutput = false;
 		readonly string inDirectory = null;//directory to test
 		readonly string outFilePath;
@@ -129,7 +129,7 @@ namespace PerfTests
 						screenOutput = true;
 						break;
 					case "--help":
-					default:						
+					default:
 						throw new Exception ();
 					}
 				}
@@ -167,12 +167,12 @@ namespace PerfTests
 			} else {
 				SolidBackground = false;
 				initBackend (true);
-				
+
 				CreateMainSurface (ref clientRectangle);
 			}
 
 			initDictionaries ();
-			loadStyling ();			
+			loadStyling ();
 		}
 
 		protected override void Dispose (bool disposing) {
@@ -212,7 +212,7 @@ namespace PerfTests
 
 			public override string ToString () =>
 				$"{MinElapsed};{MaxElapsed};{MeanElapsed};{MedianElapsed};{sigmaElapsed};{MinMem};{MaxMem};{MeanMem};{MedianMem};{sigmaMem};{MinAlloc};{MaxAlloc};{MeanAlloc};{MedianAlloc};{sigmaAlloc}";
-		}		
+		}
 
 		void getMemUsage (out long allocations, out long memory ) {
 			GC.Collect ();
@@ -246,13 +246,13 @@ namespace PerfTests
 
 				if (StartStage == Stage.ITor) {
 					getMemUsage (out allocBefore, out totMemBefore);
-					chrono.Restart (); 
+					chrono.Restart ();
 				}
 
 				Crow.IML.Instantiator iTor = isImlFragment ?
 					Crow.IML.Instantiator.CreateFromImlFragment (this, iml) : new Crow.IML.Instantiator (this, iml);
 
-				if (EndStage == Stage.ITor) {					
+				if (EndStage == Stage.ITor) {
 					chrono.Stop ();
 					getMemUsage (out allocAfter, out totMemAfter);
 				} else {
@@ -285,7 +285,7 @@ namespace PerfTests
 
 							w.DataSource = this;
 
-							if (EndStage == Stage.Datasource) {								
+							if (EndStage == Stage.Datasource) {
 								chrono.Stop ();
 								getMemUsage (out allocAfter, out totMemAfter);
 							} else {
@@ -323,7 +323,7 @@ namespace PerfTests
 									}
 								}
 							}
-						}						
+						}
 
 						DeleteWidget (w);
 						w = null;
@@ -343,7 +343,7 @@ namespace PerfTests
 				/*this.Instantiators.Clear ();
 				this.Templates.Clear ();
 				this.DefaultTemplates.Clear ();*/
-				this.DefaultValuesLoader.Clear ();                
+				this.DefaultValuesLoader.Clear ();
 
 				measures[i].AllocatedKB = (double)(allocAfter - allocBefore) / 1024.0;
 				measures[i].UsedKB = (double)(totMemAfter - totMemBefore) / 1024.0;
@@ -384,17 +384,17 @@ namespace PerfTests
 				if (measures[i].Elapsed < trimMinElapsed && measures[i].Elapsed != extMinElapsed)
 					trimMinElapsed = measures[i].Elapsed;
 				if (measures[i].Elapsed > trimMaxElapsed && measures[i].Elapsed != extMaxElapsed)
-					trimMaxElapsed = measures[i].Elapsed;				
+					trimMaxElapsed = measures[i].Elapsed;
 
 				if (measures[i].UsedKB < trimMinMem && measures[i].UsedKB != extMinMem)
 					trimMinMem = measures[i].UsedKB;
 				if (measures[i].UsedKB > trimMaxMem && measures[i].UsedKB != extMaxMem)
-					trimMaxMem = measures[i].UsedKB;				
+					trimMaxMem = measures[i].UsedKB;
 
 				if (measures[i].AllocatedKB < trimMinAlloc && measures[i].AllocatedKB != extMinAlloc)
 					trimMinAlloc = measures[i].AllocatedKB;
 				if (measures[i].AllocatedKB > trimMaxAlloc && measures[i].AllocatedKB != extMaxAlloc)
-					trimMaxAlloc = measures[i].AllocatedKB;				
+					trimMaxAlloc = measures[i].AllocatedKB;
 			}
 
 			result.MinElapsed = trimMinElapsed;
@@ -425,7 +425,7 @@ namespace PerfTests
 
 			result.sigmaElapsed = Math.Sqrt (result.sigmaElapsed / (count - 2));
 			result.sigmaMem = Math.Sqrt (result.sigmaMem / (count - 2));
-			result.sigmaAlloc = Math.Sqrt (result.sigmaAlloc / (count - 2));			
+			result.sigmaAlloc = Math.Sqrt (result.sigmaAlloc / (count - 2));
 		}
 		void testDir (string dirPath, int level = 0)
 		{
@@ -434,15 +434,15 @@ namespace PerfTests
 				Console.WriteLine (label, -50);
 			level++;
 
-			foreach (string d in Directory.GetDirectories (dirPath)) 
+			foreach (string d in Directory.GetDirectories (dirPath))
 				testDir (d, level);
 
 			foreach (string f in Directory.GetFiles (dirPath, "*.crow")) {
 				label = $"{new string (' ', level * 4)}{ Path.GetFileName (f)}";
 				try {
-					
-					Test (f);					
-										
+
+					Test (f);
+
 					if (logToDisk) {
 						writer.WriteLine ($"{f};{result}");
 						Console.Write (".");
@@ -482,7 +482,7 @@ namespace PerfTests
 			measures = ArrayPool<Measures>.Shared.Rent (count);
 
 			foreach (string unitTest in unitTests) {
-                //for (int i = 0; i < 2; i++) {                
+                //for (int i = 0; i < 2; i++) {
 					Test (unitTest, true);
 
 					if (logToDisk) {
@@ -516,7 +516,7 @@ namespace PerfTests
 
 		public static void Main (string [] args)
 		{
-			
+
 			try {
 				using (TestInterface iface = new TestInterface (args)) {
 					if (string.IsNullOrEmpty(iface.inDirectory))

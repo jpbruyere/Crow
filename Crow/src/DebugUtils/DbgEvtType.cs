@@ -73,7 +73,7 @@ namespace Crow
 		GODraw							= Widget | Drawing | 0x01,
 		GORecreateCache					= Widget | Drawing | 0x02,
 		GOUpdateCache					= Widget | Drawing | 0x03,
-		GOPaintCache					= Widget | Drawing | 0x04,		
+		GOPaintCache					= Widget | Drawing | 0x04,
 		GOPaint							= Widget | Drawing | 0x05,
 		GOCreateSurface					= Widget | Drawing | 0x06,
 		GOCreateContext					= Widget | Drawing | 0x07,

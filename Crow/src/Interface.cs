@@ -652,10 +652,6 @@ namespace Crow
 		/// </summary>
 		public Dictionary<String, Instantiator> Instantiators;
 		/// <summary>
-		/// default templates dic by metadata token
-		/// </summary>
-		public Dictionary<string, Instantiator> DefaultTemplates;
-		/// <summary>
 		/// Item templates stored with their index
 		/// </summary>
 		public Dictionary<String, ItemTemplate> ItemTemplates;
@@ -779,7 +775,6 @@ namespace Crow
 			Styling = new Dictionary<string, Style> (initCapacity);
 			DefaultValuesLoader = new Dictionary<string, LoaderInvoker> (initCapacity);
 			Instantiators = new Dictionary<string, Instantiator> (initCapacity);
-			DefaultTemplates = new Dictionary<string, Instantiator> (initCapacity);
 			ItemTemplates = new Dictionary<string, ItemTemplate> (initCapacity);
 		}
 		void loadThemeFiles () {
@@ -797,15 +792,6 @@ namespace Crow
 								else
 									sharedPictures[resId] = BmpPicture.CreateSharedPicture (s);
 							}
-						}
-					}
-					if (Directory.Exists (path)) {
-						path = Path.Combine (Theme, "DefaultTemplates");
-						foreach (string iml in Directory.GetFiles (path, "*.*", SearchOption.AllDirectories)) {
-							string resId = $"#{iml.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
-							//int mdTok = Instantiator.tryGetGOType (resId.Substring (6, resId.Length - 15)).MetadataToken;
-							using (Stream s = new FileStream (iml, FileMode.Open, FileAccess.Read))
-								DefaultTemplates[resId] = new IML.Instantiator (this, s, resId);
 						}
 					}
 					path = Path.Combine (Theme, "IML");

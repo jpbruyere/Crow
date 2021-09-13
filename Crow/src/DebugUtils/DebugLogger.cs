@@ -13,7 +13,7 @@ using System.Threading;
 using Crow.DebugLogger;
 
 namespace Crow
-{	
+{
 	public static class DbgLogger
 	{
 		public static DbgEvtType IncludeEvents = DbgEvtType.All;
@@ -26,7 +26,7 @@ namespace Crow
 			//=> IncludeEvents != DbgEvtType.None && (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) == IncludeEvents;
 			//=> IncludeEvents != DbgEvtType.None && (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) == IncludeEvents;
 			=> IncludeEvents == DbgEvtType.All || (IncludeEvents != DbgEvtType.None && (evtType & IncludeEvents) != 0);
-			
+
 
 
 		static object logMutex = new object ();
@@ -41,7 +41,7 @@ namespace Crow
 					if (startedEvents [Thread.CurrentThread.ManagedThreadId].Count == 0)
 						return events;
 					DbgEvent e = startedEvents [Thread.CurrentThread.ManagedThreadId].Peek ();
-					if (e.Events == null) 
+					if (e.Events == null)
 						e.Events = new List<DbgEvent> ();
 					return e.Events;
 				}
@@ -65,7 +65,7 @@ namespace Crow
 				if (!startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId))
 					startedEvents [Thread.CurrentThread.ManagedThreadId] = new Stack<DbgEvent> ();
 				startedEvents [Thread.CurrentThread.ManagedThreadId].Push (evt);
-				chrono.Start ();				
+				chrono.Start ();
 			}
 #endif
 		}
@@ -90,7 +90,7 @@ lock (logMutex) {
 		[Conditional ("DEBUG_LOG")]
 		public static void EndEvent (DbgEvtType evtType, bool discardIfNoChildEvents = false)
 		{
-#if DEBUG_LOG			
+#if DEBUG_LOG
 			if (!logevt (evtType))
 				return;
 
@@ -113,7 +113,7 @@ lock (logMutex) {
 		// End layouting queue event and set the corresponding lqi
 		[Conditional ("DEBUG_LOG")]
 		public static void EndEvent (DbgEvtType evtType, LayoutingQueueItem lqi) {
-#if DEBUG_LOG			
+#if DEBUG_LOG
 			if (!logevt (evtType))
 				return;
 
@@ -155,7 +155,7 @@ lock (logMutex) {
 
 		[Conditional("DEBUG_LOG")]
 		public static void AddEvent (DbgEvtType evtType, params object [] data) {
-#if DEBUG_LOG			
+#if DEBUG_LOG
 			if (!logevt (evtType))
 				return;
 
@@ -168,7 +168,7 @@ lock (logMutex) {
 		}
 		[Conditional("DEBUG_LOG")]
 		public static void AddEventWithMsg (DbgEvtType evtType, string message, params object [] data) {
-#if DEBUG_LOG			
+#if DEBUG_LOG
 			if (!logevt (evtType))
 				return;
 
@@ -197,7 +197,7 @@ lock (logMutex) {
 					else
 						evt.Message = $"{data[1]}";
 				}
-					
+
 			} else if (data [0] is LayoutingQueueItem lqi)
 				evt = new DbgLayoutEvent (chrono.ElapsedTicks, evtType, (lqi.Layoutable as Widget).instanceIndex, lqi.LayoutType, lqi.result, lqi.Slot, lqi.NewSlot);
 			else
@@ -206,8 +206,8 @@ lock (logMutex) {
 			if (ConsoleOutput) {
 				if (evt.type.HasFlag (DbgEvtType.Error)) {
 					Console.ForegroundColor = ConsoleColor.Red;
-				}				
-				if (evt is DbgWidgetEvent we) 
+				}
+				if (evt is DbgWidgetEvent we)
 					Console.WriteLine ($"{evt.Print()} {Widget.GraphicObjects[we.InstanceIndex]}");
 				else
 					Console.WriteLine ($"{evt.Print()}");
@@ -225,10 +225,10 @@ lock (logMutex) {
 			go.xLevel = xLevel;
 
 			if (go is Group gr) {
-				for (int i = 0; i < gr.Children.Count; i++)				
+				for (int i = 0; i < gr.Children.Count; i++)
 					parseTree (gr.Children[i], xLevel + 1, i);
 			} else if (go is PrivateContainer pc)
-				parseTree (pc.getTemplateRoot, xLevel + 1);		
+				parseTree (pc.getTemplateRoot, xLevel + 1);
 		}
 		static void saveEventList (StreamWriter s, List<DbgEvent> evts, int level = 0)
 		{
@@ -270,7 +270,7 @@ lock (logMutex) {
 #endif
 		}
 		[Conditional("DEBUG_LOG")]
-		public static void Save(Interface iface, Stream stream, int startingWidgetsIndex = -1, bool saveEvents = true) {			
+		public static void Save(Interface iface, Stream stream, int startingWidgetsIndex = -1, bool saveEvents = true) {
 #if DEBUG_LOG
 			using (StreamWriter writer = new StreamWriter (stream, Encoding.UTF8, 1024, true)) {
 				lock (logMutex)
@@ -290,7 +290,7 @@ lock (logMutex) {
 					}
 
 					if (saveEvents) {
-						if (startingWidgetsIndex >= 0)				
+						if (startingWidgetsIndex >= 0)
 							writer.WriteLine ("[Events]");
 						saveEventList (writer, events);
 						startedEvents.Clear ();
@@ -306,12 +306,12 @@ lock (logMutex) {
 			if (!File.Exists (logFile))
 				return;
 			using (Stream stream = new FileStream (logFile, FileMode.Open, FileAccess.Read))
-				Load (stream, events, widgets);			
+				Load (stream, events, widgets);
 		}
 		public static void Load (Stream stream, List<DbgEvent> events, List<DbgWidgetRecord> widgets)
-		{			
+		{
 			using (StreamReader reader = new StreamReader (stream)) {
-				
+
 				if (widgets != null) {
 					if (events != null && reader.ReadLine () != "[GraphicObjects]")
 						return;
@@ -336,7 +336,7 @@ lock (logMutex) {
 							reader.Read ();
 							level++;
 						}
-						DbgEvent evt = DbgEvent.Parse (reader.ReadLine ());							
+						DbgEvent evt = DbgEvent.Parse (reader.ReadLine ());
 						if (level == 0) {
 							startedEvents.Clear ();
 							events.Add (evt);

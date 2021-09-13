@@ -1233,22 +1233,33 @@ namespace Crow
 				}
 			}
 
-			//first set template if it exists
-			PropertyInfo piTmp = thisType.GetProperty ("Template");
-			if (piTmp != null) {
+			//Process Template and ItemTemplate properties first
+			if (typeof(TemplatedControl).IsAssignableFrom (thisType)) {
 				//if template has been declared in IML, cancel style or default loading
 				System.Reflection.Emit.Label cancelTemplateLoad = il.DefineLabel ();
 				il.Emit (OpCodes.Ldloc_0);//load target widget
 				il.Emit (OpCodes.Ldfld, typeof (PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic));
 				il.Emit (OpCodes.Brtrue, cancelTemplateLoad);
 
-				setDefaultValue (il, piTmp, ref styling);
+				setDefaultValue (il, CompilerServices.piTemplate, ref styling);
 
 				il.MarkLabel (cancelTemplateLoad);
 			}
+			if (typeof(TemplatedGroup).IsAssignableFrom (thisType)) {
+				//style may contains a 'ItemTemplate' value, but if item templates have been provided in IML,
+				//ItemTemplate value from style is ignored.
+				System.Reflection.Emit.Label cancelItemTemplateLoad = il.DefineLabel ();
+				il.Emit (OpCodes.Ldloc_0);//load target widget
+				il.Emit (OpCodes.Call, CompilerServices.miGet_TG_HasItemTemplates);
+				il.Emit (OpCodes.Brtrue, cancelItemTemplateLoad);
+
+				setDefaultValue (il, CompilerServices.piItemTemplate, ref styling);
+
+				il.MarkLabel (cancelItemTemplateLoad);
+			}
 
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				if (pi.Name == "Template")
+				if (pi.Name == "Template" || pi.Name == "ItemTemplate")
 					continue;
 				setDefaultValue (il, pi, ref styling);
 			}

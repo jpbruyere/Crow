@@ -76,6 +76,10 @@ namespace Crow {
 		//TODO: dont instantiate ItemTemplates if not used
 		//but then i should test if null in msil gen
 		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, ItemTemplate>();
+		/// <summary>
+		/// True if this templated group contains at least one item template.
+		/// </summary>
+		public bool HasItemTemplates => ItemTemplates.Count > 0;
 
 		/// <summary>
 		/// Keep track of expanded subnodes and closed time to unload
@@ -99,6 +103,23 @@ namespace Crow {
 
 				//TODO:reload list with new template?
 				NotifyValueChangedAuto (_itemTemplate);
+
+				loadItemTemplateFromPropertyValue ();
+			}
+		}
+		/// <summary>
+		/// load ItemTemplate(s) from ItemTemplate property
+		/// </summary>
+		void loadItemTemplateFromPropertyValue () {
+			ItemTemplates.Clear();
+			if (string.IsNullOrEmpty (_itemTemplate))
+				return;
+			foreach	(string[] itempIds in Instantiator.loadItemTemplatesFromTemplatedGroupProperty (IFace, _itemTemplate)) {
+				ItemTemplate itemp = IFace.GetItemTemplate (itempIds[1]);
+				ItemTemplates.Add (itempIds[0], itemp);
+				if (string.IsNullOrEmpty (itempIds[2]))
+					continue;
+				itemp.CreateExpandDelegate (this);
 			}
 		}
 		protected override void loadTemplate(Widget template = null)
@@ -456,39 +477,57 @@ namespace Crow {
 		}
 
 		protected void loadItem(object o, Group page, string _dataTest){
-			if (o == null)//TODO:surely a threading sync problem
+			if (o == null) {//TODO:surely a threading sync problem
+				DbgLogger.AddEventWithMsg (DbgEvtType.TGLoadingThread|DbgEvtType.Warning, "loadItem called with 'null' item.");
 				return;
+			}
 			Widget g = null;
 			ItemTemplate iTemp = null;
 			Type dataType = o.GetType ();
+
+			//First, a template for this item has to be choosen.
+
+			//By default, the item template selection is done on the full type name of the item.
+			//This is controled by the 'DataTest' attribute of the 'ItemTemplate' IML element.
+			//Its default value is 'TypeOf'.
 			string itempKey = dataType.FullName;
 
+			//If 'DataTest' is not 'TypeOf', the item template selection will be done on the value of
+			//a member of the item which name is given in the 'DataTest' attribute.
 			//if item template selection is not done depending on the type of item
-			//dataTest must contains a member name of the item
+			//dataTest must contains a member name of the item to test for.
 			if (_dataTest != "TypeOf") {
 				try {
 					itempKey = CompilerServices.getValue (dataType, o, _dataTest)?.ToString ();
 				} catch {
-					itempKey = dataType.FullName;
+					DbgLogger.AddEventWithMsg (DbgEvtType.TGLoadingThread|DbgEvtType.Warning, "dataTest fallback to full type name.");
+					itempKey = dataType.FullName;//fallback to full type name
 				}
 			}
-
 			if (ItemTemplates.ContainsKey (itempKey))
 				iTemp = ItemTemplates [itempKey];
 			else {
-				foreach (string it in ItemTemplates.Keys) {
-					if (it == "default")
-						continue;
-					Type t = CompilerServices.getTypeFromName (it);
-					if (t == null)
-						continue;
-					if (t.IsAssignableFrom (dataType)) {//TODO:types could be cached
-						iTemp = ItemTemplates [it];
-						break;
+				if (_dataTest == "Typeof") {//item template selection on full type name
+					//search ItemTemplates for an existing parent class
+					foreach (string it in ItemTemplates.Keys) {
+						if (it == "default")
+							continue;
+						Type t = CompilerServices.getTypeFromName (it);
+						if (t == null)
+							continue;
+						if (t.IsAssignableFrom (dataType)) {//TODO:types could be cached
+							iTemp = ItemTemplates [it];
+							break;
+						}
 					}
 				}
-				if (iTemp == null)
-					iTemp = ItemTemplates ["default"];
+				//if no item template is found, load the local then the global default one.
+				if (iTemp == null) {
+					if (ItemTemplates.ContainsKey ("default"))
+						iTemp = ItemTemplates ["default"];
+					else
+						iTemp = IFace.GetItemTemplate ("#Crow.DefaultItem.template");
+				}
 			}
 			if (loadingThread == null)
 				Monitor.Enter(IFace.UpdateMutex);

@@ -82,10 +82,13 @@ namespace Crow.IML
 		internal static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });
 		internal static MethodInfo miGetITempFromDic = typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item", new Type[] { typeof(string) });
 		internal static FieldInfo fldItemTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
+		internal static MethodInfo miGet_TG_HasItemTemplates = typeof(TemplatedGroup).GetProperty ("HasItemTemplates").GetGetMethod ();
+		internal static PropertyInfo piItemTemplate = typeof(TemplatedGroup).GetProperty("ItemTemplate");
+		internal static PropertyInfo piTemplate = typeof(TemplatedControl).GetProperty("Template");
 		internal static MethodInfo miLoadPage = typeof(TemplatedGroup).GetMethod ("loadPage", BindingFlags.Instance | BindingFlags.NonPublic| BindingFlags.Public);
 		internal static MethodInfo miRegisterSubData = typeof(TemplatedGroup).GetMethod ("registerSubData", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miIsAlreadyExpanded = typeof(TemplatedGroup).GetMethod("emitHelperIsAlreadyExpanded", BindingFlags.Instance | BindingFlags.NonPublic);
-		
+
 		internal static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
 		internal static FieldInfo fiFetchMethodName = typeof(ItemTemplate).GetField("fetchMethodName", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -218,7 +221,7 @@ namespace Crow.IML
 					il.Emit(OpCodes.Ldtoken, pi.PropertyType);
 					il.Emit(OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 					//load enum value name
-					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:implement here string format?					
+					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:implement here string format?
 					il.Emit (OpCodes.Call, CompilerServices.miParseEnum);
 
 					if (CompilerServices.miParseEnum.ReturnType != pi.PropertyType)
@@ -288,7 +291,7 @@ namespace Crow.IML
 #endif
 			Type t = instance.GetType();
             MethodInfo mi = t.GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-			return mi ?? CompilerServices.SearchExtMethod (t, method);			
+			return mi ?? CompilerServices.SearchExtMethod (t, method);
 		}
 		/// <summary>
 		/// set value, convert if required
@@ -373,7 +376,7 @@ namespace Crow.IML
 				if (dstType == typeof(string) || dstType == typeof (object))//TODO:object should be allowed to return null and not ""
 					return "";
 				if (dstType.IsValueType)
-					return Activator.CreateInstance (dstType);				
+					return Activator.CreateInstance (dstType);
 			} catch (Exception ex) {
 				Console.WriteLine (ex.ToString ());
 				return "";
@@ -412,10 +415,10 @@ namespace Crow.IML
 		{
 			foundMI = null;
 			if (assembly == null)
-				return false;		
+				return false;
 			foreach (Type t in assembly.GetExportedTypes().Where
 					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
-				foreach (MethodInfo mi in t.GetMethods 
+				foreach (MethodInfo mi in t.GetMethods
 					(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
 						(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
 						 m.GetParameters ().Length > 0)) {
@@ -426,10 +429,10 @@ namespace Crow.IML
 							return true;
 						}
 						curType = curType.BaseType;
-					}						
+					}
 				}
-			
-			}				
+
+			}
 			return false;
 		}
 		/// <summary>
@@ -869,7 +872,7 @@ namespace Crow.IML
 				knownTypes.Add (strDataType, dataType);
 				return dataType;
 			}
-			foreach (Assembly a in Interface.crowAssemblies) {				
+			foreach (Assembly a in Interface.crowAssemblies) {
 				foreach (Type expT in a.GetExportedTypes ()) {
 					if (expT.Name != strDataType && expT.FullName != strDataType)
 						continue;
@@ -1020,7 +1023,7 @@ namespace Crow.IML
 			{
 			 return EnumsNET.FlagEnums.IsFlagEnum (enumType) ?
 				EnumsNET.FlagEnums.ParseFlags (enumType, val, true, "|") :
-				EnumsNET.Enums.Parse (enumType, val, true);				
+				EnumsNET.Enums.Parse (enumType, val, true);
 			}
 			catch (System.Exception)
 			{

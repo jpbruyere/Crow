@@ -41,6 +41,10 @@ namespace Crow
 		/// <summary>
 		/// Template path
 		/// </summary>
+		/// <remark>
+		/// The 'null' default value with the 'NOT_SET' field init value  force a loading
+		/// of the default template by passing the first equality check.
+		/// </remark>
 		//TODO: this property should be renamed 'TemplatePath'
 		[DefaultValue(null)]
 		public string Template {
@@ -119,15 +123,12 @@ namespace Crow
 				this.ClearTemplateBinding();
 
 			if (template == null) {
-				string defTmpId = this.GetType ().FullName + ".template";
-				if (!IFace.DefaultTemplates.ContainsKey (defTmpId)) {
-
-					Stream s = IFace.GetStreamFromPath ("#" + defTmpId);
-					if (s == null)
-						throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-					IFace.DefaultTemplates [defTmpId] = new IML.Instantiator (IFace, s, defTmpId);
+				try {
+					string defTmpId = $"#{this.GetType ().FullName}.template";
+					this.SetChild (IFace.GetInstantiator (defTmpId).CreateInstance());
+				} catch (Exception ex) {
+					throw new Exception ($"Default template loading error for '{this.GetType ().FullName}'", ex);
 				}
-				this.SetChild (IFace.DefaultTemplates[defTmpId].CreateInstance());
 			}else
 				this.SetChild (template);
 		}
