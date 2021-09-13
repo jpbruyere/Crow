@@ -3,16 +3,16 @@
 	<VerticalStack  Width="25%">
 		<HorizontalStack Height="Fit" Margin="2" Background="Onyx">
 			<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.level-up.svg" MouseClick="./goUpDirClick"
-						 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />			
+						 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />
 			<TextBox Text="{²CurrentDir}" Margin="2"/>
-		</HorizontalStack>		
+		</HorizontalStack>
 		<DirectoryView Margin="1" Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged">
 					<Template>
 						<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}" Background="{./Background}"
 								SelectedItemChanged="./onSelectedItemChanged">
 							<ItemTemplate DataType="System.IO.FileInfo">
 								<ListItem CornerRadius="2" Margin="0" Height="Fit" Width="Stretched"
-										ContextCommands="{GetCommands}" 
+										ContextCommands="{GetCommands}"
 										Selected="{Background=${ControlHighlight}}"
 										Unselected="{Background=Transparent}">
 									<HorizontalStack>
@@ -55,7 +55,7 @@
 								</ListItem>
 							</ItemTemplate>
 						</TreeView>
-					</Template>		
+					</Template>
 				</DirectoryView>
 	</VerticalStack>
 	<Splitter Width="6" />
@@ -87,12 +87,12 @@
 				<Button Style="IcoButton" Command="{CMDCopy}" />
 				<Button Style="IcoButton" Command="{CMDPaste}" />-->
 				<Popper RootDataLevel="true" IsVisible="{DebugLoggingEnabled}" Fit="true">
-					<Template>					
+					<Template>
 						<CheckBox IsChecked="{²./IsPopped}">
 							<Template>
 								<HorizontalStack Background="Onyx" Margin="5" Spacing="10">
 									<Widget Background="Red" IsVisible="{DebugLogRecording}" CornerRadius="10" Width="12" Height="12"/>
-									<Label Text="Debug Logging" />									
+									<Label Text="Debug Logging" />
 								</HorizontalStack>
 							</Template>
 						</CheckBox>
@@ -112,11 +112,11 @@
 											<Label Text="{../../../Caption}" Width="Stretched"/>
 											<Label Background="SeaGreen" Text="{../../../EnumValue}" Margin="3"/>
 										</HorizontalStack>
-									</Template>	
-									<Wrapper Name="Content" Height="Fit" Width="{../PopWidth}" Background="Jet" />	
+									</Template>
+									<Wrapper Name="Content" Height="Fit" Width="{../PopWidth}" Background="Jet" />
 								</Popper>
 							</Template>
-						</EnumSelector>						
+						</EnumSelector>
 						<EnumSelector RadioButtonStyle="CheckBox2" EnumValue="{²DiscardedEvents}" Width="Stretched" BitFieldExcludeMask="255"
 									Caption="Discarded Events">
 							<Template>
@@ -126,17 +126,17 @@
 											<Label Text="{../../../Caption}" Width="Stretched"/>
 											<Label Background="SeaGreen" Text="{../../../EnumValue}" Margin="3"/>
 										</HorizontalStack>
-									</Template>	
-									<Wrapper Name="Content" Height="Fit" Width="{../PopWidth}" Background="Jet" />	
+									</Template>
+									<Wrapper Name="Content" Height="Fit" Width="{../PopWidth}" Background="Jet" />
 								</Popper>
 							</Template>
-						</EnumSelector>						
+						</EnumSelector>
 						<Label Text="Press 'F6' to start/stop recording"/>
 					</VerticalStack>
 				</Popper>
 			</HorizontalStack>
 			<HorizontalStack>
-				<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"						
+				<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"
 						TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorCommands}"
 						Foreground="DarkGrey" Background="White" MouseWheelSpeed="20"/>
 						<!--SelectionChanged="onSelectedTextChanged"-->
@@ -166,7 +166,7 @@
 					</CheckBox>
 				</Template>
 				<Label Text="{ErrorMessage}" Background="DarkRed" Foreground="White" Width="Stretched" Margin="2" Multiline="true"/>
-			</Popper>			
+			</Popper>
 		</VerticalStack>
 	</VerticalStack>
 </HorizontalStack>

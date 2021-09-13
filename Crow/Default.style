@@ -7,6 +7,8 @@ ControlCaptionHoverColor = "White";
 ControlCornerRadius = "0";
 ControlInsideMargin = "1";
 
+ButtonCaptionMargin = "6";
+
 IconSize = "11";
 IconMargin = "1";
 ToggleIconSize = "16";
@@ -76,6 +78,14 @@ Button {
 	MinimumSize = "50,22";
 	Height 		= "Fit";
 	Width 		= "Fit";
+}
+ButtonBorder {
+	BorderWidth="1";
+	Foreground="Transparent";
+	MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}";
+	MouseLeave="{Foreground=Transparent}";
+	MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}";
+	MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}";
 }
 Label {
 	Height = "Fit";

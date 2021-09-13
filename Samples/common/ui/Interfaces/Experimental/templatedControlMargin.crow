@@ -1,0 +1,11 @@
+﻿<HorizontalStack Margin="10" Height="Stretched" Visible="{ProgressVisible}" Background="SaddleBrown">
+	<ProgressBar Value="50" Maximum="100" Caption="Progress caption" Width="Stretched" Height="Stretched" Margin="0">
+		<Template>
+			<Group Background="Red" Margin="1" Height="Stretched" Width="Stretched">
+				<Gauge Background="DarkGrey" Foreground="RoyalBlue" Height="Stretched"
+						Orientation="{./Orientation}" Minimum="{./Minimum}" Maximum="{./Maximum}" Value="{./Value}"/>
+				<Label Foreground="White" Text="{./Caption}" Width="Stretched" Margin="3" Background="Transparent" Height="Fit"/>
+			</Group>
+		</Template>
+	</ProgressBar>
+</HorizontalStack>

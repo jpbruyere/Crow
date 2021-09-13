@@ -1,0 +1,31 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack Height="Fit">
+	<Button Command="{SingleCommand}" Background="DimGrey" CornerRadius="15">
+		<Template>
+			<Border Background="{./Background}" Name="Content" Margin="8" Tooltip="{./Caption}"
+										Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
+										MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
+										MouseLeave="{Foreground=Transparent}"
+										MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White};{Background=${ControlHighlight}}"
+										MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black};{Background=DimGrey}">
+					<Image Name="caption" Width="32" Height="32" Path="{./Icon}" />
+			</Border>
+		</Template>
+	</Button>
+
+	<Button Command="{SingleCommand}">
+		<Template>
+			<Border Background="{./Background}" MinimumSize="50,20" Name="Content"
+										Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
+										MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black};{caption.Foreground=White}"
+										MouseLeave="{Foreground=Transparent};{caption.Foreground=LightGrey}"
+										MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
+										MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}">
+				<HorizontalStack Margin="2">
+					<Image Style="Icon" Path="{./Icon}"/>
+					<Label Font="{./Font}" Name="caption" Margin="3" Foreground="LightGrey" Text="{./Caption}"/>
+				</HorizontalStack>
+			</Border>
+		</Template>
+	</Button>
+</HorizontalStack>

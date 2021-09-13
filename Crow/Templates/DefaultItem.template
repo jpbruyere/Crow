@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<ListItem Height="Fit" Margin="0" Focusable="true" HorizontalAlignment="Left" 
+<ListItem Height="Fit" Margin="0" Focusable="true" HorizontalAlignment="Left"
 				Selected = "{Background=${ControlHighlight}}"
 				Unselected = "{Background=Transparent}">
 	<Label Text="{}" HorizontalAlignment="Left" />

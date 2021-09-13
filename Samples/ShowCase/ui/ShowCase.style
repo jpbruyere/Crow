@@ -3,5 +3,6 @@
 	Background = "Onyx";
 }
 CheckBox2 {
+	Template = "#ShowCase.CheckBox2.imlt";
 	Width = "200";
 }

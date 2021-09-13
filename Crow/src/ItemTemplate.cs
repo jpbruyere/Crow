@@ -22,16 +22,16 @@ namespace Crow
 
 	/// <summary>
 	/// Derived from Instantiator with sub data fetching facilities for hierarchical data access.
-	/// 
+	///
 	/// ItemTemplate stores the dynamic method for instantiating the control tree defined in a valid IML file.
-	/// 
+	///
 	/// </summary>
 	public class ItemTemplate : Instantiator {
 		#if DESIGN_MODE
-		public void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem){		
+		public void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem){
 			if (sourcePath == "#Crow.DefaultItem.template")
 				return;
-			
+
 			XmlElement xe = doc.CreateElement("ItemTemplate");
 			XmlAttribute xa = null;
 
@@ -62,10 +62,10 @@ namespace Crow
 				xa.Value = fetchMethodName;
 				xe.Attributes.Append (xa);
 			}
-				
+
 			parentElem.AppendChild (xe);
 
-				
+
 		}
 		#endif
 
@@ -137,14 +137,14 @@ namespace Crow
 			//DM is bound to templatedGroup root (arg0)
 			//arg1 is the sender of the expand event
 			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + fetchMethodName,
-				typeof (void), args, typeof(TemplatedGroup), true);			
+				typeof (void), args, typeof(TemplatedGroup), true);
 
 			System.Reflection.Emit.Label gotoEnd;
 			System.Reflection.Emit.Label ifDataIsNull;
 			System.Reflection.Emit.Label gotoItemsContainerNotFound;
 
-			ILGenerator il = dm.GetILGenerator (256);			
-			
+			ILGenerator il = dm.GetILGenerator (256);
+
 			il.DeclareLocal(typeof(Widget));
 			il.DeclareLocal(typeof(IEnumerable));
 
@@ -182,7 +182,7 @@ namespace Crow
 					il.Emit (OpCodes.Ldstr, fetchMethodName);
 					il.Emit (OpCodes.Call, CompilerServices.miGetDataTypeAndFetch);
 				}else
-					emitGetSubData(il, dataType);			
+					emitGetSubData(il, dataType);
 			}
 			il.Emit (OpCodes.Stloc_1);//save and reload datas IEnumerable for registering IObsList
 			il.Emit (OpCodes.Ldloc_1);
@@ -220,7 +220,7 @@ namespace Crow
 			//dm is unbound, arg0 is instance of Item container to expand
 			dm = new DynamicMethod ("dyn_count_" + fetchMethodName,
 				typeof (bool), new Type[] {typeof(object)}, true);
-			il = dm.GetILGenerator (256);			
+			il = dm.GetILGenerator (256);
 			System.Reflection.Emit.Label end = il.DefineLabel ();
 			System.Reflection.Emit.Label test = il.DefineLabel ();
 
@@ -236,18 +236,18 @@ namespace Crow
 					il.Emit (OpCodes.Ldstr, fetchMethodName);
 					il.Emit (OpCodes.Call, CompilerServices.miGetDataTypeAndFetch);
 				}else
-					emitGetSubData(il, dataType);			
-			}			
+					emitGetSubData(il, dataType);
+			}
 			il.Emit (OpCodes.Isinst, typeof(System.Collections.ICollection));
 			il.Emit (OpCodes.Dup);//duplicate children for testing if it's a collection for childs counting
 			il.Emit (OpCodes.Brtrue, test);//if true, jump to perform count
 			il.Emit (OpCodes.Pop);//pop null
-			il.Emit (OpCodes.Ldc_I4_0);//push false			
+			il.Emit (OpCodes.Ldc_I4_0);//push false
 			il.Emit (OpCodes.Br, end);
 
 			il.MarkLabel (test);
 
-			il.Emit (OpCodes.Callvirt, CompilerServices.miGetColCount);			
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetColCount);
 			il.Emit (OpCodes.Ldc_I4_0);
 			il.Emit (OpCodes.Cgt);
 

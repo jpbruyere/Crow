@@ -3,13 +3,13 @@
 		<TargetFrameworks>netcoreapp3.1</TargetFrameworks>
 		<!--<TargetFrameworks>net5</TargetFrameworks>-->
 		<OutputType>WinExe</OutputType>
-		
+
 		<SolutionDir>$(MSBuildThisFileDirectory)..\</SolutionDir>
 		<OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
 		<IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)\</IntermediateOutputPath>
-		
+
 		<!--<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
-		
+
 		<License>MIT</License>
 		<Authors>Jean-Philippe Bruyère</Authors>
 
@@ -17,7 +17,7 @@
 		<SamplesDir>$(MSBuildThisFileDirectory)\</SamplesDir>
 		<AppConfig>$(SolutionDir)Crow\App.config</AppConfig>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />
 	</ItemGroup>

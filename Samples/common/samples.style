@@ -21,10 +21,10 @@ HStackMeasure {
 	Background = "DimGrey";
 }
 CheckBox2 {
-	Template= "Interfaces/CheckBox2.imlt";
+	//Template= "Interfaces/CheckBox2.imlt";
 	Background = "Jet";
 	Checked="{Background=MediumSeaGreen}";
-	Unchecked = "{Background=Jet}";	
+	Unchecked = "{Background=Jet}";
 }
 CheckBox3 {
 	Template= "Interfaces/CheckBox2.imlt";
@@ -105,7 +105,7 @@ allWidgetNamedCell {
 }
 allWidgetCell2 {
 	Template = "Interfaces/grpBox2.tmp";
-	Width = "20%";		
+	Width = "20%";
 }
 allWidgetHS {
 	Width = "20%";

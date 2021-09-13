@@ -134,7 +134,7 @@ namespace Crow
 						if (c == '$') {
 							if (PeekChar () == '{') {
 								ReadChar ();
-								//constant replacement								
+								//constant replacement
 								while (!EndOfStream) {
 									c = ReadChar ();
 									if (c == '}')

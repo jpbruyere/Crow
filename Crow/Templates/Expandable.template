@@ -5,7 +5,7 @@
 			<Image Style="Icon" MouseDown="./onClickForExpand"
 					MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}"
 					Background="{./Background}"
-					Path="#Crow.Icons.expandable.svg" Visible="{./IsExpandable}"	SvgSub="{./IsExpanded}" />			
+					Path="#Crow.Icons.expandable.svg" Visible="{./IsExpandable}"	SvgSub="{./IsExpanded}" />
 			<Label Style="ControlCaption" Text="{./Caption}"/>
 		</HorizontalStack>
 		<Container Name="Content" Visible="false"/>

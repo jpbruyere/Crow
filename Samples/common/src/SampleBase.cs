@@ -49,7 +49,7 @@ namespace Samples
 		static void showMsgBox (object sender) {
 			Widget w = sender as Widget;
 			Command cmd = w.DataSource as Command;
-			MessageBox.ShowModal(w.IFace, MessageBox.Type.Information, $"{cmd.Caption} CLICKED");
+			MessageBox.ShowModal(w.IFace, MessageBox.Type.Information, $"{cmd?.Caption} CLICKED");
 		}
 
 		#region Test values for Binding
@@ -62,13 +62,14 @@ namespace Samples
 				new Command("Subedit command 1", (sender) => showMsgBox (sender)),
 				new Command("Subedit command 2 a bit longer", (sender) => showMsgBox (sender), null, false),
 				new Command("Subedit command three", (sender) => showMsgBox (sender))
-			)			
+			)
 		);
 		public CommandGroup FileCommands = new CommandGroup("File Commands",
-			new Command("File command 1", (sender) => showMsgBox (sender)),
+			new Command("File command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg"),
 			new Command("File command 2 a bit longer", (sender) => showMsgBox (sender)),
 			new Command("File command three", (sender) => showMsgBox (sender))
 		);
+		public Command SingleCommand => new Command("Single command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg");
 
 		void initCommands()
 		{

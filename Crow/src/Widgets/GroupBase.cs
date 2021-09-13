@@ -37,7 +37,7 @@ namespace Crow
 				return;
 			base.getIML (doc, parentElem);
 			foreach (Widget g in Children) {
-				g.getIML (doc, parentElem.LastChild);	
+				g.getIML (doc, parentElem.LastChild);
 			}
 		}
 		#endif
@@ -94,7 +94,7 @@ namespace Crow
 				return;
 			}
 			childrenRWLock.EnterWriteLock ();
-			try {	
+			try {
 				g.Parent = this;
 				Children.Insert (idx, g);
 			} finally {
@@ -129,7 +129,7 @@ namespace Crow
 			try {
 				foreach (Widget g in Children) {
 					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-						g.OnDataSourceChanged (g, e);	
+						g.OnDataSourceChanged (g, e);
 				}
 			} finally {
 				childrenRWLock.ExitReadLock ();
@@ -161,7 +161,7 @@ namespace Crow
 				}
 			} finally {
 				childrenRWLock.ExitWriteLock ();
-			}			
+			}
 		}
 
 		#region GraphicObject overrides
@@ -186,7 +186,7 @@ namespace Crow
 				childrenRWLock.ExitReadLock ();
 			}
 		}
-		public override T FindByType<T> () 
+		public override T FindByType<T> ()
 		{
 			if (this is T t)
 				return t;
@@ -224,7 +224,7 @@ namespace Crow
 		{
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
-			base.onDraw (gr);			
+			base.onDraw (gr);
 
 			if (ClipToClientRect) {
 				gr.Save ();
@@ -236,7 +236,7 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 			try
 			{
-				for (int i = 0; i < Children.Count; i++) 
+				for (int i = 0; i < Children.Count; i++)
 					Children[i].Paint (gr);
 			} finally {
 				childrenRWLock.ExitReadLock ();
@@ -256,7 +256,7 @@ namespace Crow
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();
 					gr.Operator = Operator.Clear;
-					gr.Fill();					
+					gr.Fill();
 					gr.Operator = Operator.Over;
 
 					base.onDraw (gr);
@@ -291,7 +291,7 @@ namespace Crow
 				Console.WriteLine("GROUP REPAINT WITH EMPTY CLIPPING");*/
 			//paintCache (ctx, Slot + Parent.ClientRectangle.Position);
 			base.UpdateCache (ctx);
-			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);				
+			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);
 		}
 		#endregion
 

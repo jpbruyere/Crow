@@ -1,9 +1,4 @@
 <?xml version="1.0"?>
-<Border Background="{./Background}" Name="Content" 
-	Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
-	MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
-	MouseLeave="{Foreground=Transparent}"
-	MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
-	MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}" >
-	<Label Font="{./Font}" Name="caption" Margin="6" Foreground="{./Foreground}" Text="{./Caption}"/>
+<Border Style="ButtonBorder" Background="{./Background}" Name="Content" CornerRadius="{../CornerRadius}" >
+	<Label Font="{./Font}" Name="caption" Margin="${ButtonCaptionMargin}" Foreground="{./Foreground}" Text="{./Caption}"/>
 </Border>

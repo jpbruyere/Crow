@@ -11,7 +11,7 @@ namespace Crow
 		event EventHandler ToggleOn;
 		event EventHandler ToggleOff;
 		BooleanTestOnInstance IsToggleable { get; set; }
-		
+
 		bool IsToggled {
 			get;
 			set;

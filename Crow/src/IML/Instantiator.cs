@@ -26,14 +26,14 @@ namespace Crow.IML {
 	public delegate object InstanciatorInvoker(Interface iface);
 
 	/// <summary>
-	/// Reflexion being very slow, the settings of the starting values for widgets are set by a dynamic method.
+	/// Reflection being very slow, the settings of the starting values for widgets are set by a dynamic method.
 	/// This method is created on the first instacing and is recalled for further widget instancing.
-	/// 
+	///
 	/// It includes:
 	/// 	- XML values setting
 	/// 	- Default values (appearing as attribute in C#)  loading
 	/// 	- Styling
-	/// 
+	///
 	/// Their are stored in the Interface with their path as key, and inlined template
 	/// and itemtemplate are stored with a generated uuid
 	/// </summary>
@@ -62,7 +62,7 @@ namespace Crow.IML {
 #endif
 
 		#region CTOR
-		static XmlReaderSettings xmlReaderSettings;		
+		static XmlReaderSettings xmlReaderSettings;
 		static string NT_template, NT_iTemp, NT_style, NT_name, NT_dataSource, NT_dataSourceType;
 		static Instantiator () {
 			NameTable names =  new NameTable ();
@@ -76,13 +76,13 @@ namespace Crow.IML {
 
 			xmlReaderSettings = new XmlReaderSettings ();
 			xmlReaderSettings.NameTable = names;
-			
+
 		}
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
 		public Instantiator (Interface _iface, string path) : this (_iface, _iface.GetStreamFromPath(path), path) {
-			
+
 		}
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
@@ -231,7 +231,7 @@ namespace Crow.IML {
 			ctx.curLine += li.LineNumber - 1;
 			#endif
 
-			string tmpXml = reader.ReadOuterXml ();			
+			string tmpXml = reader.ReadOuterXml ();
 
 			if (ctx.nodesStack.Peek().HasTemplate)
 				emitTemplateLoad (ctx, tmpXml);
@@ -246,7 +246,7 @@ namespace Crow.IML {
 		/// <returns>the string triplet dataType, itemTmpID read as attribute of this tag</returns>
 		/// <param name="reader">current xml text reader</param>
 		/// <param name="itemTemplatePath">file containing the templates if its a dedicated one</param>
-		string[] parseItemTemplateTag (IMLContext ctx, XmlReader reader, string itemTemplatePath = "") {
+		string[] parseItemTemplateTag (XmlReader reader, string itemTemplatePath = "") {
 			string dataType = "default", datas = "", path = "", dataTest = "TypeOf";
 			while (reader.MoveToNextAttribute ()) {
 				if (reader.Name == "DataType")
@@ -270,7 +270,7 @@ namespace Crow.IML {
 			} else {
 				if (!reader.IsEmptyElement)
 					throw new Exception ("ItemTemplate with Path attribute set may not include sub nodes");
-				itemTmpID += path+dataType+datas;
+				itemTmpID += $"{path}{dataType}{datas}";
 				if (!iface.ItemTemplates.ContainsKey (itemTmpID))
 					iface.ItemTemplates [itemTmpID] =
 						new ItemTemplate (iface, path, dataTest, dataType, datas);
@@ -308,7 +308,7 @@ namespace Crow.IML {
 						reader.Read ();
 						readChildren (reader, ctx, -1);
 					} else if (reader.Name == NT_iTemp)
-						itemTemplateIds.Add (parseItemTemplateTag (ctx, reader));					
+						itemTemplateIds.Add (parseItemTemplateTag (reader));
 				}
 
 				if (!inlineTemplate) {//load from path or default template
@@ -331,7 +331,7 @@ namespace Crow.IML {
 							using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
 								//itemtemplate files may have multiple root nodes
 								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
-								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									
+								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {
 									while (itr.Read ()) {
 										if (!itr.IsStartElement ())
 											continue;
@@ -343,7 +343,7 @@ namespace Crow.IML {
 												itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "", "TypeOf" });
 												break;//we should be at the end of the file
 											}
-											itemTemplateIds.Add (parseItemTemplateTag (ctx, itr, itemTemplatePath));
+											itemTemplateIds.Add (parseItemTemplateTag (itr, itemTemplatePath));
 										}
 									}
 								}
@@ -356,7 +356,7 @@ namespace Crow.IML {
 				//add the default item template if no default is defined
 				if (!itemTemplateIds.Any(ids=>ids[0] == "default"))
 					itemTemplateIds.Add (new string [] { "default", "#Crow.DefaultItem.template", "", "TypeOf"});
-				//get item templates 
+				//get item templates
 				foreach (string [] iTempId in itemTemplateIds) {
 					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
 					ctx.il.Emit (OpCodes.Ldfld, CompilerServices.fldItemTemplates);//load ItemTemplates dic field
@@ -433,12 +433,12 @@ namespace Crow.IML {
 #endif
 					}
 					//check for dataSourceType, if set, datasource bindings will use direct setter/getter
-					//instead of reflexion
+					//instead of reflection
 					string dataSourceType = reader.GetAttribute (NT_dataSourceType);
 					if (string.IsNullOrEmpty (dataSourceType)) {
 						//if not set but dataSource is not null, reset dsType to null
 						string ds = reader.GetAttribute (NT_dataSource);
-						if (!string.IsNullOrEmpty (ds)) 
+						if (!string.IsNullOrEmpty (ds))
 							ctx.SetDataSourceTypeForCurrentNode (null);
 					} else
 						ctx.SetDataSourceTypeForCurrentNode(CompilerServices.getTypeFromName (dataSourceType));
@@ -446,7 +446,6 @@ namespace Crow.IML {
 				ctx.il.Emit (OpCodes.Ldloc_0);
                 ctx.il.Emit (OpCodes.Call, CompilerServices.miLoadDefaultVals);
 #endregion
-
 
 				#region Attributes reading
 				if (reader.HasAttributes) {
@@ -477,7 +476,7 @@ namespace Crow.IML {
 									if (string.IsNullOrEmpty (cstId) || !iface.StylingConstants.ContainsKey (cstId))
 										throw new Exception ("undefined constant id: " + cstId);
 									styledValue.Append (iface.StylingConstants [cstId]);
-									continue; 
+									continue;
 								}
 							}
 							styledValue.Append (imlValue [vPtr++]);
@@ -552,10 +551,10 @@ namespace Crow.IML {
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
 					ConstructorInfo ci = t.GetConstructor (
-						                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,  
+						                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
 						null, Type.EmptyTypes, null);
 					if (ci == null)
-						throw new Exception ("No default parameterless constructor found in " + t.Name);					
+						throw new Exception ("No default parameterless constructor found in " + t.Name);
 					ctx.il.Emit (OpCodes.Newobj, ci);
 					ctx.il.Emit (OpCodes.Stloc_0);//child is now loc_0
 					CompilerServices.emitSetCurInterface (ctx.il);
@@ -804,7 +803,7 @@ namespace Crow.IML {
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load handler method name
 				il.Emit (OpCodes.Call, CompilerServices.miGetMethInfoWithRefx);
-				il.Emit (OpCodes.Stloc_0);//save MethodInfo                                          
+				il.Emit (OpCodes.Stloc_0);//save MethodInfo
                 il.Emit (OpCodes.Ldloc_0);//push mi for test if null
                 il.Emit (OpCodes.Brfalse, cancel);//cancel if null
 
@@ -821,19 +820,19 @@ namespace Crow.IML {
 
                 il.Emit (OpCodes.Call, CompilerServices.miCreateBoundDel);
                 il.Emit (OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
-                                          
+
                 System.Reflection.Emit.Label finish = il.DefineLabel ();
                 il.Emit (OpCodes.Br, finish);
                 il.MarkLabel (cancel);
-				//#if DEBUG_BINDING	
-				//TODO: try to print datasource type in the error message			
+				//#if DEBUG_BINDING
+				//TODO: try to print datasource type in the error message
 				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' NOT FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
 				//#endif
 				il.MarkLabel (finish);
 				#if DEBUG_BINDING
 				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
 				#endif
-				               
+
 				il.Emit (OpCodes.Ret);
 
 				//store dschange delegate in instatiator instance for access while instancing graphic object
@@ -1314,10 +1313,10 @@ namespace Crow.IML {
 		}
 
 		/// <summary>
-		/// create the valuechanged handler and the datasourcechanged handler and return the 
+		/// create the valuechanged handler and the datasourcechanged handler and return the
 		/// DataSourceChange delegate
 		/// </summary>
-		public Delegate emitDataSourceBindings (PropertyInfo piSource, BindingDefinition bindingDef){		
+		public Delegate emitDataSourceBindings (PropertyInfo piSource, BindingDefinition bindingDef){
 
 #if DEBUG_BINDING_FUNC_CALLS
 			Console.WriteLine ($"emitDataSourceBindings: {bindingDef}");
@@ -1431,7 +1430,7 @@ namespace Crow.IML {
 					il.Emit (OpCodes.Ldloc_2);//load datasource
 					il.Emit (OpCodes.Ldloc_3);//load first memberInfo
 					il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);//get first member level
-				} 
+				}
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load member name
 				il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
 				il.Emit (OpCodes.Stloc_1);//save memberInfo

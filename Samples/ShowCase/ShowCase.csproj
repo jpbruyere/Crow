@@ -3,6 +3,6 @@
 	<ItemGroup>
 		<EmbeddedResource Include="ui\*.*">
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
-		</EmbeddedResource>		
+		</EmbeddedResource>
 	</ItemGroup>
 </Project>

@@ -102,7 +102,7 @@ namespace Crow
 				NotifyValueChangedAuto (floatingGroup);
 			}
 		}
-		
+
 		bool tryGetTargetDockStack (DockWindow dw, out DockStack ds) {
 			if (dw.Parent is DockStack dwp)
 				ds = dwp;
@@ -114,12 +114,12 @@ namespace Crow
 		}
 		bool dockParentParent = false;
 		public override void onDrag (object sender, MouseMoveEventArgs e)
-		{			
+		{
 			if (!freezeDockState && isDocked)
 				checkUndock (e.Position);
 			else
 				moveAndResize (e.XDelta, e.YDelta, currentDirection);
-			
+
 			base.onDrag (sender, e);
 
 			if (freezeDockState || isDocked)
@@ -146,7 +146,7 @@ namespace Crow
 				} else {
 					dwCb = r;
 					dwCb.Inflate (-4,-4);
-										
+
 					if (tryGetTargetDockStack (dw, out DockStack targetStack)) {
 						Console.WriteLine ($"exterior: {!dwCb.ContainsOrIsEqual (m)} targetStack.Parent: {targetStack.Parent.GetType()}");
 						if (dwCb.ContainsOrIsEqual (m)) {
@@ -157,7 +157,7 @@ namespace Crow
 							r = targetStack.ScreenCoordinates (targetStack.LastPaintedSlot);
 						} else
 							r = dw.ScreenCoordinates (dw.LastPaintedSlot);
-						
+
 						targetStack.onDragMouseMove (this, e);
 					} else
 						System.Diagnostics.Debugger.Break ();
@@ -241,7 +241,7 @@ namespace Crow
 					else if (tryGetTargetDockStack (dw, out DockStack targetStack)) {
 						if (dockParentParent)
 							targetStack = targetStack.Parent as DockStack;
-						Dock (targetStack);						
+						Dock (targetStack);
 					}else
 						System.Diagnostics.Debugger.Break ();
 				}else
@@ -274,8 +274,8 @@ namespace Crow
 				} else if (Parent is DockStack ds) {
 					ds.Undock (this);
 				} else
-					throw new Exception ("docking error");				
-				
+					throw new Exception ("docking error");
+
 				IFace.AddWidget (this);
 
 				Left = IFace.MousePosition.X - 10;
@@ -335,11 +335,11 @@ namespace Crow
 					target.NotifyValueChanged ("IsDockedInStack", false);
 
 					IsDocked = true;
-				}				
+				}
 			}
 		}
 		void Dock (DockStack target){
-			lock (IFace.UpdateMutex) {				
+			lock (IFace.UpdateMutex) {
 				dock ();
 
 				target.Dock (this);
@@ -356,7 +356,6 @@ namespace Crow
 		internal string GetDockConfigString () =>
 			string.Format($"WIN;{Name};{Width};{Height};{DockingPosition};{savedSlot};{wasResizable};");
 
-		
 		public string FloatingConfigString =>
 			$"{Name};{Left};{Top};{Width};{Height};{FreezeDockState};{Resizable}";
 		public static DockWindow CreateFromFloatingConfigString (Interface iface, ReadOnlySpan<char> conf, object datasource = null) {
@@ -374,7 +373,7 @@ namespace Crow
 			dw.Height = Measure.Parse (conf.Slice(0, i).ToString());
 			conf = conf.Slice (i + 1); i = conf.IndexOf (';');
 			dw.FreezeDockState = bool.Parse (conf.Slice(0, i).ToString());
-			
+
 			dw.Resizable = bool.Parse (conf.Slice (i + 1).ToString());
 			dw.DataSource = datasource;
 

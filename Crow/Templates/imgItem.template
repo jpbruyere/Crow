@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-	<VerticalStack Width="0" Height="-1" Focusable="true"			
+	<VerticalStack Width="0" Height="-1" Focusable="true"
 			MouseEnter="{Background=RoyalBlue}"
 			MouseLeave="{Background=Transparent}">
 		<Image Width="-1" Height="-1" Path="{FullName}" MaximumSize="80,80"/>

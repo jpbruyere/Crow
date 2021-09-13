@@ -22,12 +22,12 @@ namespace Crow {
 			base.getIML (doc, parentElem);
 
 			if (string.IsNullOrEmpty(_itemTemplate)) {
-				foreach (ItemTemplate it in ItemTemplates.Values) 
-					it.getIML (doc, parentElem.LastChild);				
+				foreach (ItemTemplate it in ItemTemplates.Values)
+					it.getIML (doc, parentElem.LastChild);
 			}
 
 			foreach (Widget g in Items) {
-				g.getIML (doc, parentElem.LastChild);	
+				g.getIML (doc, parentElem.LastChild);
 			}
 		}
 		#endif
@@ -84,13 +84,13 @@ namespace Crow {
 		internal List<Widget> nodes = new List<Widget>();//TODO:close time tracking
 		/// <summary>
 		/// Item templates file path, on disk or embedded.
-		/// 
+		///
 		/// ItemTemplate file may contains either a single template without the
 		/// ItemTemplate enclosing tag, or several item templates each enclosed
 		/// in a separate tag.
-		/// </summary>		
+		/// </summary>
 		public string ItemTemplate {
-			get { return _itemTemplate; }
+			get => _itemTemplate;
 			set {
 				if (value == _itemTemplate)
 					return;
@@ -150,7 +150,7 @@ namespace Crow {
 			set {
 				if (selectedItem == value)
 					return;
-				
+
 				if (selectedItem is ISelectable oldItem)
 					oldItem.IsSelected = false;
 
@@ -195,7 +195,7 @@ namespace Crow {
 					ol.ListRemove -= Ol_ListRemove;
 					ol.ListEdit -= Ol_ListEdit;
 					ol.ListClear -= Ol_ListClear;
-					
+
 				}
 
 				data = value;
@@ -218,11 +218,11 @@ namespace Crow {
 
 				if (data is ICollection c) {
 					if (c.Count == 0) {
-						NotifyValueChanged ("HasItems", false);		
+						NotifyValueChanged ("HasItems", false);
 						return;
 					}
 				}
-				
+
 				if (useLoadingThread) {
 					loadingThread = new CrowThread (this, loading);
 					loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
@@ -260,7 +260,7 @@ namespace Crow {
 			} else
 				loadItem (e.Element, itemsContainer, dataTest);
 		}
-		void Ol_ListEdit (object sender, ListChangedEventArg e) {			
+		void Ol_ListEdit (object sender, ListChangedEventArg e) {
 			if (this.isPaged) {
 				throw new NotImplementedException ();
 			} else if (e.Index<itemsContainer.Children.Count)
@@ -268,7 +268,7 @@ namespace Crow {
 
 		}
 		void Ol_ListClear (object sender, ListClearEventArg e) {
-			cancelLoadingThread ();			
+			cancelLoadingThread ();
 			if (this.isPaged) {
 				throw new NotImplementedException ();
 			} else {
@@ -281,13 +281,13 @@ namespace Crow {
 			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 		}
 		public virtual void AddItem(Widget g){
-			
+
 			itemsContainer.AddChild (g);
 			g.LogicalParent = this;
 			NotifyValueChanged ("HasChildren", true);
 		}
 		public virtual void RemoveItem(Widget g, bool disposeChild = true)
-		{							
+		{
 			if (disposeChild)
 				itemsContainer.DeleteChild (g);
 			else
@@ -367,7 +367,7 @@ namespace Crow {
 			} catch (Exception ex) {
 /*				while (Monitor.IsEntered (IFace.UpdateMutex))
 					Monitor.Exit (IFace.UpdateMutex);
-				while (Monitor.IsEntered (IFace.LayoutMutex)) 
+				while (Monitor.IsEntered (IFace.LayoutMutex))
 					Monitor.Exit (IFace.LayoutMutex);*/
 				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
 			} finally {
@@ -401,7 +401,7 @@ namespace Crow {
 			while (Monitor.IsEntered (IFace.LayoutMutex)) {
 				Monitor.Exit (IFace.LayoutMutex);
 				layoutMx++;
-			}*/			
+			}*/
 
 			loadingThread.Cancel ();
 
@@ -411,7 +411,7 @@ namespace Crow {
 				Monitor.Enter (IFace.UpdateMutex);*/
 
 			loadingThread = null;
-			
+
 			DbgLogger.EndEvent (DbgEvtType.TGCancelLoadingThread);
 		}
 		void loadPage(IEnumerable _data, Group page, string _dataTest)
@@ -464,7 +464,7 @@ namespace Crow {
 			string itempKey = dataType.FullName;
 
 			//if item template selection is not done depending on the type of item
-			//dataTest must contains a member name of the item 
+			//dataTest must contains a member name of the item
 			if (_dataTest != "TypeOf") {
 				try {
 					itempKey = CompilerServices.getValue (dataType, o, _dataTest)?.ToString ();
@@ -499,7 +499,7 @@ namespace Crow {
 					Thread.Sleep(1);
 				}
 			}
-			
+
 			try {
 				g = iTemp.CreateInstance();
 				#if DESIGN_MODE
@@ -518,11 +518,11 @@ namespace Crow {
 
 			if (iTemp.Expand != null) {
 				IToggle toggle = g as IToggle;
-				
+
 				if (toggle == null)
 					toggle = g.FindByType<IToggle> ();
-					
-				if (toggle != null) { 
+
+				if (toggle != null) {
 					toggle.ToggleOn += iTemp.Expand;
 					toggle.IsToggleable = iTemp.HasSubItems;
 				}
@@ -591,7 +591,7 @@ namespace Crow {
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			//SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
-			
+
 			if (sender is ISelectable nli) {
 				nli.IsSelected = true;
 				return;
@@ -599,7 +599,7 @@ namespace Crow {
 			selectedItemContainer = sender as Widget;
 			if (selectedItemContainer == null)
 				return;
-			SelectedItem = selectedItemContainer.DataSource;			
+			SelectedItem = selectedItemContainer.DataSource;
 		}
 
 		bool emitHelperIsAlreadyExpanded (Widget go){
@@ -642,11 +642,11 @@ namespace Crow {
 				ol.ListEdit += (sender, e) => itemsContainer.Children [e.Index].DataSource = e.Element;
 				ol.ListClear += (sender, e) => {	lock (IFace.UpdateMutex)
 														itemsContainer.ClearChildren ();};
-				
+
 			}*/
 		}
 		void onDatasChanged (object sender, ValueChangeEventArgs e) {
-			
+
 		}
 
 		public override void onKeyDown(object sender, KeyEventArgs e)

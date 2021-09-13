@@ -88,7 +88,7 @@ namespace Crow
 		/// <param name="gr">Backend context</param>
 		protected override void onDraw (Context gr)
 		{
-			DbgLogger.StartEvent (DbgEvtType.GODraw, this);			
+			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
 			if (ClipToClientRect) {
 				//clip to client zone
@@ -96,7 +96,7 @@ namespace Crow
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
 			}
-			
+
 			child?.Paint (gr);
 
 			if (ClipToClientRect)
@@ -108,6 +108,7 @@ namespace Crow
 
 		/// <summary>
 		/// Loads the template. Each TemplatedControl MUST provide a default template
+		/// or have an inlined template in iml.
 		/// It must be an embedded ressource with ID = fullTypeName.template
 		/// Entry assembly is search first, then the one where the type is defined
 		/// </summary>
@@ -116,11 +117,11 @@ namespace Crow
 		{
 			if (this.child != null)//template change, bindings has to be reset
 				this.ClearTemplateBinding();
-			
+
 			if (template == null) {
 				string defTmpId = this.GetType ().FullName + ".template";
 				if (!IFace.DefaultTemplates.ContainsKey (defTmpId)) {
-					
+
 					Stream s = IFace.GetStreamFromPath ("#" + defTmpId);
 					if (s == null)
 						throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
