@@ -507,7 +507,7 @@ namespace Crow {
 			if (ItemTemplates.ContainsKey (itempKey))
 				iTemp = ItemTemplates [itempKey];
 			else {
-				if (_dataTest == "Typeof") {//item template selection on full type name
+				if (_dataTest == "TypeOf") {//item template selection on full type name
 					//search ItemTemplates for an existing parent class
 					foreach (string it in ItemTemplates.Keys) {
 						if (it == "default")
