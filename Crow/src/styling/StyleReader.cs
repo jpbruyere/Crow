@@ -89,9 +89,18 @@ namespace Crow
 				switch (Peek ()) {
 				case '/':
 					ReadChar ();
-					if (PeekChar () != '/')
-						throw new ParserException (line, column, "Unexpected char '/'", resId);
-					ReadLine ();
+					if (PeekChar () == '/')
+						ReadLine ();
+					else if (PeekChar () == '*'){
+						while (!EndOfStream) {
+							char c = ReadChar ();
+							if (c == '*' && PeekChar () == '/') {
+								ReadChar();
+								break;
+							}
+						}
+					}else
+						throw new ParserException (line, column, $"Unexpected char '{PeekChar ()}'", resId);
 					break;
 				case ',':
 					ReadChar ();

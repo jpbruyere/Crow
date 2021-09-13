@@ -49,10 +49,10 @@ namespace Crow.IML
 			il.Emit (OpCodes.Nop);
 			//set local GraphicObject to root object
 			ConstructorInfo ci = rootType.GetConstructor (
-					BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, 
+					BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
 					null, Type.EmptyTypes, null);
 			if (ci == null)
-				throw new Exception ("No default parameterless constructor found in " + rootType.Name);			
+				throw new Exception ("No default parameterless constructor found in " + rootType.Name);
 			il.Emit (OpCodes.Newobj, ci);
 			il.Emit (OpCodes.Stloc_0);
 			CompilerServices.emitSetCurInterface (il);
@@ -125,7 +125,7 @@ namespace Crow.IML
 		}
 		/// <summary>
 		/// Stores all the names found in current iml for binding resolution if any of them
-		/// are targeting named widget 
+		/// are targeting named widget
 		/// </summary>
 		public void StoreCurrentName(string name){
 			if (!Names.ContainsKey(name))
@@ -136,7 +136,7 @@ namespace Crow.IML
 			foreach (BindingDefinition bd in UnresolvedTargets) {
 				if (bd.HasUnresolvedTargetName) {
 					try {
-						ResolveName (bd);	
+						ResolveName (bd);
 					} catch (Exception ex) {
 						System.Diagnostics.Debug.WriteLine (ex.ToString ());
 						continue;

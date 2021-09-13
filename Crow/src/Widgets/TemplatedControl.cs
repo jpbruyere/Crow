@@ -116,6 +116,9 @@ namespace Crow
 		/// It must be an embedded ressource with ID = fullTypeName.template
 		/// Entry assembly is search first, then the one where the type is defined
 		/// </summary>
+		/// <Remark>
+		/// Setting the default template path in style will provide an interned string for itor search.
+		/// </Remark>
 		/// <param name="template">Optional template instance</param>
 		protected virtual void loadTemplate(Widget template = null)
 		{
@@ -124,8 +127,8 @@ namespace Crow
 
 			if (template == null) {
 				try {
-					string defTmpId = $"#{this.GetType ().FullName}.template";
-					this.SetChild (IFace.GetInstantiator (defTmpId).CreateInstance());
+					string defaultTemplatePath = $"#{this.GetType().FullName}.template";
+					this.SetChild (IFace.GetInstantiator (defaultTemplatePath).CreateInstance());
 				} catch (Exception ex) {
 					throw new Exception ($"Default template loading error for '{this.GetType ().FullName}'", ex);
 				}

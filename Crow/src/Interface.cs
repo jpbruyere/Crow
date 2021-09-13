@@ -478,8 +478,10 @@ namespace Crow
 		public virtual void UpdateFrame () {
 #if VKVG
 			Update ();
-#endif
 			Thread.Sleep (UPDATE_INTERVAL);
+#else
+			Thread.Sleep (POLLING_INTERVAL);
+#endif
 		}
 
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
@@ -548,6 +550,11 @@ namespace Crow
 		const int INIT_QUEUE_CAPACITY = 512;
 		/// <summary>Time interval in milisecond between Updates of the interface</summary>
 		public static int UPDATE_INTERVAL = 5;
+		/// <summary>
+		/// Time interval in milisecond between Glfw polling for devices. Wait is done in
+		/// the 'UpdateFrame' method in the 'Run' cycle and may be overriden.
+		/// </summary>
+		public static int POLLING_INTERVAL = 1;
 		/// <summary>Crow configuration root path</summary>
 		public static string CROW_CONFIG_ROOT;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
@@ -857,7 +864,7 @@ namespace Crow
 		/// </summary>
 		internal Dictionary<string, sharedPicture> sharedPictures = new Dictionary<string, sharedPicture> ();
 
-		static bool tryGetResource (Assembly a, string resId, out Stream stream) {
+		static bool tryFindResource (Assembly a, string resId, out Stream stream) {
 			stream = null;
 			if (a == null)
 				return false;
@@ -871,17 +878,17 @@ namespace Crow
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				Stream stream = null;
 				string resId = path.Substring (1);
-				if (tryGetResource (Assembly.GetEntryAssembly (), resId, out stream))
+				if (tryFindResource (Assembly.GetEntryAssembly (), resId, out stream))
 					return stream;
 				string[] assemblyNames = resId.Split ('.');
 				if (AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyNames[0]).TryGetResource (resId, out stream))
 					return stream;
 				if (assemblyNames.Length > 3)
-					if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
+					if (tryFindResource (AppDomain.CurrentDomain.GetAssemblies ()
 						.FirstOrDefault (aa => aa.GetName ().Name == $"{assemblyNames[0]}.{assemblyNames[1]}"), resId, out stream))
 						return stream;
 				foreach (Assembly ca in crowAssemblies)
-					if (tryGetResource (ca, resId, out stream))
+					if (tryFindResource (ca, resId, out stream))
 						return stream;
 				throw new Exception ("Resource not found: " + path);
 			}

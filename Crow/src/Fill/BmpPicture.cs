@@ -40,7 +40,7 @@ namespace Crow
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path)) {
 				load (stream);
-				//loadBitmap (new System.Drawing.Bitmap (stream));	
+				//loadBitmap (new System.Drawing.Bitmap (stream));
 				iFace.sharedPictures[Path] = new sharedPicture (image, Dimensions);
 			}
 		}

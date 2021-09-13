@@ -28,7 +28,7 @@ namespace Crow
 			base.OnLayoutChanges (layoutType);
 
 			if (layoutType == LayoutingType.Width)
-				MinimumPopupSize = new Size (this.Slot.Width, minimumPopupSize.Height);			
+				MinimumPopupSize = new Size (this.Slot.Width, minimumPopupSize.Height);
 		}
 	}
 }
