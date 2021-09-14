@@ -85,7 +85,7 @@ namespace Crow
 				bool isExp = IsExpandable;
 				NotifyValueChanged ("IsExpandable", isExp);
 				if (!isExp)
-					_isExpanded = false;				
+					_isExpanded = false;
 
 				NotifyValueChangedAuto (_isExpanded);
 				NotifyValueChanged ("IsToggled",_isExpanded);

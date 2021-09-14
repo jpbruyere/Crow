@@ -4,6 +4,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Crow {
 	public class CommandGroup : CommandBase, IEnumerable, IList<CommandBase>
@@ -25,7 +26,7 @@ namespace Crow {
 			Commands = new ObservableList<CommandBase>(commands);
 		}
 
-		
+
 		public int Count => Commands.Count;
 
 		public bool IsReadOnly => false;
@@ -46,11 +47,24 @@ namespace Crow {
 
 		public bool Contains(CommandBase item) => Commands.Contains (item);
 
-		public void CopyTo(CommandBase[] array, int arrayIndex) => Commands.CopyTo (array, arrayIndex);		
+		public void CopyTo(CommandBase[] array, int arrayIndex) => Commands.CopyTo (array, arrayIndex);
 
 		public bool Remove(CommandBase item) => Commands.Remove (item);
 
 		IEnumerator<CommandBase> IEnumerable<CommandBase>.GetEnumerator()
 			=> Commands.GetEnumerator();
+		public void Add (params CommandBase[] items) {
+			foreach  (CommandBase c in items)
+				Commands.Add (c);
+		}
+		public void Remove (params CommandBase[] items) {
+			foreach  (CommandBase c in items)
+				Commands.Remove (c);
+		}
+		///
+		public void ToggleAllCommand (bool canExecute) {
+			foreach  (Command c in Commands.OfType<Command> ())
+				c.CanExecute = canExecute;
+		}
 	}
 }

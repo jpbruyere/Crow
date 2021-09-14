@@ -62,17 +62,17 @@ namespace Crow
 				NotifyValueChangedAuto (command);
 			}
 		}
-		
+
 		public override bool IsEnabled {
 			get => Command == null ? base.IsEnabled : Command.CanExecute;
 			set => base.IsEnabled = value;
 		}
-		
+
 		public override string Caption {
 			get => Command == null ? base.Caption : Command.Caption;
 			set => base.Caption = value;
 		}
-		
+
 		public string Icon {
 			get => Command == null ? icon : Command.Icon;
 			set {
@@ -121,12 +121,12 @@ namespace Crow
 		protected virtual void onOpen (object sender, EventArgs e){
 			Open.Raise (this, null);
 		}
-		protected virtual void onClose (object sender, EventArgs e){			
+		protected virtual void onClose (object sender, EventArgs e){
 			Close.Raise (this, null);
 		}
 		public override bool MouseIsIn (Point m)
 			=> IsEnabled && !IsDragged ? base.MouseIsIn (m) || child.MouseIsIn (m) : false;
-		
+
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
@@ -151,10 +151,10 @@ namespace Crow
 			if (hasClick)
 				base.onMouseClick (sender, e);
 
-			if (!IsOpened) 
+			if (!IsOpened)
 				if (LogicalParent is Menu m)
 					m.AutomaticOpening = false;
-			
+
 		}
 		void closeMenu () {
 			MenuItem tmp = LogicalParent as MenuItem;
@@ -164,6 +164,12 @@ namespace Crow
 				tmp.AutomaticOpening = false;
 				tmp = tmp.LogicalParent as MenuItem;
 			}
+		}
+		protected override void Dispose(bool disposing)
+		{
+			if (command is IDisposable dis)
+				dis.Dispose ();
+			base.Dispose(disposing);
 		}
 	}
 }

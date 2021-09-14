@@ -39,7 +39,7 @@ namespace Crow {
 		#endregion
 
 		public override void AddItem (Widget g)
-		{			
+		{
 			base.AddItem (g);
 
 			if (orientation == Orientation.Horizontal)

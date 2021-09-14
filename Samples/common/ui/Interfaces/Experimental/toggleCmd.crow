@@ -1,0 +1,55 @@
+﻿<VerticalStack Fit="true">
+	<HorizontalStack Fit="true">
+		<Button Command="{CMDToggleBoolVal}"/>
+		<CheckBox IsChecked="{²BoolVal}"/>
+		<Button Command="{CMDToggleBoolVal}">
+			<Template>
+				<Container DataSource="{./Command}">
+					<CheckBox Caption="{./Caption}" Style="CheckBox2" IsChecked="{²IsToggled}"/>
+				</Container>
+			</Template>
+		</Button>
+		<Button Command="{CMDToggleBoolVal}">
+			<Template>
+				<Border DataSource="{./Command}" Name="Content" Margin="2"
+							Background="DarkGrey" Tooltip="{./Caption}"
+							Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
+							MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
+							MouseLeave="{Foreground=Transparent}"
+							MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White};{Background=Yellow}"
+							MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black};{Background=DarkGrey}">
+					<CheckBox Focusable="False" Width="Stretched" Height="Stretched" IsChecked="{²IsToggled}"
+							Checked="{Background=${ControlHighlight}}"
+							Unchecked="{Background=Jet}">
+						<Template>
+							<Image Style="icon" Name="caption" Path="{Icon}" Background="{./Background}" Margin="10"/>
+						</Template>
+					</CheckBox>					
+				</Border>
+			</Template>
+		</Button>
+		<Button Command="{CMDToggleBoolVal}">
+			<Template>
+				<Container DataSource="{./Command}">
+<!--					<CheckBox Caption="{./Caption}" Style="CheckBox2" IsChecked="{²IsToggled}"/>-->
+					<CheckBox Width="Stretched" Height="Stretched" IsChecked="{²IsToggled}"
+							Checked="{Background=${ControlHighlight}}"
+							Unchecked="{Background=Jet}">
+						<Template>
+							<Image Style="icon" Name="caption" Path="{Icon}" Background="{./Background}" Margin="10"/>
+						</Template>
+					</CheckBox>
+				</Container>
+			</Template>
+		</Button>
+	</HorizontalStack>
+	<HorizontalStack Fit="true">
+		<Button Command="{CMDToggleBoolValField}">
+			<Template>
+				<Container DataSource="{./Command}">
+					<CheckBox Caption="{./Caption}" Style="CheckBox2" IsChecked="{²IsToggled}"/>
+				</Container>
+			</Template>
+		</Button>
+	</HorizontalStack>
+</VerticalStack>

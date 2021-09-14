@@ -53,7 +53,7 @@ namespace Crow
 		}
 		public static void DrawCote(this Context ctx, PointD p1, PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
-		{			
+		{
 			PointD vDir = p2.Substract(p1);
 			vDir = vDir.GetNormalized ();
 			PointD vPerp = vDir.GetPerp ();
@@ -69,7 +69,7 @@ namespace Crow
 				ctx.LineTo (pA0.Substract (vA));
 			else
 				ctx.MoveTo (pA0.Substract (vA));
-			
+
 			ctx.LineTo (p1);
 
 			ctx.MoveTo (p2);
@@ -90,7 +90,7 @@ namespace Crow
 		}
 		public static void DrawCoteInverse(this Context ctx, PointD p1, PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
-		{			
+		{
 			PointD vDir = p2.Substract(p1);
 			vDir = vDir.GetNormalized ();
 			PointD vPerp = vDir.GetPerp ();
@@ -122,7 +122,7 @@ namespace Crow
 		}
 		public static void DrawCoteFixed(this Context ctx, PointD p1, PointD p2,
 			double stroke = 1.0, double coteWidth = 3.0)
-		{			
+		{
 			PointD vDir = p2.Substract(p1);
 			vDir = vDir.GetNormalized ();
 			PointD vPerp = vDir.GetPerp ();
@@ -164,7 +164,7 @@ namespace Crow
 			case Alignment.BottomLeft:
 				return Alignment.TopRight;
 			case Alignment.BottomRight:
-				return Alignment.TopLeft;			
+				return Alignment.TopLeft;
 			}
 			return Alignment.Center;
 		}
@@ -187,11 +187,11 @@ namespace Crow
 			return c == '\t' || c.IsAnyLineBreakCharacter() || char.IsWhiteSpace (c);
 		}
 		public static object GetDefaultValue(this object obj)
-		{			
+		{
 			Type t = obj.GetType ();
 			if (t.IsValueType)
 				return Activator.CreateInstance (t);
-			
+
 			return null;
 		}
 
@@ -203,7 +203,7 @@ namespace Crow
 			}
 		}
 
-		internal static bool IsAnyLineBreakCharacter (this char c) 
+		internal static bool IsAnyLineBreakCharacter (this char c)
 			=> c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
 
 		public static bool TryGetResource (this Assembly a, string resId, out Stream stream) {

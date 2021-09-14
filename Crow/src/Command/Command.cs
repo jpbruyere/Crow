@@ -6,15 +6,19 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace Crow {	
+namespace Crow {
 	/// <summary>
-	/// helper class to bind in one step icon, caption, action, and validity tests to a controls 
+	/// helper class to bind in one step icon, caption, action, and validity tests to a controls
 	/// </summary>
 	public class Command : CommandBase
 	{
 
 		#region CTOR
 		public Command () {}
+		public Command (string caption, string icon = null, bool _canExecute = true)
+			:base (caption, icon)
+		{}
+
 		/// <summary>
 		/// Initializes a new instance of Command with the action passed as argument.
 		/// </summary>
@@ -31,23 +35,23 @@ namespace Crow {
 		}
 		public Command (string caption, Action executeAction, string icon = null, bool _canExecute = true)
 			:base (caption, icon)
-		{					
+		{
 			execute = executeAction;
 			canExecute = _canExecute;
 		}
 		public Command (string caption, Action<object> executeAction, string icon = null, bool _canExecute = true)
 			:base (caption, icon)
-		{					
+		{
 			execute = executeAction;
 			canExecute = _canExecute;
 		}
-		
+
 		#endregion
 
-		Delegate execute;		
+		Delegate execute;
 
 		bool canExecute = true;
-		
+
 		/// <summary>
 		/// if true, action defined in this command may be executed,
 		/// </summary>
@@ -60,7 +64,7 @@ namespace Crow {
 				canExecute = value;
 				NotifyValueChanged ("CanExecute", canExecute);
 			}
-		}		
+		}
 
 		/// <summary>
 		/// trigger the execution of the command
@@ -68,7 +72,7 @@ namespace Crow {
 		public virtual void Execute (object sender = null){
 			if (execute != null && CanExecute){
 				Task task =	(execute is Action a) ?
-					task = new Task(a) :				
+					task = new Task(a) :
 				(execute is Action<object> o) ?
 					task = new Task(o, sender) : throw new Exception("Invalid Delegate type in Crow.Command, expecting Action or Action<object>");
 				task.Start();

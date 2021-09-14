@@ -70,6 +70,8 @@ namespace Samples
 			new Command("File command three", (sender) => showMsgBox (sender))
 		);
 		public Command SingleCommand => new Command("Single command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg");
+		public ToggleCommand CMDToggleBoolVal => new ToggleCommand ("Toggle", this, "BoolVal", "#Icons.gavel.svg", true);
+		public ToggleCommand CMDToggleBoolValField => new ToggleCommand ("ToggleField", this, "boolVal", "#Icons.gavel.svg", true);
 
 		void initCommands()
 		{
@@ -291,7 +293,7 @@ namespace Samples
 
 				NotifyValueChanged(testString);
 			}
-		}		
+		}
 		string prop1;
 		public string TestList3SelProp1
 		{
@@ -337,7 +339,7 @@ namespace Samples
 
 
 		string curSources = "";
-		bool boolVal = true;
+		public bool boolVal = true;
 		public string CurSources
 		{
 			get => curSources;
@@ -356,6 +358,7 @@ namespace Samples
 					return;
 				boolVal = value;
 				NotifyValueChanged(boolVal);
+				Console.WriteLine ($"boolVal => {value}");
 			}
 		}
 		public Color AllWidgetBackground {

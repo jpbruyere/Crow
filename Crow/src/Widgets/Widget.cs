@@ -2334,7 +2334,7 @@ namespace Crow
 			LastSlots = default;
 			LastPaintedSlot = default;*/
 			//Slot = LastSlots = LastPaintedSlot = default;
-			Slot = LastPaintedSlot = default;
+			//Slot = LastPaintedSlot = default;
 		}
 	}
 }

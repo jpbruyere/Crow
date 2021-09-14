@@ -18,16 +18,16 @@ namespace Crow {
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
-		
+
 		#region CTOR
 		protected CommandBase() {}
 		protected CommandBase (string _caption, string _icon = null)
 		{
-			caption = _caption;			
+			caption = _caption;
 			icon = _icon;
 		}
 		#endregion
-		
+
 		string caption, icon;
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace Crow {
 		}
 		/// <summary>
 		/// Icon to display in the bound control
-		/// </summary>		
+		/// </summary>
 		public string Icon {
 			get => icon;
 			set {
@@ -56,7 +56,7 @@ namespace Crow {
 				NotifyValueChanged ("Icon", icon);
 			}
 		}
-		internal virtual void raiseAllValuesChanged() {		
+		internal virtual void raiseAllValuesChanged() {
 			NotifyValueChanged ("Icon", icon);
 			NotifyValueChanged ("Caption", caption);
 		}
