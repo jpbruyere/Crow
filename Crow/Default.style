@@ -33,13 +33,38 @@ Border {
 	Margin = "${ControlInsideMargin}";
 }
 
-CheckBox { Caption = "CheckBox"; }
-RadioButton { Caption = "RadioButton"; }
-Expandable { Caption = "Expandable"; }
-Popper { Caption = "Popper";}
+CheckBox {
+	Template = "#Crow.CheckBox.template";
+	Caption = "CheckBox";
+}
+RadioButton {
+	Template = "#Crow.RadioButton.template";
+	Caption = "RadioButton";
+}
+Expandable {
+	Template = "#Crow.Expandable.template";
+	Caption = "Expandable";
+}
+Popper {
+	Template = "#Crow.Popper.template";
+	Caption = "Popper";
+}
 GroupBox {
+	Template = "#Crow.GroupBox.template";
 	Caption = "Group Box";
 	Foreground = "${ControlForeground}";
+}
+ListBox {
+	Template = "#Crow.ListBox.template";
+	Caption = "List Box";
+}
+ComboBox {
+	Template = "#Crow.ComboBox.template";
+	Caption = "Combo Box";
+}
+TreeView {
+	Template = "#Crow.TreeView.template";
+	Caption = "Tree View";
 }
 
 Control {
@@ -74,6 +99,7 @@ Wrapper {
 	Orientation = "Vertical";
 }
 Button {
+	Template = "#Crow.Button.template";
 	Caption 	= "Button";
 	MinimumSize = "50,22";
 	Height 		= "Fit";
@@ -109,6 +135,7 @@ TextBox {
 	Margin = "1";
 }
 Menu {
+	Template = "#Crow.Menu.template";
 	Margin = "0";
 	Background = "${MenuBackground}";
 	Height = "Fit";
@@ -119,6 +146,7 @@ Menu {
 	//SelectionColoring = "false";
 }
 MenuItem {
+	Template = "#Crow.MenuItem.template";
 	Caption = "MenuItem";
 	Width = "Stretched";
 	Height = "Fit";
@@ -274,6 +302,7 @@ ArrowBut {
 }
 
 ScrollBar {
+	Template = "#Crow.ScrollBar.template";
 	Orientation = "Vertical";
 	Maximum = "0";
 	Value = "0";
@@ -292,6 +321,7 @@ HScrollBar {
     Orientation = "Horizontal";
 }
 EnumSelector {
+	Template = "#Crow.EnumSelector.template";
     Width = "Fit";
     Height = "Fit";
 }
