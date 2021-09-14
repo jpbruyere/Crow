@@ -143,7 +143,7 @@ namespace Crow
 
 		Widget moveHandle, sizingHandle;
 
-		public Command CMDMinimize, CMDMaximize, CMDNormalize, CMDClose;
+		public ActionCommand CMDMinimize, CMDMaximize, CMDNormalize, CMDClose;
 		CommandGroup commands;
 
 		public CommandGroup Commands {
@@ -168,10 +168,10 @@ namespace Crow
 		void initCommands () {
 			if (CMDMinimize != null)
 				return;
-			CMDMinimize = new Command ("Minimize", () => CurrentState = Status.Minimized, "#Crow.Icons.minimize.svg", allowedStates.HasFlag (Status.Minimized));
-			CMDMaximize = new Command ("Maximize", () => CurrentState = Status.Maximized, "#Crow.Icons.maximize.svg", allowedStates.HasFlag (Status.Maximized));
-			CMDNormalize = new Command ("Normalize", () => CurrentState = Status.Normal, "#Crow.Icons.normalize.svg", false);
-			CMDClose = new Command ("Close", close, "#Crow.Icons.exit2.svg", true);
+			CMDMinimize = new ActionCommand ("Minimize", () => CurrentState = Status.Minimized, "#Crow.Icons.minimize.svg", allowedStates.HasFlag (Status.Minimized));
+			CMDMaximize = new ActionCommand ("Maximize", () => CurrentState = Status.Maximized, "#Crow.Icons.maximize.svg", allowedStates.HasFlag (Status.Maximized));
+			CMDNormalize = new ActionCommand ("Normalize", () => CurrentState = Status.Normal, "#Crow.Icons.normalize.svg", false);
+			CMDClose = new ActionCommand ("Close", close, "#Crow.Icons.exit2.svg", true);
 			Commands = new CommandGroup(CMDMinimize, CMDNormalize, CMDMaximize, CMDClose);
 		}
 

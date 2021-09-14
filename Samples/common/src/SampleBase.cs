@@ -48,43 +48,43 @@ namespace Samples
 
 		static void showMsgBox (object sender) {
 			Widget w = sender as Widget;
-			Command cmd = w.DataSource as Command;
+			ActionCommand cmd = w.DataSource as ActionCommand;
 			MessageBox.ShowModal(w.IFace, MessageBox.Type.Information, $"{cmd?.Caption} CLICKED");
 		}
 
 		#region Test values for Binding
 		public CommandGroup Commands, AllCommands;
 		public CommandGroup EditCommands = new CommandGroup("Edit Commands",
-			new Command("Edit command 1", (sender) => showMsgBox (sender)),
-			new Command("Edit command 2 a bit longer", (sender) => showMsgBox (sender), null, false),
-			new Command("Edit command three", (sender) => showMsgBox (sender)),
+			new ActionCommand("Edit command 1", (sender) => showMsgBox (sender)),
+			new ActionCommand("Edit command 2 a bit longer", (sender) => showMsgBox (sender), null, false),
+			new ActionCommand("Edit command three", (sender) => showMsgBox (sender)),
 			new CommandGroup("Subedit menu",
-				new Command("Subedit command 1", (sender) => showMsgBox (sender)),
-				new Command("Subedit command 2 a bit longer", (sender) => showMsgBox (sender), null, false),
-				new Command("Subedit command three", (sender) => showMsgBox (sender))
+				new ActionCommand("Subedit command 1", (sender) => showMsgBox (sender)),
+				new ActionCommand("Subedit command 2 a bit longer", (sender) => showMsgBox (sender), null, false),
+				new ActionCommand("Subedit command three", (sender) => showMsgBox (sender))
 			)
 		);
 		public CommandGroup FileCommands = new CommandGroup("File Commands",
-			new Command("File command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg"),
-			new Command("File command 2 a bit longer", (sender) => showMsgBox (sender)),
-			new Command("File command three", (sender) => showMsgBox (sender))
+			new ActionCommand("File command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg"),
+			new ActionCommand("File command 2 a bit longer", (sender) => showMsgBox (sender)),
+			new ActionCommand("File command three", (sender) => showMsgBox (sender))
 		);
-		public Command SingleCommand => new Command("Single command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg");
+		public ActionCommand SingleCommand => new ActionCommand("Single command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg");
 		public ToggleCommand CMDToggleBoolVal => new ToggleCommand ("Toggle", this, "BoolVal", "#Icons.gavel.svg", true);
 		public ToggleCommand CMDToggleBoolValField => new ToggleCommand ("ToggleField", this, "boolVal", "#Icons.gavel.svg", true);
 
 		void initCommands()
 		{
 			Commands = new CommandGroup("commands msg boxes",
-				new Command("Action 1", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")),
-				new Command("Action two", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked"), null, false),
-				new Command("Action three", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked"))
+				new ActionCommand("Action 1", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")),
+				new ActionCommand("Action two", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked"), null, false),
+				new ActionCommand("Action three", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked"))
 			);
 			AllCommands = new CommandGroup ("All Commands",
 				FileCommands,
 				EditCommands,
 				new CommandGroup ("Combined commands", FileCommands, EditCommands),
-				new Command("Action A", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu A clicked"))
+				new ActionCommand("Action A", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu A clicked"))
 			);
 		}
 		public int intValue = 500;

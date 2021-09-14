@@ -129,20 +129,20 @@ namespace Samples
 		public new bool IsDirty => source != origSource;
 
 
-		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit, CMDShowLeftPane,
+		public ActionCommand CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit, CMDShowLeftPane,
 					CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions;
 		public CommandGroup EditorCommands => new CommandGroup (CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDSave, CMDSaveAs);
 		protected virtual void initCommands ()
 		{
-			CMDNew	= new Command ("New", new Action (onNewFile), "#Icons.blank-file.svg");			
-			CMDSave = new Command ("Save", new Action (onSave), "#Icons.save.svg", false);
-			CMDSaveAs = new Command ("Save As...", new Action (onSaveAs), "#Icons.save.svg");
-			CMDQuit = new Command ("Quit", new Action (() => base.Quit ()), "#Icons.exit.svg");
-			CMDUndo = new Command ("Undo", new Action (undo),"#Icons.undo.svg", false);
-			CMDRedo = new Command ("Redo", new Action (redo),"#Icons.redo.svg", false);
-			CMDCut	= new Command ("Cut", new Action (cut), "#Icons.scissors.svg", false);
-			CMDCopy = new Command ("Copy", new Action (copy), "#Icons.copy-file.svg", false);
-			CMDPaste= new Command ("Paste", new Action (paste), "#Icons.paste-on-document.svg", false);
+			CMDNew	= new ActionCommand ("New", new Action (onNewFile), "#Icons.blank-file.svg");			
+			CMDSave = new ActionCommand ("Save", new Action (onSave), "#Icons.save.svg", false);
+			CMDSaveAs = new ActionCommand ("Save As...", new Action (onSaveAs), "#Icons.save.svg");
+			CMDQuit = new ActionCommand ("Quit", new Action (() => base.Quit ()), "#Icons.exit.svg");
+			CMDUndo = new ActionCommand ("Undo", new Action (undo),"#Icons.undo.svg", false);
+			CMDRedo = new ActionCommand ("Redo", new Action (redo),"#Icons.redo.svg", false);
+			CMDCut	= new ActionCommand ("Cut", new Action (cut), "#Icons.scissors.svg", false);
+			CMDCopy = new ActionCommand ("Copy", new Action (copy), "#Icons.copy-file.svg", false);
+			CMDPaste= new ActionCommand ("Paste", new Action (paste), "#Icons.paste-on-document.svg", false);
 		}
 
 

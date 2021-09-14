@@ -63,7 +63,7 @@ namespace Crow {
 		}
 		///
 		public void ToggleAllCommand (bool canExecute) {
-			foreach  (Command c in Commands.OfType<Command> ())
+			foreach  (ActionCommand c in Commands.OfType<ActionCommand> ())
 				c.CanExecute = canExecute;
 		}
 	}

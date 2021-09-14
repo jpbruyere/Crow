@@ -48,11 +48,11 @@ namespace Crow
 		[XmlIgnore] public bool IsDockedInTabView => LogicalParent is TabView;
 		[XmlIgnore] public bool IsDockedInStack => Parent is DockStack;
 
-		public Command CMDFreezeDockState, CMDUnfreezeDockState;
+		public ActionCommand CMDFreezeDockState, CMDUnfreezeDockState;
 		public CommandGroup DockCommands => new CommandGroup (CMDFreezeDockState, CMDUnfreezeDockState);
 		void initCommands () {
-			CMDFreezeDockState = new Command ("Freeze Dock State", () => FreezeDockState = true, "#Crow.Icons.unpin.svg", !FreezeDockState);
-			CMDUnfreezeDockState = new Command ("Unfreeze Dock State", () => FreezeDockState = false, "#Crow.Icons.pin.svg", FreezeDockState);
+			CMDFreezeDockState = new ActionCommand ("Freeze Dock State", () => FreezeDockState = true, "#Crow.Icons.unpin.svg", !FreezeDockState);
+			CMDUnfreezeDockState = new ActionCommand ("Unfreeze Dock State", () => FreezeDockState = false, "#Crow.Icons.pin.svg", FreezeDockState);
 		}
 
 		/// <summary>

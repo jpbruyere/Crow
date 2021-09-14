@@ -15,18 +15,12 @@ namespace Crow {
 	/// </summary>
 	public class ToggleCommand : Command, IToggle, IDisposable
 	{
-		object instance;
-		string memberName;
-		Action<bool> delSet;
-		Func<bool> delGet;
-
 		#region CTOR
 		public ToggleCommand () {}
 		public ToggleCommand (object instance, string memberName, string icon = null, bool _canExecute = true)
-			:this ("", instance, memberName, icon, _canExecute) {
-		}
+			: this ("", instance, memberName, icon, _canExecute) { }
 		public ToggleCommand (string caption, object instance, string memberName, string icon = null, bool _canExecute = true)
-			:base (caption, icon, _canExecute)
+			: base (caption, icon, _canExecute)
 		{
 			this.instance = instance;
 			this.memberName = memberName;
@@ -65,7 +59,7 @@ namespace Crow {
 		void instance_valueChanged (object sender, ValueChangeEventArgs e) {
 			if (e.MemberName != memberName)
 				return;
-			Console.WriteLine ($"ToggleCommand valueChanged triggered => {e.NewValue}");
+			//Console.WriteLine ($"ToggleCommand valueChanged triggered => {e.NewValue}");
 
 			bool tog = (bool)e.NewValue;
 			NotifyValueChanged ("IsToggled", tog);
@@ -76,6 +70,12 @@ namespace Crow {
 
 		}
 		#endregion
+		object instance;
+		string memberName;
+		Action<bool> delSet;
+		Func<bool> delGet;
+		bool disposedValue;
+
 
 		/// <summary>
 		/// trigger the execution of the command
@@ -103,7 +103,7 @@ namespace Crow {
 					return;
 				delSet (value);
 				NotifyValueChanged ("IsToggled", IsToggled);
-				Console.WriteLine ($"ToggleCommand.IsToggled => {value}");
+				//Console.WriteLine ($"ToggleCommand.IsToggled => {value}");
 
 				if (IsToggled)
 					ToggleOn.Raise (this, null);
@@ -113,7 +113,6 @@ namespace Crow {
 		}
 		#endregion
 
-		bool disposedValue;
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposedValue)
