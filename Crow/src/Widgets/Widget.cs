@@ -2060,19 +2060,19 @@ namespace Crow
 		public virtual void onKeyDown(object sender, KeyEventArgs e){
 			if (KeyDown != null)
 				KeyDown.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.KeyDown))
 				FocusParent?.onKeyDown (sender, e);
 		}
 		public virtual void onKeyUp(object sender, KeyEventArgs e){
 			if (KeyUp != null)
 				KeyUp.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.KeyUp))
 				FocusParent?.onKeyUp (sender, e);
 		}
 		public virtual void onKeyPress(object sender, KeyPressEventArgs e){
 			if (KeyPress != null)
 				KeyPress.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.KeyPress))
 				FocusParent?.onKeyPress (sender, e);
 		}
 		#endregion

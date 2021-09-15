@@ -134,7 +134,7 @@ namespace Crow
 		}
 
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
-		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {			
+		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {
 			e.Handled = true;
 			if (IFace.Shift)
 				ScrollX += e.Delta * MouseWheelSpeed;
@@ -142,10 +142,10 @@ namespace Crow
 				ScrollY -= e.Delta * MouseWheelSpeed;
 			else
 				e.Handled = false;
-			
+
 			base.onMouseWheel (sender, e);
 		}
-		public override void onMouseMove (object sender, MouseMoveEventArgs e) {            
+		public override void onMouseMove (object sender, MouseMoveEventArgs e) {
 			if (!HasFocus || !IFace.IsDown (MouseButton.Left)) {
 				base.onMouseMove (sender, e);
 				return;
@@ -215,8 +215,8 @@ namespace Crow
 					return null;
 			} else if (cursor.Right < 0 || cursor.X > cb.Width || cursor.Y < 0 || cursor.Bottom > cb.Height)
 				return null;
-			
-			return cursor;            
+
+			return cursor;
 		}
 
 		void updateMaxScrolls (LayoutingType layout) {
@@ -244,7 +244,7 @@ namespace Crow
 			TextSpan selection = Selection;
 			if (selection.IsEmpty)
 				return;
-			IFace.Clipboard = SelectedText;		
+			IFace.Clipboard = SelectedText;
 		}
 		public virtual void Paste () {
 			TextSpan selection = Selection;
@@ -272,8 +272,8 @@ namespace Crow
 				if (selection.IsEmpty) {
 					if (selection.Start == Text.Length)
 						return;
-					if (CurrentLoc.Value.Column >= lines[CurrentLoc.Value.Line].Length) 
-						update (new TextChange (selection.Start, lines[CurrentLoc.Value.Line].LineBreakLength, ""));                        
+					if (CurrentLoc.Value.Column >= lines[CurrentLoc.Value.Line].Length)
+						update (new TextChange (selection.Start, lines[CurrentLoc.Value.Line].LineBreakLength, ""));
 					else
 						update (new TextChange (selection.Start, 1, ""));
 				} else {
@@ -345,7 +345,7 @@ namespace Crow
 				src.Slice (0, change.Start).CopyTo (tmp);
 				change.ChangedText.AsSpan ().CopyTo (tmp.Slice (change.Start));
 				src.Slice (change.End).CopyTo (tmp.Slice (change.Start + change.ChangedText.Length));
-			
+
 				_text = tmp.ToString ();
 				lines.Update (change);
 				//lines.Update (_text);
@@ -358,7 +358,7 @@ namespace Crow
 
 			NotifyValueChanged ("Text", Text);
 			OnTextChanged (this, new TextChangeEventArgs (change));
-			
+
 			RegisterForGraphicUpdate ();
 		}
 		protected override string LogName => "tb";

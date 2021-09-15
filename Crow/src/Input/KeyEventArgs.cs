@@ -8,33 +8,34 @@ using Glfw;
 namespace Crow
 {
 	public class KeyEventArgs : CrowEventArgs
-    {
-		int keyCode=0;
+	{
 		Key key;
-		bool repeat;	
+		int scancode;
+		Modifier modifiers;
+		bool repeat;
 
-		public KeyEventArgs(Key _key, bool _repeat)
+		public KeyEventArgs (Key _key, bool _repeat = false)
 		{
 			key = _key;
 			repeat = _repeat;
 		}
-		public KeyEventArgs(KeyEventArgs args)
+		public KeyEventArgs (Key _key, int _scancode, Modifier _modifiers, bool _repeat = false)
 		{
-		    Key = args.Key;
+			key = _key;
+			scancode = _scancode;
+			modifiers = _modifiers;
+			repeat = _repeat;
 		}
-		public Key Key
+		public KeyEventArgs (KeyEventArgs e)
 		{
-		    get { return key; }
-		    internal set { key = value; }
+			key = e.Key;
+			repeat = e.IsRepeat;
+			scancode = e.ScanCode;
+			modifiers = e.Modifiers;
 		}
-		public uint ScanCode
-		{
-		    get { return (uint)keyCode; }
-		}
-		public bool IsRepeat
-		{
-		    get { return repeat; }
-		    internal set { repeat = value; }
-		}
-    }
+		public Key Key => key;
+		public int ScanCode => scancode;
+		public Modifier Modifiers => modifiers;
+		public bool IsRepeat => repeat;
+	}
 }

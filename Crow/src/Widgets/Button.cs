@@ -119,11 +119,5 @@ namespace Crow
 			}
 			NotifyValueChanged (mName, e.NewValue);
 		}
-		protected override void Dispose(bool disposing)
-		{
-			if (command is IDisposable dis)
-				dis.Dispose ();
-			base.Dispose(disposing);
-		}
 	}
 }

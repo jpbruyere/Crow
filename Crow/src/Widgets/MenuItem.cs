@@ -165,12 +165,6 @@ namespace Crow
 				tmp = tmp.LogicalParent as MenuItem;
 			}
 		}
-		protected override void Dispose(bool disposing)
-		{
-			if (command is IDisposable dis)
-				dis.Dispose ();
-			base.Dispose(disposing);
-		}
 	}
 }
 

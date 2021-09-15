@@ -9,7 +9,8 @@ using System.Linq;
 namespace Crow {
 	public class CommandGroup : CommandBase, IEnumerable, IList<CommandBase>
 	{
-		public IList<CommandBase> Commands;
+		public IList<CommandBase> Commands { get; private set; }
+
 
 		public CommandGroup () {
 			Commands = new ObservableList<CommandBase>();
@@ -24,6 +25,9 @@ namespace Crow {
 		}
 		public CommandGroup (params CommandBase[] commands) {
 			Commands = new ObservableList<CommandBase>(commands);
+		}
+		public CommandGroup (ICommandHost host) {
+
 		}
 
 
@@ -61,7 +65,10 @@ namespace Crow {
 			foreach  (CommandBase c in items)
 				Commands.Remove (c);
 		}
-		///
+		/// <summary>
+		/// Set boolean value for the CanExecute state of all commands
+		/// </summary>
+		/// <param name="canExecute"></param>
 		public void ToggleAllCommand (bool canExecute) {
 			foreach  (ActionCommand c in Commands.OfType<ActionCommand> ())
 				c.CanExecute = canExecute;

@@ -19,7 +19,7 @@ namespace Crow
 	public class ListClearEventArg : EventArgs
 	{
 		public IEnumerable<object> Elements;
-		public ListClearEventArg (IEnumerable<object> elements)	{			
+		public ListClearEventArg (IEnumerable<object> elements)	{
 			Elements = elements;
 		}
 	}

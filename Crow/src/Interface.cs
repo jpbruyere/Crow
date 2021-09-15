@@ -45,7 +45,7 @@ namespace Crow
 	/// The resulting surface (a byte array in the OpenTK renderer) is made available and protected with the
 	/// RenderMutex of the interface.
 	/// </remarks>
-	public class Interface : ILayoutable, IDisposable, IValueChange
+	public class Interface : ILayoutable, IDisposable, ICommandHost
 	{
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -401,12 +401,17 @@ namespace Crow
 			windows [window].OnMouseWheelChanged ((int)yOffset);
 		};
 		static KeyDelegate HandleKeyDelegate = (IntPtr window, Key key, int scanCode, InputAction action, Modifier modifiers) => {
+			string localizedKey = Glfw3.GetKeyName (key, scanCode);
+			if (!string.IsNullOrEmpty (localizedKey) && EnumsNET.Enums.TryParse<Key> (localizedKey, true, out Key locKey))
+				key = locKey;
+
 			if (action == InputAction.Release)
-				windows [window].OnKeyUp (key);
+				windows [window].OnKeyUp (new KeyEventArgs (key, scanCode, modifiers));
 			 else
-				windows [window].OnKeyDown (key);
+				windows [window].OnKeyDown (new KeyEventArgs (key, scanCode, modifiers));
 		};
 		static CharDelegate HandleCharDelegate = (IntPtr window, CodePoint codepoint) => {
+			Console.WriteLine ($"Char: cp:{codepoint.Value} -> '{codepoint}'");
 			windows [window].OnKeyPress (codepoint.ToChar());
 		};
 		static WindowSizeDelegate HandleWindowSizeDelegate = (IntPtr window, int Width, int Height) => {
@@ -604,13 +609,15 @@ namespace Crow
 
 		public event EventHandler StartDragOperation;
 		public event EventHandler EndDragOperation;
+		public event EventHandler<KeyEventArgs> KeyDown;
+		public event EventHandler<KeyEventArgs> KeyUp;
+
 		//public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
 		//public event EventHandler<MouseButtonEventArgs> MouseClick;
 		//public event EventHandler<MouseMoveEventArgs> MouseMove;
 		//public event EventHandler<KeyEventArgs> KeyDown;
-		//public event EventHandler<KeyEventArgs> KeyUp;
 		//public event EventHandler<KeyPressEventArgs> KeyPress;
 		/*public event EventHandler<KeyEventArgs> KeyboardKeyDown;
 		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
@@ -1865,26 +1872,22 @@ namespace Crow
 
 		public virtual bool OnKeyPress (char c)
 		{
-			if (_focusedWidget == null)
-				return false;
-			_focusedWidget.onKeyPress (_focusedWidget, new KeyPressEventArgs (c));
-			return true;
+			KeyPressEventArgs e = new KeyPressEventArgs (c);
+			if (_focusedWidget != null)
+				_focusedWidget.onKeyPress (_focusedWidget, e);
+			return e.Handled;
 		}
-		public virtual bool OnKeyUp (Key key)
+		public virtual bool OnKeyUp (KeyEventArgs e)
 		{
-			if (_focusedWidget == null)
-				return false;
-			_focusedWidget.onKeyUp (_focusedWidget, new KeyEventArgs (key, false));
-			return true;
-
-
-			//			if (keyboardRepeatThread != null) {
-			//				keyboardRepeatOn = false;
-			//				keyboardRepeatThread.Abort();
-			//				keyboardRepeatThread.Join ();
-			//			}
+			if (!e.Handled) {
+				if (KeyUp != null)
+					KeyUp.Invoke (this, e);
+				if (!e.Handled && _focusedWidget != null)
+					_focusedWidget.onKeyUp (_focusedWidget, e);
+			}
+			return e.Handled;
 		}
-		public virtual bool OnKeyDown (Key key)
+		public virtual bool OnKeyDown (KeyEventArgs e)
 		{
 #if DEBUG_STATS
 			if (Shift && key == Key.F1) {
@@ -1912,18 +1915,15 @@ namespace Crow
 				").DataSource = this;
 			}
 #endif
+			lastKeyDownEvt = new KeyEventArgs (e);
 
-			//Keyboard.SetKeyState((Crow.Key)Key,true);
-			lastKeyDownEvt = new KeyEventArgs (key, true);
-
-			if (_focusedWidget == null)
-				return false;
-			_focusedWidget.onKeyDown (_focusedWidget, new KeyEventArgs (key, false));
-			return true;
-
-			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-			//			keyboardRepeatThread.IsBackground = true;
-			//			keyboardRepeatThread.Start ();
+			if (!e.Handled) {
+				if (KeyDown != null)
+					KeyDown.Invoke (this, e);
+				if (!e.Handled && _focusedWidget != null)
+					_focusedWidget.onKeyDown (_focusedWidget, e);
+			}
+			return e.Handled;
 		}
 
 		public bool IsKeyDown (Key key) => Glfw3.GetKey (hWin, key) == InputAction.Press;

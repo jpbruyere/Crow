@@ -70,11 +70,18 @@ namespace Samples
 			new ActionCommand("File command three", (sender) => showMsgBox (sender))
 		);
 		public ActionCommand SingleCommand => new ActionCommand("Single command 1", (sender) => showMsgBox (sender), "#Icons.gavel.svg");
-		public ToggleCommand CMDToggleBoolVal => new ToggleCommand ("Toggle", this, "BoolVal", "#Icons.gavel.svg", true);
-		public ToggleCommand CMDToggleBoolValField => new ToggleCommand ("ToggleField", this, "boolVal", "#Icons.gavel.svg", true);
+		public ToggleCommand CMDToggleBoolVal, CMDToggleBoolValField;
+
+		public ActionCommand CMDHosted;
 
 		void initCommands()
 		{
+			CMDToggleBoolVal = new ToggleCommand (this, "Toggle", new Binding<bool> ("BoolVal"), "#Icons.gavel.svg", null, true);
+			CMDToggleBoolValField = new ToggleCommand (this, "ToggleField", new Binding<bool> ("boolVal"), "#Icons.gavel.svg", null, true);
+			CMDHosted = new ActionCommand (this, "Hosted command",
+				() => MessageBox.ShowModal(this, MessageBox.Type.Information, "hosted command triggered"), "#Icons.binding.svg",
+				new KeyBinding (Key.F1, Modifier.Super),
+				new Binding<bool> ("CanExecute"));
 			Commands = new CommandGroup("commands msg boxes",
 				new ActionCommand("Action 1", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")),
 				new ActionCommand("Action two", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked"), null, false),
@@ -339,7 +346,7 @@ namespace Samples
 
 
 		string curSources = "";
-		public bool boolVal = true;
+		public bool boolVal = true, canExecute;
 		public string CurSources
 		{
 			get => curSources;
@@ -358,7 +365,16 @@ namespace Samples
 					return;
 				boolVal = value;
 				NotifyValueChanged(boolVal);
-				Console.WriteLine ($"boolVal => {value}");
+			}
+		}
+		public bool CanExecute
+		{
+			get => canExecute;
+			set	{
+				if (canExecute == value)
+					return;
+				canExecute = value;
+				NotifyValueChanged(canExecute);
 			}
 		}
 		public Color AllWidgetBackground {
@@ -387,10 +403,10 @@ namespace Samples
 			base.processDrawing(ctx);
 		}
 
-		public override bool OnKeyDown(Key key)
+		public override bool OnKeyDown(KeyEventArgs e)
 		{
 
-			switch (key)
+			switch (e.Key)
 			{
 				case Key.F5:
 					Load("Interfaces/Divers/testFileDialog.crow").DataSource = this;
@@ -407,7 +423,7 @@ namespace Samples
 					DbgLogger.Save(this);
 					return true;
 			}
-			return base.OnKeyDown(key);
+			return base.OnKeyDown(e);
 		}
 	}
 }

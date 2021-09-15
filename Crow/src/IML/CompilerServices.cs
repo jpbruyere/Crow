@@ -778,6 +778,7 @@ namespace Crow.IML
 						eiEvt.RemoveEventHandler (instance, d);
 #if DEBUG_BINDING
 						Console.WriteLine ("\tremoveEventHandlerByName: {0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+
 #endif
 					}
 				}

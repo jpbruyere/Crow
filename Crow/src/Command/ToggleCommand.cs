@@ -13,54 +13,33 @@ namespace Crow {
 	/// <summary>
 	/// helper class to bind in one step icon, caption, action, and validity tests to a controls
 	/// </summary>
-	public class ToggleCommand : Command, IToggle, IDisposable
+	public class ToggleCommand : Command, IToggle
 	{
 		#region CTOR
-		public ToggleCommand () {}
-		public ToggleCommand (object instance, string memberName, string icon = null, bool _canExecute = true)
-			: this ("", instance, memberName, icon, _canExecute) { }
-		public ToggleCommand (string caption, object instance, string memberName, string icon = null, bool _canExecute = true)
-			: base (caption, icon, _canExecute)
+		public ToggleCommand (ICommandHost _host, string caption, Binding<bool> toggleBinding, string icon = null, KeyBinding _keyBinding = null,
+						Binding<bool> _canExecuteBinding = null)
+			: base (_host, caption, icon, _keyBinding, _canExecuteBinding)
 		{
-			this.instance = instance;
-			this.memberName = memberName;
-			MemberInfo mbi = instance.GetType().GetMember (memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault();
+			binding = toggleBinding;
+			delSet = binding.CreateSetter (host);
+			delGet = binding.CreateGetter (host);
 
-			if (mbi is PropertyInfo pi) {
-				delSet = (Action<bool>)Delegate.CreateDelegate (typeof (Action<bool>), instance, pi.GetSetMethod ());
-				delGet = (Func<bool>)Delegate.CreateDelegate (typeof (Func<bool>), instance, pi.GetGetMethod ());
-			} else if (mbi is FieldInfo fi) {
-				DynamicMethod dm = new DynamicMethod($"{fi.ReflectedType.FullName}_fldset", null, new Type[] { fi.ReflectedType, typeof(bool) }, false);
-				ILGenerator il = dm.GetILGenerator ();
-				il.Emit (OpCodes.Ldarg_0);
-				il.Emit (OpCodes.Ldarg_1);
-				il.Emit (OpCodes.Stfld, fi);
-
-				il.Emit(OpCodes.Ret);
-
-				delSet = (Action<bool>)dm.CreateDelegate (typeof (Action<bool>), instance);
-
-				dm = new DynamicMethod($"{fi.ReflectedType.FullName}_fldget", typeof(bool), new Type[] { fi.ReflectedType }, false);
-				il = dm.GetILGenerator ();
-				il.Emit (OpCodes.Ldarg_0);
-				il.Emit (OpCodes.Ldfld, fi);
-
-				il.Emit(OpCodes.Ret);
-
-				delGet = (Func<bool>)dm.CreateDelegate (typeof (Func<bool>), instance);
-			} else
-				throw new Exception ("unsupported member type for ToggleCommand");
-
-			if (instance is IValueChange ivc)
-				ivc.ValueChanged +=  instance_valueChanged;
-
+			host.ValueChanged +=  toggleCommand_host_valueChanged_handler;
+		}
+		public ToggleCommand (ICommandHost _host, string caption, Binding<bool> toggleBinding, string icon = null,
+					KeyBinding _keyBinding = null, bool _canExecute = true)
+			: this (_host, caption, toggleBinding, icon, _keyBinding, null)
+		{
 			CanExecute = _canExecute;
 		}
-		void instance_valueChanged (object sender, ValueChangeEventArgs e) {
-			if (e.MemberName != memberName)
-				return;
-			//Console.WriteLine ($"ToggleCommand valueChanged triggered => {e.NewValue}");
+		#endregion
+		Binding<bool> binding;
+		Action<bool> delSet;
+		Func<bool> delGet;
 
+		void toggleCommand_host_valueChanged_handler (object sender, ValueChangeEventArgs e) {
+			if (e.MemberName != binding.SourceMember)
+				return;
 			bool tog = (bool)e.NewValue;
 			NotifyValueChanged ("IsToggled", tog);
 			if (tog)
@@ -69,12 +48,6 @@ namespace Crow {
 				ToggleOff.Raise (this, null);
 
 		}
-		#endregion
-		object instance;
-		string memberName;
-		Action<bool> delSet;
-		Func<bool> delGet;
-		bool disposedValue;
 
 
 		/// <summary>
@@ -92,7 +65,6 @@ namespace Crow {
 		}
 
 		#region IToggle implementation
-
 		public event EventHandler ToggleOn;
 		public event EventHandler ToggleOff;
 		public BooleanTestOnInstance IsToggleable {get; set; }
@@ -113,24 +85,13 @@ namespace Crow {
 		}
 		#endregion
 
-		protected virtual void Dispose(bool disposing)
+		#region IDispose implementation
+		protected override void Dispose(bool disposing)
 		{
-			if (!disposedValue)
-			{
-				if (disposing)
-				{
-					if (instance is IValueChange ivc)
-						ivc.ValueChanged -=  instance_valueChanged;
-				}
-				disposedValue = true;
-			}
+			if (disposing && !disposed && host != null)
+				host.ValueChanged -=  toggleCommand_host_valueChanged_handler;
+			base.Dispose (true);
 		}
-
-		public void Dispose()
-		{
-			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
-		}
+		#endregion
 	}
 }

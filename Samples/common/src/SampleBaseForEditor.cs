@@ -27,11 +27,11 @@ namespace Samples
 
 			if (string.IsNullOrEmpty (CurrentDir))
 				CurrentDir = Path.Combine (Directory.GetCurrentDirectory (), "Interfaces");
-			
+
 		}
 
 		protected const string _defaultFileName = "unnamed.txt";
-		protected string source = "", origSource;		
+		protected string source = "", origSource;
 		protected TextBox editor;
 		bool debugLogRecording;
 
@@ -53,7 +53,7 @@ namespace Samples
 				Configuration.Global.Set (nameof (CurrentFile), value);
 				NotifyValueChanged (CurrentFile);
 			}
-		}		
+		}
 		public virtual string Source {
 			get => source;
 			set {
@@ -71,8 +71,8 @@ namespace Samples
 			get => Configuration.Global.Get<DbgEvtType> (nameof (RecordedEvents));
 			set {
 				if (RecordedEvents == value)
-					return;				
-				Configuration.Global.Set (nameof (RecordedEvents), value);				
+					return;
+				Configuration.Global.Set (nameof (RecordedEvents), value);
 				if (DebugLogRecording)
 					DbgLogger.IncludeEvents = RecordedEvents;
 				NotifyValueChanged(RecordedEvents);
@@ -102,7 +102,7 @@ namespace Samples
 			get => Configuration.Global.Get<bool> (nameof(DebugLogToFile));
 			set {
 				if (DebugLogToFile == value)
-					return;				
+					return;
 				Configuration.Global.Set (nameof(DebugLogToFile), value);
 				NotifyValueChanged(DebugLogToFile);
 				DbgLogger.ConsoleOutput = !value;
@@ -134,7 +134,7 @@ namespace Samples
 		public CommandGroup EditorCommands => new CommandGroup (CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDSave, CMDSaveAs);
 		protected virtual void initCommands ()
 		{
-			CMDNew	= new ActionCommand ("New", new Action (onNewFile), "#Icons.blank-file.svg");			
+			CMDNew	= new ActionCommand ("New", new Action (onNewFile), "#Icons.blank-file.svg");
 			CMDSave = new ActionCommand ("Save", new Action (onSave), "#Icons.save.svg", false);
 			CMDSaveAs = new ActionCommand ("Save As...", new Action (onSaveAs), "#Icons.save.svg");
 			CMDQuit = new ActionCommand ("Quit", new Action (() => base.Quit ()), "#Icons.exit.svg");
@@ -149,7 +149,7 @@ namespace Samples
 		protected Stack<TextChange> undoStack = new Stack<TextChange> ();
 		protected Stack<TextChange> redoStack = new Stack<TextChange> ();
 		protected TextSpan selection;
-		protected string SelectedText =>	
+		protected string SelectedText =>
 				selection.IsEmpty ? "" : Source.AsSpan (selection.Start, selection.Length).ToString ();
 
 		protected void undo () {
@@ -176,7 +176,7 @@ namespace Samples
 			undoStack.Clear ();
 			redoStack.Clear ();
 			CMDUndo.CanExecute = false;
-			CMDRedo.CanExecute = false;			
+			CMDRedo.CanExecute = false;
 		}
 
 		protected void cut () {
@@ -186,11 +186,11 @@ namespace Samples
 		protected void copy () {
 			Clipboard = SelectedText;
 		}
-		protected void paste () {			
+		protected void paste () {
 			applyChange (new TextChange (selection.Start, selection.Length, Clipboard));
 		}
 		protected void onNewFile () {
-			if (IsDirty) {				
+			if (IsDirty) {
 				MessageBox.ShowModal (this, MessageBox.Type.YesNo, "Current file has unsaved changes, are you sure?").Yes += (sender, e) => newFile ();
 			} else
 				newFile ();
@@ -257,7 +257,7 @@ namespace Samples
 			CMDSave.CanExecute = false;
 		}
 
-		protected void reloadFromFile () {			
+		protected void reloadFromFile () {
 			disableTextChangedEvent = true;
 			if (File.Exists (CurrentFile)) {
 				using (Stream s = new FileStream (CurrentFile, FileMode.Open)) {
@@ -267,7 +267,7 @@ namespace Samples
 			}
 			disableTextChangedEvent = false;
 			resetUndoRedo ();
-		}		
+		}
 		protected bool disableTextChangedEvent = false;
 		protected void apply (TextChange change) {
 			Span<char> tmp = stackalloc char[source.Length + (change.ChangedText.Length - change.Length)];
@@ -278,8 +278,8 @@ namespace Samples
 			src.Slice (change.End).CopyTo (tmp.Slice (change.Start + change.ChangedText.Length));
 			disableTextChangedEvent = true;
 			Source = tmp.ToString ();
-			disableTextChangedEvent = false;			
-		}	
+			disableTextChangedEvent = false;
+		}
 		protected void applyChange (TextChange change) {
 			undoStack.Push (change.Inverse (source));
 			redoStack.Clear ();
@@ -319,8 +319,8 @@ namespace Samples
 				return;
 			applyChange (e.Change);
 		}
-		
-		protected void onSelectedTextChanged (object sender, EventArgs e) {			
+
+		protected void onSelectedTextChanged (object sender, EventArgs e) {
 			selection = (sender as Label).Selection;
 			Console.WriteLine($"selection:{selection.Start} length:{selection.Length}");
 			CMDCut.CanExecute = CMDCopy.CanExecute = !selection.IsEmpty;

@@ -28,7 +28,7 @@ namespace Crow
 		public event EventHandler<TextChangeEventArgs> TextChanged;
 
 		public virtual void OnTextChanged(Object sender, TextChangeEventArgs e)
-		{			
+		{
 			TextChanged.Raise (this, e);
 		}
         //TODO:change protected to private
@@ -36,11 +36,11 @@ namespace Crow
 		#region private and protected fields
 		protected string _text = "";
         TextAlignment _textAlignment;
-		bool _multiline;		
+		bool _multiline;
 		Color selBackground;
 		Color selForeground;
 
-		int targetColumn = -1;//handle line changes with long->short->long line length sequence.		
+		int targetColumn = -1;//handle line changes with long->short->long line length sequence.
 
 		protected CharLocation? hoverLoc = null;
 		protected CharLocation? currentLoc = null;
@@ -127,7 +127,7 @@ namespace Crow
 		/// <summary>
 		/// If measure is not 'Fit', align text inside the bounds of this label.
 		/// </summary>
-		[DefaultValue(TextAlignment.Left)]		
+		[DefaultValue(TextAlignment.Left)]
 		public TextAlignment TextAlignment
         {
             get { return _textAlignment; }
@@ -142,7 +142,7 @@ namespace Crow
 				RegisterForRedraw ();
 				NotifyValueChangedAuto (_textAlignment);
 			}
-        }		
+        }
 		/// <summary>
 		/// Text to display in this label. May include linebreaks if Multiline is 'true'.
 		/// If Multiline is false, linebreaks will be treated as unrecognized unicode char.
@@ -201,12 +201,12 @@ namespace Crow
 				RegisterForGraphicUpdate();
 			}
 		}
-		
+
 
 		/// <summary>
 		/// Moves cursor one char to the left.
 		/// </summary>
-		/// <returns><c>true</c> if move succeed</returns>		
+		/// <returns><c>true</c> if move succeed</returns>
 		public bool MoveLeft(){
 			//targetColumn = -1;
 			CharLocation loc = CurrentLoc.Value;
@@ -228,7 +228,7 @@ namespace Crow
 			} else
 				CurrentLoc = new CharLocation (loc.Line, loc.Column + 1);
 			return true;
-		}		
+		}
 		public bool LineMove (int lineDiff) {
 			CharLocation loc = CurrentLoc.Value;
 			int newLine = Math.Min (Math.Max (0, loc.Line + lineDiff), lines.Count - 1);
@@ -251,7 +251,7 @@ namespace Crow
         }
 		protected int visibleLines => (int)((double)ClientRectangle.Height / (fe.Ascent + fe.Descent));
 		public void GotoWordStart(){
-			int pos = lines.GetAbsolutePosition (CurrentLoc.Value);			
+			int pos = lines.GetAbsolutePosition (CurrentLoc.Value);
 			//skip white spaces
 			while (pos > 0 && !char.IsLetterOrDigit (_text[pos-1]))
 				pos--;
@@ -267,11 +267,11 @@ namespace Crow
 			while (pos < _text.Length - 1 && char.IsLetterOrDigit (_text[pos]))
 				pos++;
 			CurrentLoc = lines.GetLocation (pos);
-		}		
+		}
 
 		protected void detectLineBreak () {
 			if (!_multiline)
-				return;			
+				return;
 			mixedLineBreak = false;
 
 			if (lines.Count == 0 || lines[0].LineBreakLength == 0) {
@@ -288,8 +288,8 @@ namespace Crow
                 }
 			}
         }
-		
-		protected void getLines () {			
+
+		protected void getLines () {
 			if (lines == null)
 				lines = new LineCollection (_multiline ? 4 : 1);
 			else
@@ -513,7 +513,7 @@ namespace Crow
 			}
 			if (!CurrentLoc.Value.HasVisualX) {
 				setFontForContext (ctx);
-				lock (linesMutex) {					
+				lock (linesMutex) {
 					if (currentLoc?.Column < 0) {
 						updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
 						NotifyValueChanged ("CurrentColumn", CurrentColumn);
@@ -534,7 +534,7 @@ namespace Crow
 			//}
 			Rectangle c = ScreenCoordinates (textCursor.Value + Slot.Position + ClientRectangle.Position);
 			ctx.ResetClip ();
-			Foreground.SetAsSource (IFace, ctx, c);			
+			Foreground.SetAsSource (IFace, ctx, c);
 			ctx.LineWidth = 1.0;
 			ctx.MoveTo (0.5 + c.X, c.Y);
 			ctx.LineTo (0.5 + c.X, c.Bottom);
@@ -613,7 +613,7 @@ namespace Crow
 					return false;
 			}
 			try {
-				bool result = base.UpdateLayout (layoutType);				
+				bool result = base.UpdateLayout (layoutType);
 				return result;
 			} finally {
 				System.Threading.Monitor.Exit (linesMutex);
@@ -635,7 +635,7 @@ namespace Crow
 			DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
-		
+
 		protected override void onDraw (Context gr)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
@@ -643,12 +643,12 @@ namespace Crow
 			base.onDraw (gr);
 
 			setFontForContext (gr);
-			
+
 			if (!textMeasureIsUpToDate) {
 				lock (linesMutex)
 					measureTextBounds (gr);
             }
-			
+
 			if (ClipToClientRect) {
 				gr.Save ();
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
@@ -657,7 +657,7 @@ namespace Crow
 
 			lock (linesMutex)
 				drawContent (gr);
-			
+
 			if (ClipToClientRect)
 				gr.Restore ();
 
@@ -670,7 +670,7 @@ namespace Crow
 		{
 			base.onFocused (sender, e);
 			if (CurrentLoc == null) {
-				selectionStart = new CharLocation (0, 0);				
+				selectionStart = new CharLocation (0, 0);
 				CurrentLoc = new CharLocation (lines.Count - 1, lines[lines.Count - 1].Length);
 			}
 			RegisterForRedraw ();
@@ -683,7 +683,7 @@ namespace Crow
         public override void onMouseEnter (object sender, MouseMoveEventArgs e) {
             base.onMouseEnter (sender, e);
 			if (Focusable)
-				IFace.MouseCursor = MouseCursor.ibeam;			
+				IFace.MouseCursor = MouseCursor.ibeam;
 		}
         public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -692,16 +692,16 @@ namespace Crow
 			updateHoverLocation (ScreenPointToLocal (e.Position));
 
 			if (HasFocus && IFace.IsDown (MouseButton.Left)) {
-				CurrentLoc = hoverLoc;				
-				RegisterForRedraw ();				
+				CurrentLoc = hoverLoc;
+				RegisterForRedraw ();
 			}
-		}		
+		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			if (e.Button == Glfw.MouseButton.Left) {
 				targetColumn = -1;
-				if (HasFocus) {					
-					if (!IFace.Shift)						 
+				if (HasFocus) {
+					if (!IFace.Shift)
 						selectionStart = hoverLoc;
 					else if (!selectionStart.HasValue)
 						selectionStart = CurrentLoc;
@@ -709,7 +709,7 @@ namespace Crow
 					IFace.forceTextCursor = true;
 					RegisterForRedraw ();
 					e.Handled = true;
-				}					
+				}
 			}
 			base.onMouseDown (sender, e);
 
@@ -719,7 +719,7 @@ namespace Crow
 		{
 			base.onMouseUp (sender, e);
 			if (e.Button != MouseButton.Left || !HasFocus || !selectionStart.HasValue)
-				return;			
+				return;
 			if (selectionStart.Value == CurrentLoc.Value)
 				selectionStart = null;
 		}
@@ -730,7 +730,7 @@ namespace Crow
 				return;
 
 			GotoWordStart ();
-			selectionStart = CurrentLoc;			
+			selectionStart = CurrentLoc;
 			GotoWordEnd ();
 			RegisterForRedraw ();
 		}
@@ -738,7 +738,7 @@ namespace Crow
 
 		#region Keyboard handling
 		public override void onKeyDown (object sender, KeyEventArgs e) {
-			
+
 			switch (e.Key) {
 			case Key.Escape:
 				selectionStart = null;
@@ -794,7 +794,7 @@ namespace Crow
 				return;
 			}
 			IFace.forceTextCursor = true;
-			e.Handled = true;			
+			e.Handled = true;
 		}
 		#endregion
 

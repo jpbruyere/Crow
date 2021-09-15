@@ -108,9 +108,9 @@ namespace ShowCase
 		}
 
 
-        public override bool OnKeyDown (Key key) {
+        public override bool OnKeyDown (KeyEventArgs e) {
 
-            switch (key) {
+            switch (e.Key) {
             case Key.F5:
                 Load ("#ShowCase.DebugLog.crow").DataSource = this;
                 return true;
@@ -129,7 +129,7 @@ namespace ShowCase
 				}
                 return true;
             }
-            return base.OnKeyDown (key);
+            return base.OnKeyDown (e);
         }
     }
 }

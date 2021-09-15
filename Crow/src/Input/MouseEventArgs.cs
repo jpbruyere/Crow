@@ -26,7 +26,7 @@ namespace Crow
 	public class MouseEventArgs : CrowEventArgs
 	{
 		public readonly int X, Y;
-		public Point Position => new Point (X, Y);		
+		public Point Position => new Point (X, Y);
 		public MouseEventArgs () { }
 		public MouseEventArgs (int x, int y) {
 			X = x;
@@ -44,7 +44,7 @@ namespace Crow
 		}
 	}
 
-	public class MouseButtonEventArgs : MouseEventArgs 
+	public class MouseButtonEventArgs : MouseEventArgs
 	{
 		public readonly MouseButton Button;
 		public readonly InputAction Action;

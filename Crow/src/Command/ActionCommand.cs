@@ -39,9 +39,22 @@ namespace Crow {
 		{
 			execute = executeAction;
 		}
+		public ActionCommand (ICommandHost _host, string caption, Action executeAction, string icon = null, KeyBinding _keyBinding = null,
+						Binding<bool> _canExecuteBinding = null)
+			: base (_host, caption, icon, _keyBinding, _canExecuteBinding)
+		{
+			execute = executeAction;
+		}
+		public ActionCommand (ICommandHost _host, string caption, Action<object> executeAction, string icon = null, KeyBinding _keyBinding = null,
+						Binding<bool> _canExecuteBinding = null)
+			: base (_host, caption, icon, _keyBinding, _canExecuteBinding)
+		{
+			execute = executeAction;
+		}
+
 		#endregion
 
-		Delegate execute;
+		protected Delegate execute;
 
 		/// <summary>
 		/// trigger the execution of the command
@@ -54,6 +67,16 @@ namespace Crow {
 					task = new Task(o, sender) : throw new Exception("Invalid Delegate type in Crow.ActionCommand, expecting Action or Action<object>");
 				task.Start();
 			}
+		}
+	}
+	public class ActionCommand<T> : ActionCommand {
+		public ActionCommand (Action<T> _executeAction) {
+			execute = _executeAction;
+		}
+		public ActionCommand (string caption, Action<T> executeAction, string icon = null, bool _canExecute = true)
+			: base (caption, default(Action), icon, _canExecute)
+		{
+			execute = executeAction;
 		}
 	}
 }

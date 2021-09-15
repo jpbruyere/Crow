@@ -25,7 +25,7 @@
 								<ListItem ContextCommands="{GetCommands}"
 										Selected="{/exp.Background=${ControlHighlight}}"
 										Unselected="{/exp.Background=Transparent}">
-									<Expandable Name="exp" Caption="{Name}" MouseDoubleClick="/onClickForExpand" >
+									<Expandable Name="exp" Caption="{Name}" MouseDoubleClick="/onClickForExpand" BubbleMouseEvent="MouseWheel|Keyboard|ButtonDown">
 										<Template>
 											<VerticalStack>
 												<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"

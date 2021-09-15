@@ -1,7 +1,7 @@
 ﻿<VerticalStack Fit="true">
 	<HorizontalStack Fit="true">
 		<Button Command="{CMDToggleBoolVal}"/>
-		<CheckBox IsChecked="{²BoolVal}"/>
+		<CheckBox Caption="direct bound to bool value" IsChecked="{²BoolVal}" Background="Jet"/>
 		<Button Command="{CMDToggleBoolVal}">
 			<Template>
 				<Container DataSource="{./Command}">

@@ -23,7 +23,7 @@ namespace Crow
 			public double Offset;
 			public Color Color;
 
-			public ColorStop(double offset, Color color){ 
+			public ColorStop(double offset, Color color){
 				Offset = offset;
 				Color = color;
 			}
@@ -31,7 +31,7 @@ namespace Crow
 			{
 				if (string.IsNullOrEmpty (s))
 					return null;
-				
+
 				string[] parts = s.Trim ().Split (':');
 
 				if (parts.Length > 2)
@@ -80,7 +80,7 @@ namespace Crow
 					continue;
 				grad.AddColorStop (cs.Offset, cs.Color);
 			}
-			
+
 			ctx.SetSource (grad);
 			grad.Dispose ();
 		}

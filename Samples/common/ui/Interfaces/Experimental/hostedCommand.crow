@@ -1,0 +1,13 @@
+﻿<VerticalStack Fit="true">
+	<CheckBox Caption="Can execute ?" IsChecked="{²CanExecute}"/>
+	<Button Command="{CMDHosted}" Foreground="White" Background="Jet">
+		<Template>
+<Border Style="ButtonBorder" Background="{./Background}" Name="Content" CornerRadius="{../CornerRadius}" >
+	<HorizontalStack DataSource="{./Command}">
+		<Label Font="Arial, 14" Name="caption" Margin="${ButtonCaptionMargin}" Foreground="{./Foreground}" Text="{./Caption}"/>
+		<Label Font="Condensed, 9" Text="{KeyBinding}" Foreground="Grey"/>
+	</HorizontalStack>
+</Border>
+		</Template>
+	</Button>
+</VerticalStack>

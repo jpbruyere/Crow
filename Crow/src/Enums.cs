@@ -10,7 +10,7 @@ namespace Crow
         Vertical
     }
 
-	public enum Alignment 
+	public enum Alignment
     {
         Top = 0x01,
         Left = 0x02,
@@ -106,7 +106,7 @@ namespace Crow
 		ur_angle,
 		watch,
 		X_cursor,
-		xterm,			
+		xterm,
 	}
 	/// <summary>
 	/// Cursor shape use in Sliders

@@ -29,7 +29,7 @@ namespace Crow
 				return true;
 			if (child == null)
 				return false;
-			return child.FindByDesignID (designID, out go);					
+			return child.FindByDesignID (designID, out go);
 		}
 		#endif
 		protected Widget child;
@@ -59,7 +59,7 @@ namespace Crow
 			if (child != null) {
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
-				contentSize = child.Slot.Size;				
+				contentSize = child.Slot.Size;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -89,7 +89,7 @@ namespace Crow
 		}
 		public override bool Contains (Widget goToFind)
 		{
-			return child == goToFind ? true : 
+			return child == goToFind ? true :
 				child == null ? false : child.Contains(goToFind);
 		}
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
@@ -116,7 +116,7 @@ namespace Crow
 							contentSize.Height = child.measureRawSize (LayoutingType.Height);
 						break;
 					}
-					DbgLogger.SetMsg(DbgEvtType.GOMeasure, $"{lt} contentSize:{contentSize}");					
+					DbgLogger.SetMsg(DbgEvtType.GOMeasure, $"{lt} contentSize:{contentSize}");
 				}
 				return base.measureRawSize (lt);
 			} finally {
@@ -171,7 +171,7 @@ namespace Crow
 			child.RegisterForLayouting (ltChild);
 		}
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
-		{			
+		{
 			Widget g = sender as Widget;
 			if (arg.LayoutType == LayoutingType.Width) {
 				contentSize.Width = g.Slot.Width;
@@ -220,7 +220,7 @@ namespace Crow
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();
 					gr.Operator = Operator.Clear;
-					gr.Fill();					
+					gr.Fill();
 					gr.Operator = Operator.Over;
 
 					onDraw (gr);
@@ -237,8 +237,8 @@ namespace Crow
 		{
 			base.checkHoverWidget (e);
 
-			if (child != null) 
-				if (child.MouseIsIn (e.Position)) 
+			if (child != null)
+				if (child.MouseIsIn (e.Position))
 					child.checkHoverWidget (e);
 		}
 		#endregion

@@ -12,7 +12,7 @@ namespace Crow
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
-			if (ValueChanged != null)				
+			if (ValueChanged != null)
 				ValueChanged.Invoke(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
@@ -23,7 +23,7 @@ namespace Crow
 			Layouting,
 			Drawing
         }
-		public static PerformanceMeasure[] Measures;		
+		public static PerformanceMeasure[] Measures;
 
 		[Conditional("MEASURE_TIME")]
 		public static void InitMeasures () {
@@ -36,7 +36,7 @@ namespace Crow
 		[Conditional ("MEASURE_TIME")]
 		public static void Notify () {
             for (int i = 0; i < 4; i++)
-				Measures[i].NotifyChanges ();            
+				Measures[i].NotifyChanges ();
 		}
 		[Conditional ("MEASURE_TIME")]
 		public static void Begin (Kind kind) {
@@ -80,7 +80,7 @@ namespace Crow
 			}
 		}
 
-		void computeStats(){			
+		void computeStats(){
 			current = timer.ElapsedMilliseconds;
 			if (current < cancelLimit)
 				return;
@@ -89,7 +89,7 @@ namespace Crow
 			if (timer.ElapsedMilliseconds < minimum)
 				minimum = timer.ElapsedMilliseconds;
 			if (timer.ElapsedMilliseconds > maximum)
-				maximum = timer.ElapsedMilliseconds;			
+				maximum = timer.ElapsedMilliseconds;
 		}
 		void ResetStats(){
 			Debug.WriteLine("reset measure cpt:{0}",cptMeasures);
