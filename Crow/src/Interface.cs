@@ -1742,7 +1742,7 @@ namespace Crow
 						topContainer = w;
 
 					int indexOfTopContainer = GraphicTree.IndexOf (topContainer);
-					if (indexOfTopContainer != 0) {
+					if (indexOfTopContainer != 0) {//0 is topMost
 						for (int i = 0; i < indexOfTopContainer; i++) {//check all top containers that are at a higher level
 							//if logical parent of top container is the Interface, that's not a popup.
 							if (GraphicTree [i].LogicalParent is Interface) {

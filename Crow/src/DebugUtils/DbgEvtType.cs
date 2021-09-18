@@ -26,8 +26,9 @@ namespace Crow
 		TemplatedGroup					= 0x00080000,
 		Dispose		 					= 0x00100000,
 		Mouse		 					= 0x00200000,
+		DragNDrop	 					= 0x00400000,
 
-		Update							= IFace | 0x00100000,
+		Update							= IFace | 0x10000000,
 		ProcessLayouting				= IFace | Update | Lock | Layouting,
 		ClippingRegistration			= IFace | Update | Lock | Clipping,
 		ProcessDrawing					= IFace | Update | Lock | Drawing,
@@ -98,6 +99,12 @@ namespace Crow
 		WidgetMouseWheel				= Widget | Mouse | 0x06,
 		WidgetMouseClick				= Widget | Mouse | 0x07,
 		WidgetMouseDblClick				= Widget | Mouse | 0x08,
+		Drag							= Widget | DragNDrop | 0x01,
+		DragEnter						= Widget | DragNDrop | 0x02,
+		DragLeave						= Widget | DragNDrop | 0x03,
+		StartDrag						= Widget | DragNDrop | 0x04,
+		EndDrag							= Widget | DragNDrop | 0x05,
+		Drop							= Widget | DragNDrop | 0x06,
 
 		All = 0x7FFFFF00
 	}

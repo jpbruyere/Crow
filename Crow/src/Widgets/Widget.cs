@@ -1437,56 +1437,49 @@ namespace Crow
 		/// equivalent to mouse move for a dragged widget, no bubbling.
 		/// </summary>
 		public virtual void onDrag (object sender, MouseMoveEventArgs e) {
+			DbgLogger.AddEvent (DbgEvtType.Drag, this, e);
+
 			if (Drag != null)
 				Drag.Invoke (this, e);
-#if DEBUG_DRAGNDROP
-			Debug.WriteLine (this.ToString () + " : DRAG => " + e.ToString ());
-#endif
 		}
 
 		/// <summary>
 		/// fired when drag and drop operation start
 		/// </summary>
 		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
+			DbgLogger.AddEvent (DbgEvtType.StartDrag, this, e);
+
 			IFace.DragAndDropOperation = e;
 			IFace.dragndropHover = e.DropTarget;
 			IsDragged = true;
 			StartDrag.Raise (this, IFace.DragAndDropOperation);
-			#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
-			#endif
 		}
 		protected virtual void onDragEnter (object sender, DragDropEventArgs e){
+			DbgLogger.AddEvent (DbgEvtType.DragEnter, this, e);
+
 			e.DropTarget = this;
 			DragEnter.Raise (this, e);
-			#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : DRAG Enter => " + e.ToString());
-			#endif
 		}
 		public virtual void onDragLeave (object sender, DragDropEventArgs e){
+			DbgLogger.AddEvent (DbgEvtType.DragLeave, this, e);
+
 			DragLeave.Raise (this, e);
-#if DEBUG_DRAGNDROP
-			Debug.WriteLine (this.ToString () + " : DRAG Leave => " + e.ToString ());
-#endif
 			e.DropTarget = null;
 		}
 		/// <summary>
 		///  Occured when dragging ends without dropping
 		/// </summary>
 		public virtual void onEndDrag (object sender, DragDropEventArgs e) {
+			DbgLogger.AddEvent (DbgEvtType.EndDrag, this, e);
+
 			IsDragged = false;
 			EndDrag.Raise (this, e);
-#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : END DRAG => " + e.ToString());
-#endif
 		}
 		public virtual void onDrop (object sender, DragDropEventArgs e){
+			DbgLogger.AddEvent (DbgEvtType.Drop, this, e);
+
 			IsDragged = false;
 			Drop.Raise (this, e);
-			//e.DropTarget.onDragLeave (this, e);//raise drag leave in target
-#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
-#endif
 		}
 		public bool IsDropTarget => IFace.DragAndDropOperation?.DropTarget == this;
 		#endregion
