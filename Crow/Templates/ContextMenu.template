@@ -3,8 +3,8 @@
 		Orientation="Vertical"
 		IsOpened ="true" IsVisible="{/IsOpened}"
 		ItemTemplate="#Crow.MenuItem.itmp">
-	<Template>		
-		<GenericStack Orientation="{./Orientation}" Name="ItemsContainer" Margin="0" Background="${MenuBackground}"/>		
+	<Template>
+		<GenericStack Orientation="{./Orientation}" Name="ItemsContainer" Margin="0" Background="${MenuBackground}"/>
 	</Template>
 </MenuItem>
 

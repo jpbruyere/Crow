@@ -15,7 +15,7 @@
 
 		<!-- Compile with logging enabled, this will slow down apps, use this only
 			 for debugging purpose-->
-		<CrowDebugLogEnabled>false</CrowDebugLogEnabled>
+		<CrowDebugLogEnabled>true</CrowDebugLogEnabled>
 
 		<!-- Collect several statistics on widgets-->
 		<CrowDebugStatsEnabled>false</CrowDebugStatsEnabled>

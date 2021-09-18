@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -114,13 +115,33 @@ namespace Crow {
 			ItemTemplates.Clear();
 			if (string.IsNullOrEmpty (_itemTemplate))
 				return;
-			foreach	(string[] itempIds in Instantiator.loadItemTemplatesFromTemplatedGroupProperty (IFace, _itemTemplate)) {
-				ItemTemplate itemp = IFace.GetItemTemplate (itempIds[1]);
-				ItemTemplates.Add (itempIds[0], itemp);
-				if (string.IsNullOrEmpty (itempIds[2]))
-					continue;
-				itemp.CreateExpandDelegate (this);
+			if (_itemTemplate.Trim().StartsWith('<')) {//iml fragment in property
+				using (Stream stream = new MemoryStream (System.Text.Encoding.UTF8.GetBytes (_itemTemplate))) {
+					foreach	(string[] itempIds in Instantiator.loadItemTemplatesFromTemplatedGroupProperty (IFace, stream)) {
+						ItemTemplate itemp = IFace.GetItemTemplate (itempIds[1]);
+						ItemTemplates.Add (itempIds[0], itemp);
+						if (string.IsNullOrEmpty (itempIds[2]))
+							continue;
+						itemp.CreateExpandDelegate (this);
+					}
+				}
+			} else {
+				foreach	(string[] itempIds in Instantiator.loadItemTemplatesFromTemplatedGroupProperty (IFace, _itemTemplate)) {
+					ItemTemplate itemp = IFace.GetItemTemplate (itempIds[1]);
+					ItemTemplates.Add (itempIds[0], itemp);
+					if (string.IsNullOrEmpty (itempIds[2]))
+						continue;
+					itemp.CreateExpandDelegate (this);
+				}
 			}
+			realoadDatas ();
+		}
+		void realoadDatas () {
+			if (data == null)
+				return;
+			IEnumerable dataSave = data;
+			Data = null;
+			Data = dataSave;
 		}
 		protected override void loadTemplate(Widget template = null)
 		{
@@ -234,8 +255,10 @@ namespace Crow {
 				lock (IFace.UpdateMutex)
 					ClearItems ();
 
-				if (data == null)
+				if (data == null) {
+					NotifyValueChanged ("HasItems", false);
 					return;
+				}
 
 				if (data is ICollection c) {
 					if (c.Count == 0) {
@@ -504,7 +527,7 @@ namespace Crow {
 					itempKey = dataType.FullName;//fallback to full type name
 				}
 			}
-			if (ItemTemplates.ContainsKey (itempKey))
+			if (!string.IsNullOrEmpty (itempKey) && ItemTemplates.ContainsKey (itempKey))
 				iTemp = ItemTemplates [itempKey];
 			else {
 				if (_dataTest == "TypeOf") {//item template selection on full type name

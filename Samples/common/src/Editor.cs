@@ -52,13 +52,13 @@ namespace Crow
 
 
 		IEnumerable<MemberInfo> getAllCrowTypeMembers (string crowTypeName) {
-			Type crowType = IML.Instantiator.GetWidgetTypeFromName (crowTypeName);
+			Type crowType = IFace.GetWidgetTypeFromName (crowTypeName);
 			return crowType.GetMembers (BindingFlags.Public | BindingFlags.Instance).
 				Where (m=>((m is PropertyInfo pi && pi.CanWrite) || (m is EventInfo)) &&
 						m.GetCustomAttribute<XmlIgnoreAttribute>() == null);
 		}
 		MemberInfo getCrowTypeMember (string crowTypeName, string memberName) {
-			Type crowType = IML.Instantiator.GetWidgetTypeFromName (crowTypeName);
+			Type crowType = IFace.GetWidgetTypeFromName (crowTypeName);
 			return crowType.GetMember (memberName, BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
 		}
 

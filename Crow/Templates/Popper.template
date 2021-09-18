@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
 <Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
 	<HorizontalStack Spacing="1">
-		<Image Style="Icon" 
-			MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}"					
+		<Image Style="Icon"
+			MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}"
 			Path="#Crow.Icons.expandable.svg" SvgSub="{./IsPopped}"/>
 		<Label Style="ControlCaption" Text="{./Caption}" Foreground="{./Foreground}"/>
 	</HorizontalStack>

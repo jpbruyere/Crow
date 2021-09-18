@@ -14,7 +14,10 @@ using System.Diagnostics;
 using System.Linq;
 using Crow.IML;
 using System.Collections;
-
+//TODO(09/2021): itemTemplate are created  with datatest and datatype only to be able
+//to get their original iml, but itor part takes no advantage of it.
+//One advantage could be to set the DataSourceType (which speed bindings by bypassing reflection)
+//at the root level of the item template if the dataTest is 'typeOf'...
 namespace Crow
 {
 	/// <summary> Test func on data, return yes if there's children </summary>

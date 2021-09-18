@@ -94,6 +94,17 @@ namespace Samples
 				new ActionCommand("Action A", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu A clicked"))
 			);
 		}
+		DeviceEventType deviceEventTypeEnum;
+		public DeviceEventType DeviceEventTypeEnum {
+			get => deviceEventTypeEnum;
+			set {
+				if (deviceEventTypeEnum == value)
+					return;
+				deviceEventTypeEnum = value;
+				NotifyValueChanged ("DeviceEventTypeEnum", deviceEventTypeEnum);
+			}
+
+		}
 		public int intValue = 500;
 		VerticalAlignment currentVAlign;
 

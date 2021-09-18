@@ -33,7 +33,7 @@
 											Name="ItemsContainer" Margin="0" Spacing="1"/>
 									</Scroller>
 									<ScrollBar Name="scrollbar1" Orientation="Vertical"
-										Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}" 
+										Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}"
 										CursorRatio="{../scroller1.ChildHeightRatio}"
 										LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
 										Width="14" />
@@ -51,8 +51,8 @@
 					<CheckBox Style="CheckBoxAlt" Name="cbShowHidden" Caption="Show Hidden" IsChecked="{²./ShowHidden}"/>
 				</HorizontalStack>
 				<HorizontalStack Fit="true" HorizontalAlignment="Right" Margin="3" Spacing="3">
-					<Button Caption="Ok" MouseClick="./onFileSelect"/>
-					<Button Caption="Cancel" MouseClick="./onCancel"/>
+					<Button Caption="Ok" Command="{./CMDOk}"/>
+					<Button Caption="Cancel" Command="{./CMDCancel}"/>
 				</HorizontalStack>
 			</VerticalStack>
 		</Container>

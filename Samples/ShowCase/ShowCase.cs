@@ -19,6 +19,13 @@ namespace ShowCase
 {
 	class Showcase : SampleBaseForEditor
 	{
+		DbgEvtType[] logEvts = {
+			DbgEvtType.MouseEnter,
+			DbgEvtType.MouseLeave,
+			DbgEvtType.WidgetMouseDown,
+			DbgEvtType.WidgetMouseUp,
+			DbgEvtType.WidgetMouseClick,
+		};
 		static void Main ()
 		{
 			initDebugLog ();
@@ -116,15 +123,13 @@ namespace ShowCase
                 return true;
             case Key.F6:
 				if (DebugLogRecording) {
-					DbgLogger.IncludeEvents = DbgEvtType.None;
-					DbgLogger.DiscardEvents = DbgEvtType.All;
+					DbgLogger.IncludedEvents.Clear();
 					if (DebugLogToFile && !string.IsNullOrEmpty(DebugLogFilePath))
 	                	DbgLogger.Save (this, DebugLogFilePath);
 					DebugLogRecording = false;
  				} else {
 					DbgLogger.Reset ();
-					DbgLogger.IncludeEvents = RecordedEvents;
-					DbgLogger.DiscardEvents = DiscardedEvents;
+					DbgLogger.IncludedEvents = new List<DbgEvtType> (logEvts);
 					DebugLogRecording = true;
 				}
                 return true;

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Button Command="{}" Width="Stretched">
+<Button Command="{}" Width="Stretched" BubbleEvents="All">
 	<Template>
 		<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
 						MouseEnter="{Background=${ControlHighlight}}"

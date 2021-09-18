@@ -27,7 +27,7 @@ namespace Crow
 	/// <summary>
 	/// The base class for all the graphic tree elements.
 	/// </summary>
-	public class Widget : ILayoutable, IValueChange, IDisposable
+	public class Widget : ILayoutable, ICommandHost, IDisposable
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 #if DEBUG_LOG
@@ -140,9 +140,7 @@ namespace Crow
 			}
 			return di;
 		}
-		public string DesignName {
-			get { return GetType ().Name + design_id; }
-		}
+		public string DesignName => LogName + design_id;
 #endif
 
 		#region IDisposable implementation
@@ -558,7 +556,7 @@ namespace Crow
 		public virtual string Name {
 			get {
 #if DEBUG_LOG
-				return string.IsNullOrEmpty(name) ? this.GetType().Name + GraphicObjects.IndexOf(this).ToString () : name;
+				return string.IsNullOrEmpty(name) ? this.LogName + GraphicObjects.IndexOf(this).ToString () : name;
 #else
 				return name;
 #endif
@@ -774,7 +772,7 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Behaviour")]
 		[DefaultValue (DeviceEventType.All)]
-		public virtual DeviceEventType BubbleMouseEvent {
+		public virtual DeviceEventType BubbleEvents {
 			get => bubbledEvents;
 			set {
 				if (bubbledEvents == value)
@@ -1971,7 +1969,6 @@ namespace Crow
 				ctx.Fill ();
 				ctx.Operator = Operator.Over;
 			}
-
 			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 #if VKVG
@@ -2060,19 +2057,19 @@ namespace Crow
 		public virtual void onKeyDown(object sender, KeyEventArgs e){
 			if (KeyDown != null)
 				KeyDown.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.KeyDown))
+			else if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.KeyDown))
 				FocusParent?.onKeyDown (sender, e);
 		}
 		public virtual void onKeyUp(object sender, KeyEventArgs e){
 			if (KeyUp != null)
 				KeyUp.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.KeyUp))
+			else if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.KeyUp))
 				FocusParent?.onKeyUp (sender, e);
 		}
 		public virtual void onKeyPress(object sender, KeyPressEventArgs e){
 			if (KeyPress != null)
 				KeyPress.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.KeyPress))
+			else if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.KeyPress))
 				FocusParent?.onKeyPress (sender, e);
 		}
 		#endregion
@@ -2123,7 +2120,7 @@ namespace Crow
 
 			if (MouseMove != null)
 				MouseMove.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.MouseMove))
+			else if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.MouseMove))
 				FocusParent?.onMouseMove (sender, e);
 		}
 		/// <summary>
@@ -2135,7 +2132,8 @@ namespace Crow
 		/// <param name="sender">Sender of the event</param>
 		/// <param name="e">mouse button pressed event arguments</param>
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-			if (Focusable) {
+			DbgLogger.AddEvent (DbgEvtType.MouseDown, this);
+			if (Focusable && !HasFocus) {
 				IFace.FocusedWidget = this;
 				e.Handled = true;
 			}
@@ -2145,9 +2143,8 @@ namespace Crow
 				e.Handled = true;
 			}
 
-			if (MouseDown != null)
-				MouseDown?.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.ButtonDown))
+			MouseDown?.Invoke (this, e);
+			if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.ButtonDown))
 				FocusParent?.onMouseDown (sender, e);
 		}
 		/// <summary>
@@ -2159,10 +2156,10 @@ namespace Crow
 		/// <param name="sender">Sender of the event</param>
 		/// <param name="e">mouse button release event arguments</param>
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
-
+			DbgLogger.AddEvent (DbgEvtType.WidgetMouseUp, this);
 			if (MouseUp != null)
 				MouseUp.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.ButtonUp))
+			if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.ButtonUp))
 				FocusParent?.onMouseUp (sender, e);
 		}
 		/// <summary>
@@ -2171,9 +2168,10 @@ namespace Crow
 		/// <param name="sender">The Sender of the event</param>
 		/// <param name="e">event arguments</param>
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
+			DbgLogger.AddEvent (DbgEvtType.WidgetMouseClick, this);
 			if (MouseClick != null)
 				MouseClick.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.MouseClick))
+			if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.MouseClick))
 				FocusParent?.onMouseClick (sender, e);
 		}
 		/// <summary>
@@ -2183,19 +2181,24 @@ namespace Crow
 		/// <param name="sender">The Sender of the event</param>
 		/// <param name="e">event arguments</param>
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
+			DbgLogger.AddEvent (DbgEvtType.WidgetMouseDblClick, this);
 			if (MouseDoubleClick != null)
 				MouseDoubleClick.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.MouseClick))
+			if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.MouseClick))
 				FocusParent?.onMouseDoubleClick (sender, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
+			DbgLogger.AddEvent (DbgEvtType.WidgetMouseWheel, this);
 			if (MouseWheelChanged != null)
 				MouseWheelChanged.Invoke (this, e);
-			else if (!e.Handled && BubbleMouseEvent.HasFlag (DeviceEventType.MouseWheel))
+			if (!e.Handled && BubbleEvents.HasFlag (DeviceEventType.MouseWheel))
 				FocusParent?.onMouseWheel (sender, e);
 		}
+		protected bool mouseIsEntered;
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
+			DbgLogger.AddEvent (DbgEvtType.MouseEnter, this);
+			mouseIsEntered = true;
 			IFace.MouseCursor = MouseCursor;
 			/*if (IFace.DragAndDropOperation != null) {
 				Widget g = this;
@@ -2216,6 +2219,8 @@ namespace Crow
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
+			DbgLogger.AddEvent (DbgEvtType.MouseLeave, this);
+			mouseIsEntered = false;
 			MouseLeave.Raise (this, e);
 		}
 
@@ -2312,8 +2317,8 @@ namespace Crow
 						w = w.FocusParent;
 					}
 					this.onMouseLeave (this, e);
-					IFace.HoverWidget = null;
-					IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
+					IFace.HoverWidget = FocusParent;
+					//IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
 				}
 			}
 

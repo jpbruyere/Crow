@@ -214,7 +214,7 @@ namespace Crow.IML {
 			while (reader.NodeType != XmlNodeType.Element)
 				reader.Read ();
 			root = reader.Name;
-			Type t = GetWidgetTypeFromName (root);
+			Type t = iface.GetWidgetTypeFromName (root);
 			if (t == null)
 				throw new Exception ("IML parsing error: undefined root type (" + root + ")");
 			return t;
@@ -323,7 +323,8 @@ namespace Crow.IML {
 				}
 				if (itemTemplateIds.Count == 0) {
 					//try to load ItemTemplate(s) from ItemTemplate property of TemplatedGroup
-					if (!string.IsNullOrEmpty (itemTemplatePath)) {
+					//but don't if it's an binding expression
+					if (!string.IsNullOrEmpty (itemTemplatePath) && !itemTemplatePath.StartsWith('{')) {
 						//check if it is already loaded in cache as a single itemTemplate instantiator
 						if (iface.ItemTemplates.ContainsKey (itemTemplatePath))
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
@@ -357,23 +358,30 @@ namespace Crow.IML {
 				}
 			}
 		}
+		//TODO(09/2021):output an ItemTemplateDecl object instead of an array of string
 		public static IEnumerable<string[]> loadItemTemplatesFromTemplatedGroupProperty (Interface iface, string itemTemplatePath) {
 			using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
-				//itemtemplate files may have multiple root nodes
-				XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
-				using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {
-					while (itr.Read ()) {
-						if (!itr.IsStartElement ())
-							continue;
-						if (itr.NodeType == XmlNodeType.Element) {
-							if (itr.Name != NT_iTemp) {
-								//the file contains a single template to use as default
-								iface.ItemTemplates [itemTemplatePath] = new ItemTemplate (iface, itr);
-								yield return new string [] { "default", itemTemplatePath, "", "TypeOf" };
-								break;//we should be at the end of the file
-							}
-							yield return parseItemTemplateTag (iface, itr, itemTemplatePath);
+				foreach (string[] item in loadItemTemplatesFromTemplatedGroupProperty (iface, stream, itemTemplatePath))
+					yield return item;
+			}
+		}
+		public static IEnumerable<string[]> loadItemTemplatesFromTemplatedGroupProperty (Interface iface, Stream stream, string itemTemplatePath = null) {
+			if (string.IsNullOrEmpty (itemTemplatePath))
+				itemTemplatePath = Guid.NewGuid().ToString();
+			//itemtemplate files may have multiple root nodes
+			XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
+			using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {
+				while (itr.Read ()) {
+					if (!itr.IsStartElement ())
+						continue;
+					if (itr.NodeType == XmlNodeType.Element) {
+						if (itr.Name != NT_iTemp) {
+							//the file contains a single template to use as default
+							iface.ItemTemplates [itemTemplatePath] = new ItemTemplate (iface, itr);
+							yield return new string [] { "default", itemTemplatePath, "", "TypeOf" };
+							break;//we should be at the end of the file
 						}
+						yield return parseItemTemplateTag (iface, itr, itemTemplatePath);
 					}
 				}
 			}
@@ -543,7 +551,7 @@ namespace Crow.IML {
 					ctx.il.Emit (OpCodes.Ldloc_0);
 					ctx.il.Emit (OpCodes.Ldloc_0);
 
-					Type t = GetWidgetTypeFromName (reader.Name);
+					Type t = iface.GetWidgetTypeFromName (reader.Name);
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
 					ConstructorInfo ci = t.GetConstructor (

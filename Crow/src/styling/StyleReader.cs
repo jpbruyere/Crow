@@ -54,7 +54,7 @@ namespace Crow
 			return (Char)Peek();
 		}
 		void SkipWhiteSpaceAndLineBreak (){
-			while (!EndOfStream){				
+			while (!EndOfStream){
 				if (!PeekChar ().IsWhiteSpaceOrNewLine ())
 					break;
 				if (ReadChar () == '\n') {
@@ -102,108 +102,108 @@ namespace Crow
 					}else
 						throw new ParserException (line, column, $"Unexpected char '{PeekChar ()}'", resId);
 					break;
-				case ',':
-					ReadChar ();
-					if (curState != States.classNames || token.Length == 0)
-						throw new ParserException (line, column, "Unexpected char ','", resId);
-					targetsClasses.Add (token.ToString());
-					token.Clear();
-					curState = States.classNames;
-					break;
-				case '{':
-					ReadChar ();
-					if (curState != States.classNames || token.Length == 0)
-						throw new ParserException (line, column, "Unexpected char '{'", resId);
-					targetsClasses.Add (token.ToString());
-					token.Clear();
-					curState = States.members;
-					break;
-				case '}':
-					ReadChar ();
-					if (curState != States.members)
-						throw new ParserException (line, column, "Unexpected char '}'", resId);
-					curState = States.classNames;
-					targetsClasses.Clear ();
-					break;
-				case '=':
-					ReadChar ();
-					if (!(curState == States.members || curState == States.classNames) || token.Length == 0)
-						throw new ParserException (line, column, "Unexpected char '='", resId);
-					currentProperty = token.ToString ();
-					token.Clear ();
-					curState = States.value;
-					break;
-				case '"':
-					if (curState != States.value)
-						throw new ParserException (line, column, "Unexpected char '\"'", resId);
-					ReadChar ();
-
-					while (!EndOfStream) {
-						char c = ReadChar ();
-						if (c == '$') {
-							if (PeekChar () == '{') {
-								ReadChar ();
-								//constant replacement
-								while (!EndOfStream) {
-									c = ReadChar ();
-									if (c == '}')
-										break;
-									constantId.Append (c);
-								}
-								if (constantId.Length == 0)
-									throw new ParserException (line, column, "Empty constant id in styling", resId);
-								string cst = constantId.ToString ();
-								constantId.Clear ();
-								if (!StylingConstants.ContainsKey (cst))
-									throw new ParserException (line, column, $"Constant id not found in styling ({cst})", resId);
-								token.Append (StylingConstants[cst]);
-								continue;
-							}
-						} else if (c == '\"') {
-							curState = States.endOfStatement;
-							break;
-						}
-						token.Append (c);
-					}
-					break;
-				case ';':
-					if (curState != States.endOfStatement)
-						throw new ParserException (line, column, "Unexpected end of statement", resId);
-					ReadChar ();
-					if (targetsClasses.Count == 0) {
-						//only first style constants kept.
-						if (!StylingConstants.ContainsKey (currentProperty))
-							StylingConstants[currentProperty] = token.ToString ();
+					case ',':
+						ReadChar ();
+						if (curState != States.classNames || token.Length == 0)
+							throw new ParserException (line, column, "Unexpected char ','", resId);
+						targetsClasses.Add (token.ToString());
+						token.Clear();
 						curState = States.classNames;
-					} else {
-						foreach (string tc in targetsClasses) {
-							if (!Styling.ContainsKey (tc))
-								Styling [tc] = new Style ();
-							if (!Styling[tc].ContainsKey (currentProperty)) {
-								Styling[tc][currentProperty] = token.ToString ();
-#if DESIGN_MODE
-								Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
-#endif
-							}
-						}
+						break;
+					case '{':
+						ReadChar ();
+						if (curState != States.classNames || token.Length == 0)
+							throw new ParserException (line, column, "Unexpected char '{'", resId);
+						targetsClasses.Add (token.ToString());
+						token.Clear();
 						curState = States.members;
-					}
-					token.Clear ();
-					currentProperty = null;
-					break;
-				default:
-					if (curState == States.value)
-						throw new ParserException (line, column, "expecting value enclosed in '\"'", resId);
-					if (curState == States.endOfStatement)
-						throw new ParserException (line, column, "expecting end of statement", resId);
+						break;
+					case '}':
+						ReadChar ();
+						if (curState != States.members)
+							throw new ParserException (line, column, "Unexpected char '}'", resId);
+						curState = States.classNames;
+						targetsClasses.Clear ();
+						break;
+					case '=':
+						ReadChar ();
+						if (!(curState == States.members || curState == States.classNames) || token.Length == 0)
+							throw new ParserException (line, column, "Unexpected char '='", resId);
+						currentProperty = token.ToString ();
+						token.Clear ();
+						curState = States.value;
+						break;
+					case '"':
+						if (curState != States.value)
+							throw new ParserException (line, column, "Unexpected char '\"'", resId);
+						ReadChar ();
 
-					if (nextCharIsValidCharStartName) {
-						token.Append (ReadChar ());
-						while (nextCharIsValidCharName)
+						while (!EndOfStream) {
+							char c = ReadChar ();
+							if (c == '$') {
+								if (PeekChar () == '{') {
+									ReadChar ();
+									//constant replacement
+									while (!EndOfStream) {
+										c = ReadChar ();
+										if (c == '}')
+											break;
+										constantId.Append (c);
+									}
+									if (constantId.Length == 0)
+										throw new ParserException (line, column, "Empty constant id in styling", resId);
+									string cst = constantId.ToString ();
+									constantId.Clear ();
+									if (!StylingConstants.ContainsKey (cst))
+										throw new ParserException (line, column, $"Constant id not found in styling ({cst})", resId);
+									token.Append (StylingConstants[cst]);
+									continue;
+								}
+							} else if (c == '\"') {
+								curState = States.endOfStatement;
+								break;
+							}
+							token.Append (c);
+						}
+						break;
+					case ';':
+						if (curState != States.endOfStatement)
+							throw new ParserException (line, column, "Unexpected end of statement", resId);
+						ReadChar ();
+						if (targetsClasses.Count == 0) {
+							//only first style constants kept.
+							if (!StylingConstants.ContainsKey (currentProperty))
+								StylingConstants[currentProperty] = token.ToString ();
+							curState = States.classNames;
+						} else {
+							foreach (string tc in targetsClasses) {
+								if (!Styling.ContainsKey (tc))
+									Styling [tc] = new Style ();
+								if (!Styling[tc].ContainsKey (currentProperty)) {
+									Styling[tc][currentProperty] = token.ToString ();
+	#if DESIGN_MODE
+									Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
+	#endif
+								}
+							}
+							curState = States.members;
+						}
+						token.Clear ();
+						currentProperty = null;
+						break;
+					default:
+						if (curState == States.value)
+							throw new ParserException (line, column, "expecting value enclosed in '\"'", resId);
+						if (curState == States.endOfStatement)
+							throw new ParserException (line, column, "expecting end of statement", resId);
+
+						if (nextCharIsValidCharStartName) {
 							token.Append (ReadChar ());
+							while (nextCharIsValidCharName)
+								token.Append (ReadChar ());
+						}
+						break;
 					}
-					break;
-				}
 			}
 
 		}

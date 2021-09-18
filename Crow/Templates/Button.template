@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<Border Style="ButtonBorder" Background="{./Background}" Name="Content" CornerRadius="{../CornerRadius}" >
+<Border Style="ButtonBorder" Background="{./Background}" Name="Content" CornerRadius="{../CornerRadius}" Width="Stretched" Height="Stretched" >
 	<Label Font="{./Font}" Name="caption" Margin="${ButtonCaptionMargin}" Foreground="{./Foreground}" Text="{./Caption}"/>
 </Border>

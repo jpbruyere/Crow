@@ -140,7 +140,8 @@ namespace Crow
 		{
 			if (IsOpened)
 				IsOpened = false;
-			base.onMouseLeave (this, e);
+			if (mouseIsEntered)
+				base.onMouseLeave (this, e);
 		}
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{

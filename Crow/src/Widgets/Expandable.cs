@@ -58,6 +58,7 @@ namespace Crow
 		public void onClickForExpand (object sender, MouseButtonEventArgs e)
 		{
 			IsExpanded = !IsExpanded;
+			e.Handled = true;
 		}
 
 		#region Public properties

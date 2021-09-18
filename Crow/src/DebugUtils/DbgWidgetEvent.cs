@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace Crow.DebugLogger
-{	
+{
 	public class DbgWidgetEvent : DbgEvent
 	{
 		public int InstanceIndex;
@@ -17,7 +17,7 @@ namespace Crow.DebugLogger
 			InstanceIndex = widgetInstanceIndex;
 		}
 		//public override string Print() => $"{base.Print()}:{InstanceIndex}"
-		
+
         public override string ToString ()
 			=> $"{base.ToString ()};{InstanceIndex}";
 		public override Color Color {
@@ -76,6 +76,6 @@ namespace Crow.DebugLogger
 					return Colors.White;
 				}
 			}
-		}			
-	}	
+		}
+	}
 }

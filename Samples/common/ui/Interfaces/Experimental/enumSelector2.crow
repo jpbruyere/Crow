@@ -1,0 +1,18 @@
+﻿<VerticalStack>
+	<Label Text="{DeviceEventTypeEnum}"/>
+	<EnumSelector Caption="Device Events:" EnumValue="{²DeviceEventTypeEnum}" ItemStyle="CheckBox3" Width="Fit"  Background="Jet">
+		<Template>
+			<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
+				<HorizontalStack>
+					<Label Text="{./Caption}"/>
+					<Popper Caption="{./EnumValue}" PopDirection="BottomLeft" >
+						<Template>
+							<Label Style="ControlCaption" Text="{./Caption}" Foreground="{./Foreground}" MinimumSize="80,1" TextAlignment="Center"/>
+						</Template>
+						<VerticalStack Fit="true" Name="Content" Background="Onyx" Width="{../PopWidth}" Margin="5"/>
+					</Popper>
+				</HorizontalStack>
+			</Border>
+		</Template>
+	</EnumSelector>
+</VerticalStack>

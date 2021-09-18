@@ -327,18 +327,18 @@ namespace Crow
 			=> value == (UInt32)other;*/
 
 		public bool Equals (Color other)
-			=> value == other.value;		
+			=> value == other.value;
 		public override int GetHashCode ()
 			=> value.GetHashCode ();
 
 		public override string ToString()
 			=> EnumsNET.Enums.IsValid<Colors> ((Colors)value) ? EnumsNET.Enums.GetName((Colors)value) : HtmlCode;
-			
+
 		public static Color FromIml (string iml)
 		{
 			Span<double> components = stackalloc double[4];
 			components[3] = 1;//init alpha to 1 so that it can be ommitted
-			ReadOnlySpan<char> c = iml.AsSpan ();			
+			ReadOnlySpan<char> c = iml.AsSpan ();
 			int i = 0;
 			int ioc = c.IndexOf (',');
 
@@ -347,7 +347,7 @@ namespace Crow
 				c = c.Slice (ioc + 1);
 				ioc = c.IndexOf (',');
 			}
-			components[i++] = double.Parse (c);			
+			components[i++] = double.Parse (c);
 			return new Color (components);
 		}
 

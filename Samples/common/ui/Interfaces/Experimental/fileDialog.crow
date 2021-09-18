@@ -1,0 +1,17 @@
+﻿<VerticalStack> 
+	<HorizontalStack Height="Fit">
+		<Label Text="Hover:" Width="50" Foreground="Grey"/>
+		<Label Text="{HoverWidget}" Font="mono, 8"/>
+	</HorizontalStack>
+	<HorizontalStack Height="Fit">
+		<Label Text="Focus:" Width="50" Foreground="Grey"/>
+		<Label Text="{FocusedWidget}" Font="mono, 8"/>
+	</HorizontalStack>
+	<HorizontalStack Height="Fit">
+		<Label Text="Active:" Width="50" Foreground="Grey"/>
+		<Label Text="{ActiveWidget}" Font="mono, 8"/>
+	</HorizontalStack>
+	<Container>
+	<FileDialog Focusable="true" Resizable="true"/>
+	</Container>
+</VerticalStack>

@@ -1,0 +1,9 @@
+﻿<VerticalStack Fit="true" Background="Onyx" Margin="0">
+	<Button Caption='Ok' Background='MediumSeaGreen' Width="Stretched" MouseClick="{Background=Red}">
+		<Template>
+			<Border Style="ButtonBorder" Background="{./Background}" Name="Content" CornerRadius="{../CornerRadius}" Width="Stretched">
+				<Label Font="{./Font}" Name="caption" Margin="${ButtonCaptionMargin}" Foreground="{./Foreground}" Text="{./Caption}"/>
+			</Border>
+		</Template>
+	</Button>
+</VerticalStack>

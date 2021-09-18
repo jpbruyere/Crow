@@ -1,8 +1,7 @@
-﻿using System.Text;
-// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,18 +15,21 @@ namespace Crow
 {
 	public static class DbgLogger
 	{
-		public static DbgEvtType IncludeEvents = DbgEvtType.All;
-		public static DbgEvtType DiscardEvents = DbgEvtType.Focus;
+		/*public static DbgEvtType IncludeEvents = DbgEvtType.All;
+		public static DbgEvtType DiscardEvents = DbgEvtType.Focus;*/
+
+		public static List<DbgEvtType> IncludedEvents = new List<DbgEvtType> ();
 		public static bool ConsoleOutput = true;
 
 
 #if DEBUG_LOG
-		static bool logevt (DbgEvtType evtType)
-			//=> IncludeEvents != DbgEvtType.None && (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) == IncludeEvents;
-			//=> IncludeEvents != DbgEvtType.None && (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) == IncludeEvents;
-			=> IncludeEvents == DbgEvtType.All || (IncludeEvents != DbgEvtType.None && (evtType & IncludeEvents) != 0);
-
-
+		static bool logevt (DbgEvtType evtType) {
+			foreach (DbgEvtType et in IncludedEvents) {
+				if ((et & evtType) == et)
+					return true;
+			}
+			return false;
+		}
 
 		static object logMutex = new object ();
 		static Stopwatch chrono = Stopwatch.StartNew ();

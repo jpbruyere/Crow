@@ -360,8 +360,46 @@ namespace Crow
 			}
 		}
 
-		internal Dictionary<string, MethodInfo> knownExtMethods = new Dictionary<string, MethodInfo> ();
-		internal MethodInfo SearchExtMethod (Type t, string methodName) {
+		protected Dictionary<string, MethodInfo> knownExtMethods;
+		protected Dictionary<string, Type> knownCrowWidgetTypes;
+
+		/// <summary>
+		/// search for graphic object type in crow assembly, if not found,
+		/// search for type independently of namespace in all the loaded assemblies
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		/// <returns>the corresponding type object</returns>
+		/// <param name="typeName">graphic object type name without its namespace</param>
+		public virtual Type GetWidgetTypeFromName (string typeName){
+			if (knownCrowWidgetTypes.ContainsKey (typeName))
+				return knownCrowWidgetTypes [typeName];
+			Type t = Type.GetType ("Crow." + typeName);
+			if (t != null) {
+				knownCrowWidgetTypes.Add (typeName, t);
+				return t;
+			}
+
+			foreach (Type expT in Assembly.GetEntryAssembly ().GetExportedTypes ()) {
+				if (expT.Name != typeName)
+					continue;
+				knownCrowWidgetTypes.Add (typeName, expT);
+				return expT;
+			}
+
+			foreach (Assembly a in Interface.crowAssemblies) {
+				foreach (Type expT in a.GetExportedTypes ()) {
+					if (expT.Name != typeName)
+						continue;
+					knownCrowWidgetTypes.Add (typeName, expT);
+					return expT;
+				}
+			}
+			return null;
+		}
+
+
+		public virtual MethodInfo SearchExtMethod (Type t, string methodName) {
 			string key = t.Name + "." + methodName;
 			if (knownExtMethods.ContainsKey (key))
 				return knownExtMethods [key];
@@ -790,6 +828,8 @@ namespace Crow
 			DefaultValuesLoader = new Dictionary<string, LoaderInvoker> (initCapacity);
 			Instantiators = new Dictionary<string, Instantiator> (initCapacity);
 			ItemTemplates = new Dictionary<string, ItemTemplate> (initCapacity);
+			knownCrowWidgetTypes = new Dictionary<string, Type> (initCapacity);
+			knownExtMethods = new Dictionary<string, MethodInfo> (initCapacity);
 		}
 		void loadThemeFiles () {
 			if (string.IsNullOrEmpty (Theme))
@@ -1033,6 +1073,9 @@ namespace Crow
 				}
 
 				_hoverWidget = value;
+				if (_hoverWidget.ToString() == "HelloWorld.Program.vs2.Border12")
+					Debugger.Break();
+
 
 				NotifyValueChanged ("HoverWidget", _hoverWidget);
 				DbgLogger.AddEvent (DbgEvtType.HoverWidget, _hoverWidget);
@@ -1840,10 +1883,12 @@ namespace Crow
 					return true;
 				}
 
-				if (doubleClickTriggered)
-					_activeWidget.onMouseDoubleClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
-				else
-					_activeWidget.onMouseClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
+				if (_focusedWidget != null &&_focusedWidget.MouseIsIn(MousePosition)) {
+					if (doubleClickTriggered)
+						_activeWidget.onMouseDoubleClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
+					else
+						_activeWidget.onMouseClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
+				}
 
 				ActiveWidget = null;
 				//			if (!lastActive.MouseIsIn (Mouse.Position)) {
@@ -2057,7 +2102,7 @@ namespace Crow
 				else
 					ctxMenuContainer.IsOpened = true;
 
-				ctxMenuContainer.BubbleMouseEvent = DeviceEventType.None;
+				ctxMenuContainer.BubbleEvents = DeviceEventType.None;
 				ctxMenuContainer.LogicalParent = go;
 				ctxMenuContainer.DataSource = go;
 

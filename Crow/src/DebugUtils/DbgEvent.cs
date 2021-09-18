@@ -50,7 +50,7 @@ namespace Crow.DebugLogger
 				return null;
 			string [] tmp = str.Trim ().Split (';', StringSplitOptions.None);
 
-			DbgEvtType evtType = (DbgEvtType)Enum.Parse (typeof (DbgEvtType), tmp [3]);			
+			DbgEvtType evtType = (DbgEvtType)Enum.Parse (typeof (DbgEvtType), tmp [3]);
 
 			if (evtType.HasFlag (DbgEvtType.Widget)) {
 				if (evtType.HasFlag (DbgEvtType.Layouting))
@@ -109,13 +109,13 @@ namespace Crow.DebugLogger
 				case DbgEvtType.Update:
 					return Colors.Grey;
 				case DbgEvtType.IFaceLoad:
-					return Colors.Teal;				
+					return Colors.Teal;
 				default:
 					if (type.HasFlag(DbgEvtType.Mouse))
 						return Colors.DeepPink;
 					return Colors.White;
 				}
 			}
-		}		
+		}
 	}
 }

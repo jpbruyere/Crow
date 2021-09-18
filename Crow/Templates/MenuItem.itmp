@@ -2,6 +2,7 @@
 <ItemTemplate DataType="Crow.Command" Path="#Crow.MenuButton.template"/>
 <ItemTemplate DataType="Crow.CommandGroup" Data="Commands">
 	<Popper PopDirection="Right" Caption="{Caption}" IsEnabled="{CanExecute}" Width="Stretched"
+			BubbleEvents="All"
 			MouseEnter="{Background=${ControlHighlight}}"
 			MouseLeave="{Background=Transparent}">
 		<Template>
@@ -9,7 +10,7 @@
 				<Label Text="{./Caption}"   Width="Fit" Height="Stretched"/>
 				<Label Text="..."/>
 			</HorizontalStack>
-		</Template>		
+		</Template>
 		<VerticalStack Margin="0" Name="ItemsContainer" Fit="true" Background="${MenuBackground}"/>
 	</Popper>
 </ItemTemplate>

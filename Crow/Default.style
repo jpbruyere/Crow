@@ -100,8 +100,9 @@ Wrapper {
 }
 Button {
 	Template = "#Crow.Button.template";
+	//Focusable	= "true";
 	Caption 	= "Button";
-	MinimumSize = "50,22";
+	MinimumSize = "60,22";
 	Height 		= "Fit";
 	Width 		= "Fit";
 }
@@ -163,6 +164,7 @@ ListItem {
 	//Selected = "{Background=${ControlHighlight}}";
 	//Unselected = "{Background=Transparent}";
 	//Margin="1";
+	Focusable = "true";
 }
 MessageBox {
 	Background = "0.1,0.1,0.2,0.85";
@@ -362,13 +364,13 @@ TableHeaderLabel {
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox, NumericControl {
-	//Focusable = "true";
+	Focusable = "true";
 	Foreground="${ControlForeground}";
 	Height = "Fit";
 	Background = "${ControlBackground}";
 	CornerRadius = "${ControlCornerRadius}";
 	Margin="0";
-	BubbleMouseEvent="MouseWheel|Keyboard";
+	BubbleEvents="MouseWheel|Keyboard";
 }
 TemplatedControl, GenericStack {
 	CacheEnabled="true";

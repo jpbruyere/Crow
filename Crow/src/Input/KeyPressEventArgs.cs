@@ -13,7 +13,7 @@ namespace Crow
     public class KeyPressEventArgs : CrowEventArgs
     {
         char key_char;
-        
+
         /// <summary>
         /// Constructs a new instance.
         /// </summary>

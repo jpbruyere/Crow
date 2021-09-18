@@ -3,10 +3,10 @@
   <a href="http://www.amitmerchant.com/electron-markdownify">
     <img src="https://github.com/jpbruyere/Crow/blob/master/Images/crow.png" alt="C.R.O.W." width="140">
   </a>
-  <br>  
+  <br>
     <br>
   C# Rapid Open Widgets
-  <br>  
+  <br>
 <p align="center">
   <a href="https://www.nuget.org/packages/Crow"><img src="https://buildstats.info/nuget/Crow"></a>
   <a href="https://travis-ci.org/jpbruyere/Crow">
@@ -20,7 +20,7 @@
   </a>
   <a href="https://gitter.im/CSharpRapidOpenWidgets?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
     <img src="https://badges.gitter.im/CSharpRapidOpenWidgets.svg">
-  </a>    
+  </a>
 </p>
 </h1>
 

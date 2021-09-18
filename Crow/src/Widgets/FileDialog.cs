@@ -14,9 +14,17 @@ namespace Crow
 	public class FileDialog: Window
 	{
 		#region CTOR
-		protected FileDialog() : base(){}
+		protected FileDialog() : base() {}
 		public FileDialog (Interface iface) : base(iface){}
 		#endregion
+		protected override void loadTemplate(Widget template = null)
+		{
+			if (CMDOk == null) {
+ 				CMDOk = new ActionCommand (this, "Ok", validate, null, new KeyBinding (Glfw.Key.Enter));
+				CMDCancel = new ActionCommand (this, "Cancel", () => IFace.DeleteWidget (this), null, new KeyBinding (Glfw.Key.Escape));
+			}
+			base.loadTemplate(template);
+		}
 
 		string searchPattern, curDir, _selectedFile, _selectedDir;
 		bool showHidden, showFiles;
@@ -24,6 +32,9 @@ namespace Crow
 		#region events
 		public event EventHandler OkClicked;
 		#endregion
+
+		[XmlIgnore]public ActionCommand CMDOk { get; set;}
+		[XmlIgnore]public ActionCommand CMDCancel { get; set;}
 
 		public string SelectedFileFullPath {
 			get { return Path.Combine (SelectedDirectory, SelectedFile); }
@@ -115,20 +126,22 @@ namespace Crow
 			CurrentDirectory = SelectedDirectory;
 		}
 
-		void onFileSelect (object sender, MouseButtonEventArgs e){
+		void validate () {
 			if (ShowFiles) {
 				if (string.IsNullOrEmpty (SelectedFile)) {
 					CurrentDirectory = SelectedDirectory;
 					return;
-				} 									
+				}
 			}
 			OkClicked.Raise (this, null);
 			IFace.DeleteWidget (this);
 		}
-		void onCancel(object sender, MouseButtonEventArgs e){
-			IFace.DeleteWidget (this);
+		protected override void Dispose(bool disposing)
+		{
+			CMDOk?.Dispose ();
+			CMDCancel?.Dispose ();
+			base.Dispose(disposing);
 		}
-
 	}
 }
 

@@ -67,7 +67,7 @@ namespace Samples
 		}
 		public bool DebugLoggingEnabled => DbgLogger.IsEnabled;
 
-		public DbgEvtType RecordedEvents {
+		/*public DbgEvtType RecordedEvents {
 			get => Configuration.Global.Get<DbgEvtType> (nameof (RecordedEvents));
 			set {
 				if (RecordedEvents == value)
@@ -88,7 +88,7 @@ namespace Samples
 					DbgLogger.DiscardEvents = DiscardedEvents;
 				NotifyValueChanged(DiscardedEvents);
 			}
-		}
+		}*/
 		public bool DebugLogRecording {
 			get => debugLogRecording;
 			set {
@@ -119,9 +119,6 @@ namespace Samples
 		}
 
 		protected static void initDebugLog () {
-			DbgLogger.IncludeEvents = DbgEvtType.None;
-			DbgLogger.DiscardEvents = DbgEvtType.All;
-			//DbgLogger.DiscardEvents = DbgEvtType.All;
 			DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));
 		}
 
