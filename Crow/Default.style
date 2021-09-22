@@ -27,6 +27,9 @@ MenuBackground = "Jet";
 
 InactiveTabItem = "DarkGrey";
 
+FolderIcon	= "#Crow.Icons.folder.svg";
+FileIcon	= "#Crow.Icons.file.svg";
+
 Border {
 	BorderWidth	= "${ControlBorderWidth}";
 	Foreground  = "${ControlBorderColor}";
@@ -165,6 +168,7 @@ ListItem {
 	//Unselected = "{Background=Transparent}";
 	//Margin="1";
 	Focusable = "true";
+	BubbleEvents="MouseWheel|Keyboard";
 }
 MessageBox {
 	Background = "0.1,0.1,0.2,0.85";
