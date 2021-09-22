@@ -136,12 +136,12 @@ namespace Crow
 			Group g = child as Group;
 			if (g != null)
 				g.ChildrenCleared -= onChildListCleared;
-			
+
 			base.SetChild (_child);
 
 			g = _child as Group;
 			if (g != null)
-				g.ChildrenCleared += onChildListCleared;			
+				g.ChildrenCleared += onChildListCleared;
 		}
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
@@ -187,7 +187,7 @@ namespace Crow
 			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
 			gr.Fill ();
-		
+
 			gr.Save ();
 
 			if (ClipToClientRect) {
@@ -200,7 +200,7 @@ namespace Crow
 
 			if (child != null)
 				child.Paint (gr);
-			
+
 			//gr.Translate (ScrollX, ScrollY);
 
 			gr.Restore ();
@@ -210,7 +210,7 @@ namespace Crow
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
-			if (IFace.Shift)
+			if (IFace.Shift || maxScrollY == 0)
 				ScrollX += e.Delta * ScrollSpeed;
 			else
 				ScrollY -= e.Delta * ScrollSpeed;
@@ -264,7 +264,7 @@ namespace Crow
 			if (lt == LayoutingType.Height) {
 				MaxScrollY = child.Slot.Height - cb.Height;
 				if (child.Slot.Height > 0)
-					NotifyValueChanged ("ChildHeightRatio", (double)Slot.Height / child.Slot.Height);			
+					NotifyValueChanged ("ChildHeightRatio", (double)Slot.Height / child.Slot.Height);
 			} else if (lt == LayoutingType.Width) {
 				MaxScrollX = child.Slot.Width - cb.Width;
 				if (child.Slot.Width > 0)

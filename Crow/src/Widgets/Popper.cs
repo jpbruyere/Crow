@@ -50,8 +50,8 @@ namespace Crow
 			set
 			{
 				if (!_canPop & value)
-					return;					
-				
+					return;
+
 				if (value == _isPopped)
 					return;
 
@@ -141,7 +141,7 @@ namespace Crow
 						if (r.Right - Content.Slot.Width < tc.ClientRectangle.Left)
 							Content.Left = r.Right;
 						else
-							Content.Left = r.Right - Content.Slot.Width;						
+							Content.Left = r.Right - Content.Slot.Width;
 					}
 				} else {
 					if (Content.Slot.Width < tc.ClientRectangle.Width) {
@@ -186,7 +186,7 @@ namespace Crow
 			base.onMouseLeave (this, e);
 		}
 		public override bool MouseIsIn (Point m)
-		{			
+		{
 			if (Content?.Parent != null)
 				if (Content.MouseIsIn (m))
 					return true;
@@ -208,7 +208,7 @@ namespace Crow
 
 		public virtual void onPop(object sender, EventArgs e)
 		{
-			if (Content != null) {				
+			if (Content != null) {
 				if (Content.Parent == null)
 					IFace.AddWidget (Content);
 				Content.IsVisible = true;
@@ -223,7 +223,7 @@ namespace Crow
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
 			if (Content != null)
-				Content.IsVisible = false;			
+				Content.IsVisible = false;
 			Unpoped.Raise (this, e);
 			ToggleOff.Raise (this, null);
 		}
@@ -254,6 +254,6 @@ namespace Crow
 				IsPopped = value;
 			}
 		}
-		#endregion		
+		#endregion
 	}
 }
