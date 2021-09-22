@@ -203,8 +203,11 @@ namespace Crow {
 
 				NotifyValueChanged ("SelectedItem", SelectedItem);
 				NotifyValueChanged ("SelectedIndex", SelectedIndex);
-				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
+				onSelectedItemChanged (this, new SelectionChangeEventArgs (SelectedItem));
 			}
+		}
+		public virtual void onSelectedItemChanged (object sender, SelectionChangeEventArgs e) {
+			SelectedItemChanged.Raise (sender, e);
 		}
 		[XmlIgnore]public virtual int SelectedIndex{
 			get => selectedItemContainer == null ? -1 : itemsContainer.Children.IndexOf (selectedItemContainer);

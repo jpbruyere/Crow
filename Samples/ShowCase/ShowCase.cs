@@ -79,6 +79,7 @@ namespace ShowCase
 		}
 
 		void showError (Exception ex) {
+			Console.WriteLine (ex);
 			NotifyValueChanged ("ErrorMessage", ex);
 			NotifyValueChanged ("ShowError", true);
 		}

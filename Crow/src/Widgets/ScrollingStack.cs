@@ -47,7 +47,7 @@ namespace Crow {
 				NotifyValueChangedAuto (maxScroll);
 				//RegisterForGraphicUpdate ();
 			}
-		}		
+		}
 
 
 
@@ -84,11 +84,11 @@ namespace Crow {
 			Widget go = sender as Widget;
 
 			if (Orientation == Orientation.Horizontal) {
-				if (arg.LayoutType == LayoutingType.Width && itemSize < go.Slot.Width) 
+				if (arg.LayoutType == LayoutingType.Width && itemSize < go.Slot.Width)
 					itemSize = go.Slot.Width;
 			} else if (arg.LayoutType == LayoutingType.Height && itemSize < go.Slot.Height)
 				itemSize = go.Slot.Height;
-			
+
 			base.OnChildLayoutChanges (sender, arg);
 			DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 		}
@@ -105,7 +105,7 @@ namespace Crow {
 		{
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
-			base.onDraw (gr);			
+			base.onDraw (gr);
 
 			if (ClipToClientRect) {
 				gr.Save ();
@@ -115,7 +115,7 @@ namespace Crow {
 			}
 
 			childrenRWLock.EnterReadLock ();
-			try	{				
+			try	{
 				for (int i = Scroll; i < Children.Count && i < Scroll + visibleItems; i++) {
 					if (!Children[i].IsVisible)
 						continue;
@@ -177,10 +177,10 @@ namespace Crow {
 			}/*else
 				Console.WriteLine("GROUP REPAINT WITH EMPTY CLIPPING");*/
 			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
-			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);				
-		}		
+			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);
+		}
 
-		
+
 		public override void checkHoverWidget (MouseMoveEventArgs e) {
 			base.checkHoverWidget (e);//TODO:check if not possible to put it at beginning of meth to avoid doubled check to DropTarget.
 			if (!childrenRWLock.TryEnterReadLock (10))
@@ -197,9 +197,9 @@ namespace Crow {
 			}
 		}
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
-		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {			
+		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {
 			e.Handled = true;
-			Scroll += e.Delta * itemSize;			
+			Scroll += e.Delta * itemSize;
 			base.onMouseWheel (sender, e);
 		}
 	}
