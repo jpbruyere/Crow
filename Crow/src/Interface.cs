@@ -1073,9 +1073,6 @@ namespace Crow
 				}
 
 				_hoverWidget = value;
-				if (_hoverWidget.ToString() == "HelloWorld.Program.vs2.Border12")
-					Debugger.Break();
-
 
 				NotifyValueChanged ("HoverWidget", _hoverWidget);
 				DbgLogger.AddEvent (DbgEvtType.HoverWidget, _hoverWidget);
@@ -1176,7 +1173,7 @@ namespace Crow
 						clipping.UnionRectangle(lastDragImageBounds);
 				}
 
-				if (!clipping.IsEmpty) {
+				if (!clipping.IsEmpty || shouldDrawTextCursor) {
 					if (ctx == null) {
 						using (ctx = new Context (surf))
 							processDrawing (ctx);
@@ -1190,7 +1187,6 @@ namespace Crow
 						ProcessResize (new Rectangle (0,0,(int)vkCtx.width, (int)vkCtx.height));
 				}
 #endif
-
 			} finally {
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Update);
@@ -1285,67 +1281,68 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
 
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
-
+			if (!clipping.IsEmpty) {
 #if VKVG
-			clear (ctx);
-#else
-			ctx.PushGroup ();
-
-			if (SolidBackground)
 				clear (ctx);
+#else
+				ctx.PushGroup ();
+
+				if (SolidBackground)
+					clear (ctx);
 #endif
 
-			for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-				Widget p = GraphicTree[i];
-				if (!p.IsVisible)
-					continue;
-				if (clipping.OverlapOut (p.Slot))
-					continue;
+				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
+					Widget p = GraphicTree[i];
+					if (!p.IsVisible)
+						continue;
+					if (clipping.OverlapOut (p.Slot))
+						continue;
 
-				ctx.Save ();
-				p.Paint (ctx);
-				ctx.Restore ();
-			}
+					ctx.Save ();
+					p.Paint (ctx);
+					ctx.Restore ();
+				}
 
 
-			if (lastDragImageBounds != DragImageBounds) {
-				DirtyRect += lastDragImageBounds;
-				ctx.Save ();
-				ctx.ResetClip ();
-				ctx.SetSource (DragImage, DragImageBounds.X, DragImageBounds.Y);
-				ctx.PaintWithAlpha (0.8);
-				ctx.Restore ();
-				DirtyRect += DragImageBounds;
-				IsDirty = true;
-			}
+				if (lastDragImageBounds != DragImageBounds) {
+					DirtyRect += lastDragImageBounds;
+					ctx.Save ();
+					ctx.ResetClip ();
+					ctx.SetSource (DragImage, DragImageBounds.X, DragImageBounds.Y);
+					ctx.PaintWithAlpha (0.8);
+					ctx.Restore ();
+					DirtyRect += DragImageBounds;
+					IsDirty = true;
+				}
 
 
 #if DEBUG_CLIP_RECTANGLE
-			ctx.LineWidth = 1;
-			ctx.SetSource(1,1,0,0.5);
-			for (int i = 0; i < clipping.NumRectangles; i++)
-				ctx.Rectangle(clipping.GetRectangle(i));
-			ctx.Stroke ();
+				ctx.LineWidth = 1;
+				ctx.SetSource(1,1,0,0.5);
+				for (int i = 0; i < clipping.NumRectangles; i++)
+					ctx.Rectangle(clipping.GetRectangle(i));
+				ctx.Stroke ();
 
 #endif
 
 #if VKVG
-			ctx.Flush();
+				ctx.Flush();
 #else
-			ctx.PopGroupToSource ();
+				ctx.PopGroupToSource ();
 
-			if (!SolidBackground)
-				clear (ctx);
+				if (!SolidBackground)
+					clear (ctx);
 
-			ctx.Paint ();
+				ctx.Paint ();
 
-			surf.Flush ();
+				surf.Flush ();
 #endif
 
-			clipping.Reset ();
+				clipping.Reset ();
 
-			PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
-			IsDirty = true;
+				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
+				IsDirty = true;
+			}
 
 #if !VKVG
 			drawTextCursor (ctx);
@@ -1417,6 +1414,8 @@ namespace Crow
 			}
 		}
 		#endregion
+		bool shouldDrawTextCursor => forceTextCursor || (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY &&
+			(FocusedWidget is IEditableTextWidget || textCursor != null));
 
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
@@ -2113,8 +2112,10 @@ namespace Crow
 			ctxMenuContainer.Top = MousePosition.Y - 5;
 
 			//OnMouseMove (MousePosition.X, MousePosition.Y);
-			HoverWidget = ctxMenuContainer;
+			//
+			//
 			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (MousePosition.X, MousePosition.Y, 0, 0));
+			HoverWidget = ctxMenuContainer;
 		}
 		#endregion
 

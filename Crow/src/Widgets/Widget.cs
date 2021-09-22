@@ -1823,9 +1823,9 @@ namespace Crow
 				if (isVisible) {
 					if (Width.IsFixed)
 						Slot.Width = Width;
-					else if (Width == Measure.Fit) {
+					else if (Width == Measure.Fit)
 						Slot.Width = measureRawSize (LayoutingType.Width);
-					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 					else if (Width == Measure.Stretched)
 						Slot.Width = Parent.GetClientRectangleForChild(this).Width;

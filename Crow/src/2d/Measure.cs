@@ -53,8 +53,8 @@ namespace Crow
 		public bool IsRelativeToParent { get { return Value >= 0 && Units == Unit.Percent; }}
 		#region Operators
 		public static implicit operator int(Measure m) => m.Value;
-		public static implicit operator Measure(int i) => new Measure(i);		
-		public static implicit operator string(Measure m) => m.ToString();		
+		public static implicit operator Measure(int i) => new Measure(i);
+		public static implicit operator string(Measure m) => m.ToString();
 		public static implicit operator Measure(string s) => Measure.Parse(s);
 
 		public static bool operator ==(Measure m1, Measure m2) => m1.Equals (m2);
@@ -87,7 +87,7 @@ namespace Crow
 			else if (string.Equals ("Fit", st, StringComparison.Ordinal))
 				return Measure.Fit;
 			else if (string.Equals ("Stretched", s, StringComparison.Ordinal))
-				return Measure.Stretched;			
+				return Measure.Stretched;
 			else {
 				if (st.EndsWith ("%", StringComparison.Ordinal)) {
 					if (int.TryParse (s.Substring(0, st.Length - 1), out tmp))
