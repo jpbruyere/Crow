@@ -215,30 +215,37 @@ namespace Crow
 				return;
 			if (e.LayoutType == LayoutingType.Width) {
 				Widget g = sender as Widget;
-				int cIdx = HeaderRow.Children.IndexOf (g);
-				if (cIdx < Columns.Count &&  Columns[cIdx].Width.IsFit)
-					searchLargestChildInColumn (cIdx);
 				childrenRWLock.EnterReadLock ();
-				for (int i = 1; i < Children.Count; i++) {
-					TableRow row = Children[i] as TableRow;
-					if (row.Children.Count <= cIdx)
-						continue;
-					setRowCellWidth (row.Children[cIdx], g.Slot.Width);
+				try {
+					int cIdx = HeaderRow.Children.IndexOf (g);
+					if (cIdx < Columns.Count &&  Columns[cIdx].Width.IsFit)
+						searchLargestChildInColumn (cIdx);
+					for (int i = 1; i < Children.Count; i++) {
+						TableRow row = Children[i] as TableRow;
+						if (row.Children.Count <= cIdx)
+							continue;
+						setRowCellWidth (row.Children[cIdx], g.Slot.Width);
+					}
+				} catch {
+				} finally {
+					childrenRWLock.ExitReadLock ();
 				}
-				childrenRWLock.ExitReadLock ();
-
 				RegisterForRedraw ();
 			} else if (e.LayoutType == LayoutingType.X) {
 				Widget g = sender as Widget;
-				int cIdx = HeaderRow.Children.IndexOf (g);
 				childrenRWLock.EnterReadLock ();
-				for (int i = 1; i < Children.Count; i++) {
-					TableRow row = Children[i] as TableRow;
-					if (row.Children.Count <= cIdx)
-						continue;
-					row.Children[cIdx].Slot.X = g.Slot.X;
+				try {
+					int cIdx = HeaderRow.Children.IndexOf (g);
+					for (int i = 1; i < Children.Count; i++) {
+						TableRow row = Children[i] as TableRow;
+						if (row.Children.Count <= cIdx)
+							continue;
+						row.Children[cIdx].Slot.X = g.Slot.X;
+					}
+				} catch {
+				} finally {
+					childrenRWLock.ExitReadLock ();
 				}
-				childrenRWLock.ExitReadLock ();
 				RegisterForRedraw ();
 			}
 		}
@@ -270,7 +277,7 @@ namespace Crow
 				int largestWidth = 0;
 				for (int i = 1; i < Children.Count; i++) {
 					TableRow row = Children[i] as TableRow;
-					if (!row.IsVisible || row.Children.Count <= i)
+					if (row == null || !row.IsVisible || row.Children.Count <= i)
 						continue;
 					int cw = row.Children [cIdx]. measureRawSize (LayoutingType.Width);
 					if (cw > largestWidth) {
