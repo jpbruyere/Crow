@@ -138,10 +138,12 @@ namespace Crow
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
+			base.onMouseLeave (this, e);
+			IFace.HoverWidget = null;	//prevent unshown post action to set hoverWidget while calling onMouseLeave
+										//because IsOpened is often bound to IsVisible....
 			if (IsOpened)
 				IsOpened = false;
-			if (mouseIsEntered)
-				base.onMouseLeave (this, e);
+			IFace.HoverWidget = this;
 		}
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
