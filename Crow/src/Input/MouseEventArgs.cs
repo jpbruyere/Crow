@@ -32,6 +32,10 @@ namespace Crow
 			X = x;
 			Y = y;
 		}
+		public MouseEventArgs (Point mousePosition) {
+			X = mousePosition.X;
+			Y = mousePosition.Y;
+		}
 	}
 	public class MouseMoveEventArgs : MouseEventArgs
 	{
@@ -57,7 +61,7 @@ namespace Crow
 	public class MouseWheelEventArgs : MouseEventArgs
 	{
 		public readonly int Delta;
-		public MouseWheelEventArgs (int delta)
+		public MouseWheelEventArgs (int delta, Point mousePosition) : base (mousePosition)
 		{
 			Delta = delta;
 		}

@@ -27,9 +27,11 @@ namespace Crow.Text
 		public override int GetHashCode()
 			=> HashCode.Combine(Start, End);
 		public static bool operator ==(TextSpan left, TextSpan right)
-			=> left.Equals (right);		
+			=> left.Equals (right);
 		public static bool operator !=(TextSpan left, TextSpan right)
 			=> !left.Equals (right);
 		public override string ToString() => $"{Start},{End}";
+		public bool Contains (int absolutePosition)
+			=> absolutePosition >= Start && absolutePosition < End;
 	}
 }

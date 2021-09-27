@@ -41,6 +41,8 @@ namespace Crow.Text
 		/// Absolute end character position just before linebreak if any.
 		/// </summary>
 		public int End => Start + Length;
+		public TextSpan Span => new TextSpan (Start, End);
+		public TextSpan SpanIncludingLineBreak => new TextSpan (Start, EndIncludingLineBreak);
 		/// <summary>
 		/// Absolute line's end position after linebreak if any.
 		/// </summary>
@@ -85,7 +87,7 @@ namespace Crow.Text
 		/// </summary>
 		/// <param name="start"></param>
 		/// <returns></returns>
-		public TextLine WithStartOffset (int start) => new TextLine (Start + start, End, EndIncludingLineBreak);		
+		public TextLine WithStartOffset (int start) => new TextLine (Start + start, End, EndIncludingLineBreak);
 		public int CompareTo (TextLine other) => Start - other.Start;
     }
 }

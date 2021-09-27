@@ -6,13 +6,13 @@ using System.Diagnostics;
 
 namespace Crow.Text
 {
-    [DebuggerDisplay ("{Line}, {Column}, {VisualCharXPosition}")]
+	[DebuggerDisplay ("{Line}, {Column}, {VisualCharXPosition}")]
 	public struct CharLocation : IEquatable<CharLocation>
 	{
 		public readonly int Line;
 		/// <summary>
 		/// Character position in current line. If equals '-1', the visualX must contains the on screen position.
-		/// 
+		///
 		/// </summary>
 		public int Column;
 		public double VisualCharXPosition;
@@ -21,7 +21,7 @@ namespace Crow.Text
 			Column = column;
 			VisualCharXPosition = visualX;
 		}
-		public bool HasVisualX => Column >= 0 && VisualCharXPosition >= 0;		
+		public bool HasVisualX => Column >= 0 && VisualCharXPosition >= 0;
 		public void ResetVisualX () => VisualCharXPosition = -1;
 		public static bool operator == (CharLocation a, CharLocation b)
 			=> a.Equals (b);
@@ -40,5 +40,5 @@ namespace Crow.Text
 		}
 
 		public override string ToString () => $"{Line}, {Column}";
-    }
+	}
 }

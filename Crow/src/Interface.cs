@@ -1906,7 +1906,7 @@ namespace Crow
 		/// <param name="delta">wheel delta</param>
 		public virtual bool OnMouseWheelChanged (float delta)
 		{
-			MouseWheelEventArgs e = new MouseWheelEventArgs ((int)delta);
+			MouseWheelEventArgs e = new MouseWheelEventArgs ((int)delta, MousePosition);
 
 			if (_hoverWidget == null)
 				return false;
