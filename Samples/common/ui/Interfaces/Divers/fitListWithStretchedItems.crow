@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<ListBox Data="{TestList}" Width="Fit" Focusable="true" >
+<ListBox Data="{TestList}" Width="Fit" Focusable="true" Foreground="Red" >
 	<Template>
 		<Scroller Name="ItemsScroller" Height="Stretched" Background="Onyx" Margin="10">
 			<VerticalStack Name="ItemsContainer" Orientation="Horizontal" VerticalAlignment="Top" Height="Fit" Background="Grey" Margin="20"/>
@@ -10,7 +10,7 @@
 		<ListItem Width="Stretched" Margin="1" CornerRadius="5"
 			Selected="{Background=Yellow}"
 			Unselected="{Background=Transparent}">
-			<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="Black" Margin="6" Background="{}" Width="Stretched" />
+			<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="{Foreground}" Margin="6" Background="{}" Width="Stretched" />
 		</ListItem>
 	</ItemTemplate>
 

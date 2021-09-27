@@ -1,0 +1,40 @@
+﻿<DirectoryView2 CurrentDirectory="/mnt/devel" Data="{/FileSystemEntries}">
+	<Template>
+		<VerticalStack>
+			<Spinner Value="{²./IconSize}" SmallIncrement="1" LargeIncrement="1"/>
+			<HorizontalStack Background="Grey" Margin="5">
+				<Scroller Name="scroller1">
+					<Wrapper Orientation="Vertical" Height="Fit" VerticalAlignment="Top"
+						Name="ItemsContainer" Margin="0" Spacing="2"/>
+				</Scroller>
+				<ScrollBar Name="scrollbar1" Orientation="Vertical"
+					Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}"
+					CursorRatio="{../scroller1.ChildHeightRatio}"
+					LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+					Width="14" />
+			</HorizontalStack>
+		</VerticalStack>
+	</Template>
+	<ItemTemplate DataType="System.IO.FileInfo">
+		<ListItem Width="70" Height="60"
+					BubbleEvents="All" Tooltip="{Name}"
+					Selected = "{Background=${ControlHighlight}}"
+					Unselected = "{Background=Transparent}">
+			<VerticalStack>
+				<Image Margin="8"  Width="Fit" Height="Stretched" Path="${FileIcon}" Scaled="true"/>
+				<Label Text="{Name}" Background="Jet" Width="Stretched" TextAlignment="Center" Multiline="true" Font="sans,9" />
+			</VerticalStack>
+		</ListItem>
+	</ItemTemplate>
+	<ItemTemplate DataType="System.IO.DirectoryInfo">
+		<ListItem Width="90" Height="60"
+					BubbleEvents="All" Tooltip="{Name}"
+					Selected = "{Background=${ControlHighlight}}"
+					Unselected = "{Background=Transparent}">
+			<VerticalStack>
+				<Image Margin="0"  Width="Fit" Height="Stretched" Path="${FolderIcon}" Scaled="true"/>
+				<Label Text="{Name}" Background="Jet" Width="Stretched" TextAlignment="Center" Multiline="true" Font="sans,9"/>
+			</VerticalStack>
+		</ListItem>
+	</ItemTemplate>
+</DirectoryView2>

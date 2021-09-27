@@ -1,0 +1,40 @@
+﻿<DirectoryView2 CurrentDirectory="/mnt/devel" Data="{/FileSystemEntries}">
+	<Template>
+		<VerticalStack>
+			<Spinner Value="{²./IconSize}" SmallIncrement="1" LargeIncrement="1"/>
+			<VerticalStack Background="Grey" Margin="5">
+				<Scroller Name="scroller1">
+					<VerticalStack Height="Fit" Width="Stretched" VerticalAlignment="Top"
+						Name="ItemsContainer" Margin="0" Spacing="2"/>
+				</Scroller>
+			</VerticalStack>
+		</VerticalStack>
+	</Template>
+	<ItemTemplate DataType="System.IO.FileInfo">
+		<ListItem Width="Stretched" Height="Fit"
+					BubbleEvents="All" Tooltip="{Name}"
+					Selected = "{Background=${ControlHighlight}}"
+					Unselected = "{Background=Transparent}">
+			<HorizontalStack Spacing="5">
+				<Image Margin="0"  Width="16" Height="16" Path="${FileIcon}" Scaled="true"/>
+				<Label Text="{Name}"  Width="Stretched" Font="sans,9" />
+				<Label Text="{Length}"  Width="Fit" Font="sans,9"/>
+				<Label Text="{Attributes}"  Width="Fit" Font="sans,9"/>
+				<Label Text="{LastAccessTime}"  Width="Fit" Font="sans,9"/>
+			</HorizontalStack>
+		</ListItem>
+	</ItemTemplate>
+	<ItemTemplate DataType="System.IO.DirectoryInfo">
+		<ListItem Width="Stretched" Height="Fit"
+					BubbleEvents="All" Tooltip="{Name}"
+					Selected = "{Background=${ControlHighlight}}"
+					Unselected = "{Background=Transparent}">
+			<HorizontalStack Spacing="5">
+				<Image Margin="0"  Width="16" Height="16" Path="${FolderIcon}" Scaled="true"/>
+				<Label Text="{Name}"  Width="Stretched" Font="sans,9"/>
+				<Label Text="{Attributes}"  Width="Fit" Font="sans,9"/>
+				<Label Text="{LastAccessTime}"  Width="Fit" Font="sans,9"/>
+			</HorizontalStack>
+		</ListItem>
+	</ItemTemplate>
+</DirectoryView2>
