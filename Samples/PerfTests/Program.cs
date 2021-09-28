@@ -130,17 +130,15 @@ namespace PerfTests
 						break;
 					case "--help":
 					default:
-						throw new Exception ();
+						throw new Exception ("none");
 					}
 				}
-				if (EndStage < StartStage) {
-					Console.WriteLine ($"Ending stage (){EndStage} is before Starting stage ({StartStage})");
-					throw new Exception ();
-				}
+				if (EndStage < StartStage)
+					throw new Exception ($"Ending stage (){EndStage} is before Starting stage ({StartStage})");
 
-			} catch (Exception) {
+			} catch (Exception e) {
 				printHelp ();
-				throw;
+				throw e;
 			}
 
 			if (string.IsNullOrEmpty (outDir)) {
@@ -525,9 +523,11 @@ namespace PerfTests
 						iface.PerformTests ();
 				}
 			} catch (Exception e) {
-				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.WriteLine (e);
-				Console.ResetColor ();
+				if (e.Message != "none") {
+					Console.ForegroundColor = ConsoleColor.DarkRed;
+					Console.WriteLine (e);
+					Console.ResetColor ();
+				}
             }
 		}
 	}

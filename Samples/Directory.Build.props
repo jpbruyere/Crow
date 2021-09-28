@@ -6,7 +6,6 @@
 
 		<SolutionDir>$(MSBuildThisFileDirectory)..\</SolutionDir>
 		<OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
-		<IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)\</IntermediateOutputPath>
 
 		<!--<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
 
