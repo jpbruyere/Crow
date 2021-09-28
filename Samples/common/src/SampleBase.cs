@@ -22,6 +22,8 @@ namespace Samples
 
 			switch (libraryName)
 			{
+				case "cairo":
+					return NativeLibrary.Load("cairo-2", assembly, null);
 				case "glfw3":
 					return NativeLibrary.Load("glfw", assembly, null);
 				case "rsvg-2.40":
@@ -30,10 +32,11 @@ namespace Samples
 			Console.WriteLine($"[UNRESOLVE] {assembly} {libraryName}");
 			return IntPtr.Zero;
 		}
-
 		static SampleBase()
 		{
-			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).ResolvingUnmanagedDll += resolveUnmanaged;
+			System.Runtime.Loader.AssemblyLoadContext ctx =
+				System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
+			ctx.ResolvingUnmanagedDll += resolveUnmanaged;
 		}
 #endif
 		public SampleBase(IntPtr hWin) : base(800, 600, hWin) { }

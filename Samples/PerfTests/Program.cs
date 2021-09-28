@@ -19,6 +19,8 @@ namespace PerfTests
 
 			switch (libraryName)
 			{
+				case "cairo":
+					return NativeLibrary.Load("cairo-2", assembly, null);
 				case "glfw3":
 					return  NativeLibrary.Load("glfw", assembly, null);
 				case "rsvg-2.40":
