@@ -246,7 +246,7 @@ namespace Crow
 		/// <summary>
 		/// This constructor **must** be used when creating widget from code.
 		///
-		/// When creating new widgets derived from GraphicObject, both parameterless and this constructors are
+		/// When creating new widgets derived from Widget, both parameterless and this constructors are
 		/// facultatives, the compiler will create the parameterless one automaticaly if no other one exists.
 		/// But if you intend to be able to create instances of the new widget in code and override the constructor
 		/// with the Interface parameter, you **must** also provide the override of the parameterless constructor because
@@ -350,7 +350,7 @@ namespace Crow
 			get => requiredLayoutings;
 			set => requiredLayoutings = value;
 		}
-		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
+		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was Widget
 		//		or we could add to the interface the mouse events
 		/// <summary>
 		/// Parent in the graphic tree, used for rendering and layouting
@@ -531,7 +531,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// If true, rendering of GraphicObject is clipped inside client rectangle
+		/// If true, rendering of Widget is clipped inside client rectangle
 		/// </summary>
 		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool ClipToClientRect {
@@ -875,7 +875,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// Font being used in many controls, it is defined in the base GraphicObject class.
+		/// Font being used in many controls, it is defined in the base Widget class.
 		/// </summary>
 		[DesignCategory ("Appearance")][DefaultValue("sans, 12")]
 		public virtual Font Font {
@@ -1198,7 +1198,7 @@ namespace Crow
 			il = dm.GetILGenerator(256);
 			il.DeclareLocal(typeof (object));//store root
 			il.Emit(OpCodes.Nop);
-			//set local GraphicObject to root object passed as 1st argument
+			//set local Widget to root object passed as 1st argument
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Stloc_0);
 

@@ -46,7 +46,7 @@ namespace Crow {
 		}
 		#endregion
 
-		#region GraphicObject Overrides
+		#region Widget Overrides
 		public override bool ArrangeChildren => true;
 		public override void ChildrenLayoutingConstraints (ILayoutable layoutable, ref LayoutingType layoutType) {
 			//Prevent child repositionning in the direction of stacking

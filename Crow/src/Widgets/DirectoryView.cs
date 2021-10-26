@@ -33,7 +33,7 @@ namespace Crow
 			get {
 				return _selectedItem;
 			}
-			set { 
+			set {
 				if (value == _selectedItem)
 					return;
 				_selectedItem = value;

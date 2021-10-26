@@ -9,7 +9,7 @@ namespace Crow
 {
 	[DesignIgnore]
 	public class DockStack : GenericStack
-	{		
+	{
 		#region CTor
 		public DockStack ()	{}
 		public DockStack (Interface iface, string style = null) : base (iface, style) { }
@@ -37,7 +37,7 @@ namespace Crow
 		}
 
 		/*public override bool PointIsIn (ref Point m)
-		{			
+		{
 			if (!base.PointIsIn(ref m))
 				return false;
 
@@ -65,7 +65,7 @@ namespace Crow
 //			base.OnLayoutChanges (layoutType);
 //
 //			if ((layoutType & LayoutingType.Sizing) > 0)
-//				computeRects();			
+//				computeRects();
 //		}
 
 		Rectangle rIn = default(Rectangle);
@@ -95,7 +95,7 @@ namespace Crow
 		public void onDragMouseMove (object sender, MouseMoveEventArgs e)
 		{
 
-			//if (IsDropTarget) {				
+			//if (IsDropTarget) {
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
 				if (dw == null || dw.IsDocked) {
 					base.onMouseMove (sender, e);
@@ -121,14 +121,14 @@ namespace Crow
 							if (lm.X < cb.Left + cb.Width / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Left;
 							else if (lm.X > cb.Right - cb.Width / dockWidthDivisor)
-								dw.DockingPosition = Alignment.Right;							
+								dw.DockingPosition = Alignment.Right;
 						} else {
 							getFocusedChild (lm);
 							if (focusedChild != null) {
 								if (lm.Y < rIn.Top + rIn.Height / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Top;
 								else if (lm.Y > rIn.Bottom - rIn.Height / dockWidthDivisor)
-									dw.DockingPosition = Alignment.Bottom;										
+									dw.DockingPosition = Alignment.Bottom;
 							}
 						}
 					}
@@ -137,18 +137,18 @@ namespace Crow
 							if (lm.Y < cb.Top + cb.Height / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Top;
 							else if (lm.Y > cb.Bottom - cb.Height / dockWidthDivisor)
-								dw.DockingPosition = Alignment.Bottom;							
+								dw.DockingPosition = Alignment.Bottom;
 						} else {
 							getFocusedChild (lm);
 							if (focusedChild != null) {
 								if (lm.X < rIn.Left + rIn.Width / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Left;
 								else if (lm.X > rIn.Right - rIn.Width / dockWidthDivisor)
-									dw.DockingPosition = Alignment.Right;										
+									dw.DockingPosition = Alignment.Right;
 							}
 						}
 					}
-					
+
 				}
 
 				if (curDockPos != dw.DockingPosition)
@@ -160,7 +160,7 @@ namespace Crow
 		protected override void onDragEnter (object sender, DragDropEventArgs e)
 		{
 			base.onDragEnter (sender, e);
-			
+
 		}
 		public override void onDragLeave (object sender, DragDropEventArgs e)
 		{
@@ -168,16 +168,16 @@ namespace Crow
 			//if (dw != null)
 			//	dw.DockingPosition = Alignment.Undefined;
 			base.onDragLeave (sender, e);
-			
+
 		}
-			
+
 		public void Dock(DockWindow dw){
 			DockStack activeStack = this;
 
 			if (Children.Count == 1) {
 				Orientation = dw.DockingPosition.GetOrientation ();
 				if (Children [0] is DockWindow dwc)
-					dwc.DockingPosition = dw.DockingPosition.GetOpposite ();				
+					dwc.DockingPosition = dw.DockingPosition.GetOpposite ();
 			} else if (Children.Count > 0 && dw.DockingPosition.GetOrientation () != Orientation) {
 				activeStack = new DockStack (IFace);
 				activeStack.Orientation = dw.DockingPosition.GetOrientation ();
@@ -201,7 +201,7 @@ namespace Crow
 
 			System.Diagnostics.Debug.WriteLine ("Docking {0} as {2} in {1}", dw.Name, activeStack.Name, dw.DockingPosition);
 			switch (dw.DockingPosition) {
-			case Alignment.Top:						
+			case Alignment.Top:
 				dw.Height = vTreshold;
 				dw.Width = Measure.Stretched;
 				activeStack.InsertChild (0, dw);
@@ -233,7 +233,7 @@ namespace Crow
 			}
 			dw.IsDocked = true;
 		}
-		public void Undock (DockWindow dw){			
+		public void Undock (DockWindow dw){
 			int idx = Children.IndexOf(dw);
 
 			System.Diagnostics.Debug.WriteLine ("undocking child index: {0} ; name={1}; pos:{2} ; childcount:{3}",idx, dw.Name, dw.DockingPosition, Children.Count);
@@ -242,8 +242,8 @@ namespace Crow
 
 			if (Children.Count == 0)//TODO:empty Stack should be removed if not root stack I guess
 				return;
-			
-			if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top) {				
+
+			if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top) {
 				RemoveChild (idx);
 				if (stretchedChild == dw) {
 					stretchedChild = Children [idx];
@@ -262,7 +262,7 @@ namespace Crow
 				if (dsp == null) {
 					Children [0].Width = Children [0].Height = Measure.Stretched;
 					return;
-				}				
+				}
 				//remove level and move remaining obj to level above
 				Widget g = Children [0];
 				RemoveChild (g);
@@ -316,10 +316,10 @@ namespace Crow
 			DockWindow dw = null;
 			string wName = getConfAttrib (conf, ref i).ToString();
 			try {
-				dw = IFace.CreateInstance (wName) as DockWindow;	
+				dw = IFace.CreateInstance (wName) as DockWindow;
 			} catch (Exception ex){
 				Console.WriteLine ($"[importDockWinConfig]{ex}");
-				dw = new DockWindow (IFace);						
+				dw = new DockWindow (IFace);
 			}
 
 			dw.Name = wName;
@@ -329,14 +329,14 @@ namespace Crow
 			dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i).ToString());
 			dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i).ToString());
 			dw.Resizable = false;
-			
+
 			dw.DataSource = dataSource;
 			return dw;
 		}
-		void importConfig (ReadOnlySpan<char> conf, ref int i, object dataSource) {						
+		void importConfig (ReadOnlySpan<char> conf, ref int i, object dataSource) {
 			if (conf [i++] != '(')
 				return;
-			DockWindow dw = null;			
+			DockWindow dw = null;
 			while (i < conf.Length - 4) {
 				string sc = conf.Slice (i, 4).ToString();
 				i += 4;
@@ -346,7 +346,7 @@ namespace Crow
 					tv.Width = Measure.Parse (getConfAttrib (conf, ref i).ToString());
 					tv.Height = Measure.Parse (getConfAttrib (conf, ref i).ToString());
 					this.AddChild (tv);
-					i++;					
+					i++;
 					while (conf [i] != ')') {
 						dw = importDockWinConfig (conf, ref i, dataSource);
 						tv.AddItem (dw);
@@ -354,8 +354,8 @@ namespace Crow
 					}
 					i++;
 					break;
-				case "WIN;":		
-					dw = importDockWinConfig (conf, ref i, dataSource);			
+				case "WIN;":
+					dw = importDockWinConfig (conf, ref i, dataSource);
 					this.AddChild (dw);
 					dw.IsDocked = true;
 					break;
@@ -386,19 +386,19 @@ namespace Crow
 			StringBuilder tmp = new StringBuilder("(");
 
 			for (int i = 0; i < Children.Count; i++) {
-				if (Children [i] is DockWindow dw)					
+				if (Children [i] is DockWindow dw)
 					tmp.Append (dw.GetDockConfigString());
 				else if (Children [i] is TabView tv) {
 					tmp.Append ($"TVI;{tv.Width};{tv.Height};(");
 					foreach (DockWindow d in tv.Items)
-						tmp.Append (d.GetDockConfigString().Substring(4));					
+						tmp.Append (d.GetDockConfigString().Substring(4));
 					tmp.Append (")");
 				}else if (Children [i] is DockStack ds)
 					tmp.Append ($"STK;{ds.Width};{ds.Height};{ds.Orientation};{ds.exportConfig()}");
-				else if (Children [i] is Splitter sp) 
+				else if (Children [i] is Splitter sp)
 					tmp.Append (string.Format("SPL;{0};{1};{2};", sp.Width, sp.Height, sp.Thickness));
 				if (i < Children.Count - 1)
-					tmp.Append ("|");				
+					tmp.Append ("|");
 			}
 
 			tmp.Append (")");

@@ -24,7 +24,7 @@ namespace Crow
 		public event EventHandler Pressed;
 		public event EventHandler Released;
 
-		#region GraphicObject Overrides
+		#region Widget Overrides
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			IsPressed = true;

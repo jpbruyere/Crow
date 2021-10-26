@@ -28,14 +28,14 @@
 							SelectedItemChanged="./onSelectedItemChanged">
 							<Template>
 								<HorizontalStack>
-									<Scroller Name="scroller1">
+									<Scroller Name="ItemsScroller" KeyEventsOverrides="true" >
 										<VerticalStack Height="Fit" VerticalAlignment="Top"
 											Name="ItemsContainer" Margin="0" Spacing="1"/>
 									</Scroller>
 									<ScrollBar Name="scrollbar1" Orientation="Vertical"
-										Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}"
-										CursorRatio="{../scroller1.ChildHeightRatio}"
-										LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+										Value="{²../ItemsScroller.ScrollY}"	Maximum="{../ItemsScroller.MaxScrollY}"
+										CursorRatio="{../ItemsScroller.ChildHeightRatio}"
+										LargeIncrement="{../ItemsScroller.PageHeight}" SmallIncrement="30"
 										Width="14" />
 								</HorizontalStack>
 							</Template>

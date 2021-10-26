@@ -178,7 +178,7 @@ namespace Crow
 				positionContent (LayoutingType.Y);
 		}
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			IsPopped = false;

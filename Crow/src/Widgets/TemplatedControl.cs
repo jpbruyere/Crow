@@ -39,13 +39,12 @@ namespace Crow
 		string caption;
 
 		/// <summary>
-		/// Template path
+		/// Template path or IML fragment.
 		/// </summary>
 		/// <remark>
 		/// The 'null' default value with the 'NOT_SET' field init value  force a loading
 		/// of the default template by passing the first equality check.
 		/// </remark>
-		//TODO: this property should be renamed 'TemplatePath'
 		[DefaultValue(null)]
 		public string Template {
 			get => _template;
@@ -56,6 +55,8 @@ namespace Crow
 
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
+				else if (_template.Trim().StartsWith('<'))//imlfragment
+					loadTemplate (IFace.CreateITorFromIMLFragment (_template).CreateInstance());
 				else
 					loadTemplate (IFace.CreateInstance (_template));
 			}
@@ -74,9 +75,9 @@ namespace Crow
 			}
 		}
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		/// <summary>
-		/// override search method from GraphicObject to prevent
+		/// override search method from Widget to prevent
 		/// searching inside template
 		/// </summary>
 		/// <returns>widget identified by name, or null if not found</returns>

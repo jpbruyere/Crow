@@ -164,7 +164,7 @@ namespace Crow
 			}
 		}
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)

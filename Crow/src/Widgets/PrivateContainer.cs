@@ -34,9 +34,7 @@ namespace Crow
 		#endif
 		protected Widget child;
 		#if DEBUG_LOG
-		internal Widget getTemplateRoot {
-			get { return child; }
-		}
+		internal Widget getTemplateRoot => child;
 		#endif
 
 		protected virtual void SetChild(Widget _child)
@@ -71,7 +69,7 @@ namespace Crow
 				g.Dispose ();
 		}
 
-		#region GraphicObject Overrides
+		#region Widget Overrides
 
 		public override Widget FindByName (string nameToFind)
 		{

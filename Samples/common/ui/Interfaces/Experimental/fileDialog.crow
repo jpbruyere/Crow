@@ -12,7 +12,7 @@
 		<Label Text="{ActiveWidget}" Font="mono, 8"/>
 	</HorizontalStack>
 	<Container>
-	<FileDialog Focusable="true" Resizable="true">
+	<FileDialog Focusable="true" Resizable="true" Width="80%" Height="80%">
 		<Template>
 			<Border Name="SizeHandle" Style="winBorder"  CornerRadius="{./CornerRadius}" Background="{./Background}">
 				<VerticalStack Spacing="0">
@@ -65,7 +65,7 @@
 														Selected = "{Background=${ControlHighlight}}"
 														Unselected = "{Background=Transparent}">
 												<HorizontalStack Spacing="5">
-													<Image Width="20" Height="20" Path="#Crow.Icons.file.svg"/>
+													<Image Width="16" Height="16" Path="#Crow.Icons.file.svg"/>
 													<Label Margin="2" Text="{Name}" Width="Stretched"/>
 												</HorizontalStack>
 											</ListItem>
@@ -76,7 +76,7 @@
 														Selected = "{Background=${ControlHighlight}}"
 														Unselected = "{Background=Transparent}">
 												<HorizontalStack Spacing="5">
-													<Image Width="20" Height="20" Path="#Crow.Icons.folder.svg"/>
+													<Image Width="16" Height="16" Path="#Crow.Icons.folder.svg"/>
 													<Label Margin="2" Text="{Name}" Width="Stretched"/>
 													<Label Margin="2" Text="{LastAccessTime}" />
 												</HorizontalStack>

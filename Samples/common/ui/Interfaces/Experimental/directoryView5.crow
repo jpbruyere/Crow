@@ -1,36 +1,40 @@
-﻿<DirectoryView2 CurrentDirectory="/mnt/devel" Data="{/FileSystemEntries}"> 
-	<Template>
-		<VerticalStack>
-			<Spinner Value="{²./IconSize}" SmallIncrement="1" LargeIncrement="1"/>
-			<VerticalStack Background="DarkGrey" Margin="0">
-				<Scroller Name="scroller1">
-					<Table Columns=",20;Name,Stretched;Size,100;Accessed,Fit" Height="Fit" Width="Stretched" VerticalAlignment="Top"
-						Name="ItemsContainer" Margin="0" Spacing="0"  RowsMargin="0" ColumnSpacing="10"
-						HorizontalLineWidth="0" VerticalLineWidth="1" /> 
-				</Scroller>
+﻿<VerticalStack>
+	<EnumSelector Caption="View Style" EnumValue="{²../dv.ViewStyle}"/>
+	<Spinner Value="{²../dv.IconSize}" SmallIncrement="1" LargeIncrement="1"/>
+	<DirectoryView2 Name="dv" CurrentDirectory="/mnt/devel" Data="{/FileSystemEntries}">
+		<Template>
+			<VerticalStack>
+				<Spinner Value="{²./IconSize}" SmallIncrement="1" LargeIncrement="1"/>
+				<VerticalStack Background="DarkGrey" Margin="0">
+					<Scroller Name="scroller1">
+						<Table Columns=",20;Name,Stretched;Size,100;Accessed,Fit" Height="Fit" Width="Stretched" VerticalAlignment="Top"
+							Name="ItemsContainer" Margin="0" Spacing="0"  RowsMargin="0" ColumnSpacing="10"
+							HorizontalLineWidth="0" VerticalLineWidth="1" /> 
+					</Scroller>
+				</VerticalStack>
 			</VerticalStack>
-		</VerticalStack>
-	</Template>
-	<ItemTemplate DataType="System.IO.DirectoryInfo">
-		<TableRow Width="Stretched" Height="Fit" Focusable="true"
-					BubbleEvents="All" Tooltip="{Name}"
-					Selected="{Background=${ControlHighlight}}"
-					Unselected="{Background=Transparent}">
-			<Image Width="Stretched" Height="Stretched" Path="${FolderIcon}" Margin="0"  />
-			<Label Text="{Name}" Width="Fit"  Font="sans,11" Margin="3"/>
-			<Label Text="" Font="sans,9"/>
-			<Label Text="{LastAccessTime}" Font="sans,9"/>
-		</TableRow>
-	</ItemTemplate>
-	<ItemTemplate DataType="System.IO.FileInfo">
-		<TableRow Width="Stretched" Height="Fit" Focusable="true"
-					BubbleEvents="All" Tooltip="{Name}"
-					Selected="{Background=${ControlHighlight}}"
-					Unselected="{Background=Transparent}">
-			<Image Width="Stretched" Height="Stretched" Path="${FileIcon}" Margin="2"  />
-			<Label Text="{Name}" Width="Fit"  Font="sans,11" Margin="3"/>
-			<Label Text="{Length}" Font="sans,9" TextAlignment="Right"/>
-			<Label Text="{LastAccessTime}" Font="sans,9"/>
-		</TableRow>
-	</ItemTemplate>
-</DirectoryView2>
+		</Template>
+		<ItemTemplate DataType="System.IO.DirectoryInfo">
+			<TableRow Width="Stretched" Height="Fit" Focusable="true"
+						BubbleEvents="All" Tooltip="{Name}"
+						Selected="{Background=${ControlHighlight}}"
+						Unselected="{Background=Transparent}">
+				<Image Width="Stretched" Height="Stretched" Path="${FolderIcon}" Margin="0"  />
+				<Label Text="{Name}" Width="Fit"  Font="sans,11" Margin="3"/>
+				<Label Text="" Font="sans,9"/>
+				<Label Text="{LastAccessTime}" Font="sans,9"/>
+			</TableRow>
+		</ItemTemplate>
+		<ItemTemplate DataType="System.IO.FileInfo">
+			<TableRow Width="Stretched" Height="Fit" Focusable="true"
+						BubbleEvents="All" Tooltip="{Name}"
+						Selected="{Background=${ControlHighlight}}"
+						Unselected="{Background=Transparent}">
+				<Image Width="Stretched" Height="Stretched" Path="${FileIcon}" Margin="2"  />
+				<Label Text="{Name}" Width="Fit"  Font="sans,11" Margin="3"/>
+				<Label Text="{Length}" Font="sans,9" TextAlignment="Right"/>
+				<Label Text="{LastAccessTime}" Font="sans,9"/>
+			</TableRow>
+		</ItemTemplate>
+	</DirectoryView2>
+</VerticalStack>

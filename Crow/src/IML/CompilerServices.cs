@@ -280,7 +280,7 @@ namespace Crow.IML
 #if DEBUG_BINDING_FUNC_CALLS
 			Console.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
 #endif
-            MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
+            MemberInfo mi = t.GetMember (member, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.FirstOrDefault();
 			if (mi == null)
 				mi = CompilerServices.SearchExtMethod (t, member);
 			return mi;
@@ -507,7 +507,7 @@ namespace Crow.IML
 				emitGetChild (il, dest [i].CrowType, dest [i + 1].Index);
 		}
 		/// <summary>
-		/// Emits msil to fetch chil instance of current GraphicObject on the stack
+		/// Emits msil to fetch chil instance of current Widget on the stack
 		/// </summary>
 		/// <param name="il">Il generator</param>
 		/// <param name="parentType">Parent type</param>
@@ -879,12 +879,16 @@ namespace Crow.IML
 				return dataType;
 			}
 			foreach (Assembly a in Interface.crowAssemblies) {
-				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name != strDataType && expT.FullName != strDataType)
-						continue;
-					if (!knownTypes.ContainsKey(strDataType))
-						knownTypes.Add (strDataType, expT);
-					return expT;
+				try {
+					foreach (Type expT in a.GetExportedTypes ()) {
+						if (expT.Name != strDataType && expT.FullName != strDataType)
+							continue;
+						if (!knownTypes.ContainsKey(strDataType))
+							knownTypes.Add (strDataType, expT);
+						return expT;
+					}
+				}catch (Exception e) {
+					Debug.WriteLine ($"Crow.getTypeFromeName error: {e.Message}");
 				}
 			}
 			knownTypes.Add (strDataType, null);

@@ -89,9 +89,26 @@ namespace Crow
 			}
 		}
 
+		static IntPtr resolveUnmanaged(Assembly assembly, String libraryName)
+		{
+
+			switch (libraryName)
+			{
+				/*case "glfw3":
+					return NativeLibrary.Load("glfw", assembly, null);*/
+				case "rsvg-2.40":
+					return NativeLibrary.Load("rsvg-2", assembly, null);
+			}
+			Console.WriteLine($"[UNRESOLVE] {assembly} {libraryName}");
+			return IntPtr.Zero;
+		}
+
+
 		#region CTOR
 		static Interface ()
 		{
+			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).ResolvingUnmanagedDll += resolveUnmanaged;
+
 			CROW_CONFIG_ROOT =
 				System.IO.Path.Combine (
 					Environment.GetFolderPath (Environment.SpecialFolder.UserProfile),
@@ -426,7 +443,7 @@ namespace Crow
 		#region events delegates
 
 		static CursorPosDelegate HandleCursorPosDelegate = (window, xPosition, yPosition) => {
-			windows [window].OnMouseMove ((int)xPosition, (int)yPosition);
+			windows [window].OnMouseMove ((int)(xPosition / windows [window].ZoomFactor), (int)(yPosition / windows [window].ZoomFactor));
 		};
 		static MouseButtonDelegate HandleMouseButtonDelegate = (IntPtr window, MouseButton button, InputAction action, Modifier mods) => {
 			if (action == InputAction.Release)
@@ -634,8 +651,8 @@ namespace Crow
 		public static Antialias Antialias = Antialias.Subpixel;
 
 		/// <summary>
-		/// Each control need a ref to the root interface containing it, if not set in GraphicObject.currentInterface,
-		/// the ref of this one will be stored in GraphicObject.currentInterface
+		/// Each control need a ref to the root interface containing it, if not set in Widget.currentInterface,
+		/// the ref of this one will be stored in Widget.currentInterface
 		/// </summary>
 		//protected static Interface CurrentInterface;
 		#endregion
@@ -972,7 +989,7 @@ namespace Crow
 			return Instantiator.CreateFromImlFragment (this, imlFragment);
 		}
 		/// <summary>
-		/// Create an instance of a GraphicObject and add it to the GraphicTree of this Interface
+		/// Create an instance of a Widget and add it to the GraphicTree of this Interface
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
@@ -1001,7 +1018,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
+		/// Create an instance of a Widget linked to this interface but not added to the GraphicTree
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
@@ -1273,7 +1290,21 @@ namespace Crow
 					Debug.WriteLine ("SolidBackground property only available on unix.");
 			}
 		}
-
+		double zoomFactor = 1.0;
+		public double ZoomFactor {
+			get => zoomFactor;
+			set {
+				if (zoomFactor == value)
+					return;
+				zoomFactor = value;
+				NotifyValueChanged (zoomFactor);
+				lock (UpdateMutex) {
+					foreach (Widget g in GraphicTree)
+						g.RegisterForLayouting (LayoutingType.All);
+					registerRefreshClientRectangle ();
+				}
+			}
+		}
 
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
@@ -1282,6 +1313,8 @@ namespace Crow
 
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
 			if (!clipping.IsEmpty) {
+				ctx.Scale (zoomFactor,zoomFactor);
+
 #if VKVG
 				clear (ctx);
 #else
@@ -1692,7 +1725,7 @@ namespace Crow
 		/// Ask OS to force the mouse position to the actual coordinate of Interface.MousePosition
 		/// </summary>
 		public virtual void ForceMousePosition () {
-			Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
+			Glfw3.SetCursorPosition (hWin, MousePosition.X * ZoomFactor, MousePosition.Y * ZoomFactor);
 		}
 
 		/// <summary>Processes mouse move events from the root container, this function
@@ -2169,8 +2202,8 @@ namespace Crow
 			set { throw new NotImplementedException (); }
 		}
 
-		public Rectangle ClientRectangle => clientRectangle;
-		public Rectangle GetClientRectangleForChild (ILayoutable child) => clientRectangle;
+		public Rectangle ClientRectangle => clientRectangle.Scaled (1.0/zoomFactor);
+		public Rectangle GetClientRectangleForChild (ILayoutable child) => ClientRectangle;
 		public Interface HostContainer => this;
 
 		public Rectangle getSlot () => ClientRectangle;

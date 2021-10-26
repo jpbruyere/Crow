@@ -37,6 +37,8 @@ namespace ShowCase
 				app.SetWindowIcon ("#Crow.Icons.crow.png");
 				//app.Theme = @"C:\Users\Jean-Philippe\source\Crow\Themes\TestTheme";
 				CurrentProgramInstance = app;
+				Interface.UPDATE_INTERVAL = 50;
+				Interface.POLLING_INTERVAL = 5;
 
 				app.Run ();
 			}

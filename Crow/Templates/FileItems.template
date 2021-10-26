@@ -3,6 +3,7 @@
 </ItemTemplate>
 <ItemTemplate DataType="System.IO.FileInfo">
 	<ListItem Height="Fit"
+				BubbleEvents="All"
 				Selected = "{Background=${ControlHighlight}}"
 				Unselected = "{Background=Transparent}">
 		<HorizontalStack>
@@ -13,6 +14,7 @@
 </ItemTemplate>
 <ItemTemplate DataType="System.IO.DirectoryInfo">
 	<ListItem Height="Fit"
+				BubbleEvents="All"
 				Selected = "{Background=${ControlHighlight}}"
 				Unselected = "{Background=Transparent}">
 		<HorizontalStack>

@@ -112,7 +112,7 @@ namespace Crow
 		/// <summary>
 		/// Opacity parameter for the image
 		/// </summary>
-		// TODO:could be moved in GraphicObject
+		// TODO:could be moved in Widget
 		[DefaultValue(1.0)]
 		public virtual double Opacity {
 			get { return opacity; }
@@ -157,7 +157,7 @@ namespace Crow
 		}
 		#endregion
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		public override int measureRawSize (LayoutingType lt)
 		{
 			if (_pic == null)

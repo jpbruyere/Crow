@@ -1,0 +1,18 @@
+﻿<VerticalStack>
+	<VerticalStack Width="Fit" Background="DarkSlateGrey" Margin="10" Height="Fit">
+		<HorizontalStack Height="Fit" Spacing="10">
+			<Label Text="Value:"/>
+			<Label Text="{../../slider.Value}" Background="Onyx" Margin="1" Width="40" TextAlignment="Right"/>
+		</HorizontalStack>
+		<Slider Name="slider" Height="10" Width="200" Background="DarkGrey" LargeIncrement="20" SmallIncrement="5"
+			Minimum="10" Maximum="1000" Value="{²RandomProgressItemCount}"/>
+	</VerticalStack>
+	<ListBox UseLoadingThread="false" Data="{RandomProgressList}">
+		<Template>
+			<Wrapper Name="ItemsContainer"/>
+		</Template>
+		<ItemTemplate>
+			<ProgressBar Maximum="{Maximum}" Value="{Value}" Height="10" Width="50"/>
+		</ItemTemplate>
+	</ListBox>
+</VerticalStack>
