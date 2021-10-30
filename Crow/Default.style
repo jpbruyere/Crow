@@ -107,7 +107,7 @@ TextBox {
 	CursorColor = "Black";
 	Focusable = "True";
 	Width = "Inherit";
-	Height = "Inherit";
+	Height = "Fit";
 	//Text = "TextBox";
 	Margin = "1";
 }
@@ -336,7 +336,7 @@ TableHeaderLabel {
 }
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
-MessageBox, Popper, Slider, Spinner, TextBox, NumericControl {
+MessageBox, Popper, Slider, Spinner, TextInheritBox, NumericControl {
 	Focusable = "true";
 	Foreground="${ControlForeground}";
 	Height = "Fit";

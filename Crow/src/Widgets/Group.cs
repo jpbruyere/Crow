@@ -98,7 +98,7 @@ namespace Crow
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		public override int measureRawSize (LayoutingType lt)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this, lt);

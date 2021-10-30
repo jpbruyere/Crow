@@ -33,5 +33,7 @@ namespace Crow.Text
 		public override string ToString() => $"{Start},{End}";
 		public bool Contains (int absolutePosition)
 			=> absolutePosition >= Start && absolutePosition < End;
+		public bool Contains (TextSpan span)
+			=> Start <= span.Start && End >= span.End;
 	}
 }

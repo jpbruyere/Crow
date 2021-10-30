@@ -1,12 +1,9 @@
 ﻿<TabView Orientation="Horizontal">
 	<Template>
-		<GenericStack Orientation="{./OppositeOrientation}" Spacing="0" Background="{./Background}"> 
+		<VerticalStack Spacing="0" Background="{./Background}"> 
 			<ListBox  Data="{./Items}" Height="Fit" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedItem="{²./SelectedItem}"> 
 				<Template>
 					<VerticalStack Spacing="0" >
-						<Scroller Name="ItemsScroller"  >
-							<GenericStack Orientation="{../../../../../Orientation}" Width="Fit" Name="ItemsContainer" HorizontalAlignment="Left"/>
-						</Scroller>
 						<ScrollBar Orientation="Horizontal" Foreground="RoyalBlue" Height="6" Width="Stretched" CornerRadius="3"
 							Value="{²../ItemsScroller.ScrollX}"
 							LargeIncrement="{../ItemsScroller.PageWidth}" SmallIncrement="1"
@@ -17,6 +14,9 @@
 								</Container>
 							</Template>
 						</ScrollBar>
+						<Scroller Name="ItemsScroller"  >
+							<HorizontalStack Width="Fit" Name="ItemsContainer" HorizontalAlignment="Left"/>
+						</Scroller>
 					</VerticalStack>
 				</Template>
 				<ItemTemplate>
@@ -28,7 +28,7 @@
 				</ItemTemplate>
 			</ListBox>
 			<Group Name="ItemsContainer" />
-		</GenericStack>
+		</VerticalStack>
 	</Template>
 	<GroupBox Name="item 1" Caption="item 1" IsVisible="true" Background="Violet"/>			
 	<GroupBox Name="item 2" Caption="item 2" IsVisible="false" Background="CornflowerBlue"/>

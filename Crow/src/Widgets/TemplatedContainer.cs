@@ -56,7 +56,7 @@ namespace Crow
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
 
-#region GraphicObject overrides
+#region Widget overrides
 		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)

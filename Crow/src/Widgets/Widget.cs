@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -25,7 +25,7 @@ using System.IO;
 namespace Crow
 {
 	/// <summary>
-	/// The base class for all the graphic tree elements.
+	/// The base class for all the ui components.
 	/// </summary>
 	public class Widget : ILayoutable, ICommandHost, IDisposable
 	{
@@ -189,9 +189,9 @@ namespace Crow
 #endif
 
 		/// <summary>
-		/// interface this widget is bound to, this should not be changed once the instance is created
+		/// The interface this widget is bound to when instantiated, 
 		/// </summary>
-		public Interface IFace = null;
+		public readonly Interface IFace = null;
 
 		/// <summary>
 		/// contains the dirty rectangles in the coordinate system of the cache. those dirty zones
@@ -246,7 +246,7 @@ namespace Crow
 		/// <summary>
 		/// This constructor **must** be used when creating widget from code.
 		///
-		/// When creating new widgets derived from GraphicObject, both parameterless and this constructors are
+		/// When creating new widgets, both parameterless and this constructors are
 		/// facultatives, the compiler will create the parameterless one automaticaly if no other one exists.
 		/// But if you intend to be able to create instances of the new widget in code and override the constructor
 		/// with the Interface parameter, you **must** also provide the override of the parameterless constructor because
@@ -262,7 +262,7 @@ namespace Crow
 		#endregion
 		//internal bool initialized = false;
 		/// <summary>
-		/// Initialize this Graphic object instance by setting style and default values and loading template if required
+		/// Initialize this Graphic object instance by setting style and default values and loading template if required.
 		/// </summary>
 		public void Initialize(){
 			loadDefaultValues ();
@@ -329,8 +329,12 @@ namespace Crow
 		public Rectangle LastPaintedSlot;
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
 		public bool IsQueueForClipping = false;
-		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
+		/// <summary>drawing Cache, if null, a redraw is done on repaint, cached or not</summary>
 		public Surface bmp;
+		/// <summary>
+		/// If the widget dirty state is set to true, a full redraw will be triggered on paint.
+		/// </summary>
+		//TODO:ensure this is not redondant with bmp cache.
 		public bool IsDirty = true;
 		/// <summary>
 		/// This size is computed on each child' layout changes.
@@ -342,15 +346,23 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
+		/// <summary>
+		/// Curently queued layouting passes.
+		/// </summary>
+		/// <value></value>
 		[XmlIgnore]public LayoutingType RegisteredLayoutings {
 			get => registeredLayoutings;
 			set => registeredLayoutings = value;
 		}
+		/// <summary>
+		/// Required layouting passes before this widget may be renderend.
+		/// </summary>
+		/// <value></value>
 		[XmlIgnore]public LayoutingType RequiredLayoutings {
 			get => requiredLayoutings;
 			set => requiredLayoutings = value;
 		}
-		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
+		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was Widget
 		//		or we could add to the interface the mouse events
 		/// <summary>
 		/// Parent in the graphic tree, used for rendering and layouting
@@ -375,6 +387,10 @@ namespace Crow
 		/// </summary>
 		internal Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget;
 
+		/// <summary>
+		/// Logical parenting is used to override the default Graphic tree hierarchy for datasource resolution.
+		/// </summary>
+		/// <value></value>
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
 			set {
@@ -390,6 +406,10 @@ namespace Crow
 				onLogicalParentChanged (this, dsce);
 			}
 		}
+		/// <summary>
+		/// Local coordinates of the client rectangle. The x and y are equal to the margin.
+		/// </summary>
+		/// <value></value>
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
@@ -410,7 +430,11 @@ namespace Crow
 					r + Parent.ClientRectangle.Position : Parent.ContextCoordinates (r)
 				: Parent != null ? r + Parent.ClientRectangle.Position : r;
 		}
-
+		/// <summary>
+		/// Compute coordintates relative to another widget.
+		/// </summary>
+		/// <param name="target"></param>
+		/// <returns></returns>
 		public virtual Rectangle RelativeSlot (Widget target)
 		{
 			if (this == target)
@@ -419,6 +443,11 @@ namespace Crow
 				return Slot + p.RelativeSlot (target).Position + Margin;
 			return Slot + new Point(Margin, Margin);
 		}
+		/// <summary>
+		/// Widget coordintate relative to the main drawing surface, normally a GLFW window.
+		/// </summary>
+		/// <param name="r"></param>
+		/// <returns></returns>
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
 			try {
 				return
@@ -430,6 +459,11 @@ namespace Crow
 		}
 		public virtual Rectangle getSlot () => Slot;
 		#endregion
+		/// <summary>
+		/// Used to convert top window coordinate to widget local ones (for mouse for example).
+		/// </summary>
+		/// <param name="p"></param>
+		/// <returns></returns>
 		public Point ScreenPointToLocal(Point p){
 			Point pt = p - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft;
 			/*if (pt.X < 0)
@@ -531,7 +565,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// If true, rendering of GraphicObject is clipped inside client rectangle
+		/// If true, rendering of Widget is clipped inside client rectangle
 		/// </summary>
 		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool ClipToClientRect {
@@ -875,7 +909,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// Font being used in many controls, it is defined in the base GraphicObject class.
+		/// Font being used in many controls, it is defined in the base Widget class.
 		/// </summary>
 		[DesignCategory ("Appearance")][DefaultValue("sans, 12")]
 		public virtual Font Font {
@@ -1198,7 +1232,7 @@ namespace Crow
 			il = dm.GetILGenerator(256);
 			il.DeclareLocal(typeof (object));//store root
 			il.Emit(OpCodes.Nop);
-			//set local GraphicObject to root object passed as 1st argument
+			//set local Widget to root object passed as 1st argument
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Stloc_0);
 

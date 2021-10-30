@@ -11,31 +11,13 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using Crow.Drawing;
+using System.Diagnostics;
 
 namespace Samples
 {
 	public class SampleBase : Interface
 	{
-#if NETCOREAPP
-		static IntPtr resolveUnmanaged(Assembly assembly, String libraryName)
-		{
 
-			switch (libraryName)
-			{
-				case "glfw3":
-					return NativeLibrary.Load("glfw", assembly, null);
-				case "rsvg-2.40":
-					return NativeLibrary.Load("rsvg-2", assembly, null);
-			}
-			Console.WriteLine($"[UNRESOLVE] {assembly} {libraryName}");
-			return IntPtr.Zero;
-		}
-
-		static SampleBase()
-		{
-			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).ResolvingUnmanagedDll += resolveUnmanaged;
-		}
-#endif
 		public SampleBase(IntPtr hWin) : base(800, 600, hWin) { }
 		public SampleBase() : base(800, 600, true, true) { }
 		public SampleBase(int width, int height, bool startUIThread, bool createSurface) :
@@ -435,6 +417,64 @@ namespace Samples
 					return true;
 			}
 			return base.OnKeyDown(e);
+		}
+		public IEnumerable<RandomProgress> RandomProgressList {
+			get {
+				for (int i=0; i< RandomProgressItemCount; i++)
+					yield return new RandomProgress ();
+			}
+		}
+		int randomProgressItemCount = 10;
+		public int RandomProgressItemCount {
+			get => randomProgressItemCount;
+			set {
+				if (randomProgressItemCount == value)
+					return;
+				randomProgressItemCount = value;
+				NotifyValueChanged (randomProgressItemCount);
+				NotifyValueChanged ("RandomProgressList", RandomProgressList);
+			}
+		}
+
+		public class RandomProgress : IValueChange {
+			static Random rnd = new Random();
+			public event EventHandler<ValueChangeEventArgs> ValueChanged;
+			public void NotifyValueChanged(object _value, [CallerMemberName] string caller = null)
+				=> ValueChanged.Raise(this, new ValueChangeEventArgs(caller, _value));
+			public void NotifyValueChanged(string membername, object _value)
+				=> ValueChanged.Raise(this, new ValueChangeEventArgs(membername, _value));
+			public RandomProgress () {
+				step = rnd.Next (10);
+				max = rnd.Next (100, 1000);
+				sleep = rnd.Next (2,200);
+				Thread t = new Thread(increment);
+				t.IsBackground = true;
+				t.Start ();
+
+				NotifyValueChanged ("Maximum", max);
+			}
+			int val, step, max, sleep;
+			public int Value {
+				get => val;
+				set {
+					if (val == value)
+						return;
+					val = value;
+					NotifyValueChanged (val);
+				}
+			}
+			public int Maximum => max;
+
+			void increment() {
+				Stopwatch sw = Stopwatch.StartNew();
+				while (sw.ElapsedMilliseconds < 10000) {
+					Value += step;
+					if (Value > max)
+						Value = 0;
+					Thread.Sleep (sleep);
+				}
+				Value = max;
+			}
 		}
 	}
 }

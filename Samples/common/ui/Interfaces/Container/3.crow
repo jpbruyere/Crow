@@ -1,4 +1,10 @@
 ﻿<?xml version="1.0"?>
 <Container Background="Blue" Margin="10" Fit="true">
-	<Label Text="test" Margin="10" Fit="true" Background="SeaGreen"/>
+	<Label   Multiline="true" Text="this is a test of&#10;a multiline textbox&#13;
+and another line&#13;
+and another line&#13;
+and another line a little bit longuer&#13;
+and another line&#13;
+and another line
+" Margin="10" Fit="true" Background="SeaGreen" TextAlignment="Center"/>
 </Container>

@@ -99,12 +99,12 @@ namespace Crow
 
 		#endregion
 
-		#region GraphicObject Overrides
+		#region Widget Overrides
 //		protected override Size measureRawSize ()
 //		{
 //			Size tmp = new Size ();
 //
-//			foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
+//			foreach (Widget c in Children.Where(ch=>ch.Visible)) {
 //				tmp.Width = Math.Max (tmp.Width, c.Slot.Width);
 //				tmp.Height = Math.Max (tmp.Height, c.Slot.Height);
 //			}

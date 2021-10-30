@@ -144,5 +144,12 @@ namespace Crow.Text
 				(Peak == '\xD' && (buffer [curPos + 1]  == '\xA' || buffer [curPos + 1]  == '\x85'));
 
 		}
+		/// <summary>
+		/// next char sequence has already been tested as eol, advance 1 or two char depending on eol format.
+		/// </summary>
+		public void ReadEol () {
+			if (Read () == '\xD')
+				Advance();
+		}
     }
 }

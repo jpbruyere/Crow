@@ -41,9 +41,7 @@ namespace Crow.IML {
 	{
 		#region Dynamic Method ID generation
 		static long curId = 0;
-		internal static long NewId {
-			get { return curId++; }
-		}
+		internal static long NewId => curId++;
 		#endregion
 
 		internal static Dictionary<string, Type> knownGOTypes = new Dictionary<string, Type> ();
@@ -141,7 +139,7 @@ namespace Crow.IML {
 		#endregion
 
 		/// <summary>
-		/// Creates a new instance of the GraphicObject compiled in the instantiator
+		/// Creates a new instance of the Widget compiled in the instantiator
 		/// </summary>
 		/// <returns>The new graphic object instance</returns>
 		public Widget CreateInstance(){
@@ -205,7 +203,7 @@ namespace Crow.IML {
 			loader = (InstanciatorInvoker)ctx.dm.CreateDelegate (typeof (InstanciatorInvoker), this);
 		}
 		/// <summary>
-		/// read first node to set GraphicObject class for loading
+		/// read first node to set Widget class for loading
 		/// and let reader position on that node
 		/// </summary>
 		Type findRootType (XmlReader reader)
@@ -1500,7 +1498,12 @@ namespace Crow.IML {
 				il.Emit (OpCodes.Stfld, mi as FieldInfo);
 			else if (mi.MemberType == MemberTypes.Property) {
 				MethodInfo mt = (mi as PropertyInfo).GetSetMethod ();
-				il.Emit (mt.IsVirtual?OpCodes.Callvirt:OpCodes.Call, mt);
+				if (mt == null) {
+					Console.WriteLine ($"[emitSetValue]No set method found for: {mi}");
+					il.Emit (OpCodes.Pop);//pop value
+					il.Emit (OpCodes.Pop);//pop set target instance
+				} else
+					il.Emit (mt.IsVirtual?OpCodes.Callvirt:OpCodes.Call, mt);
 			} else
 				throw new NotImplementedException ();
 		}

@@ -606,7 +606,7 @@ namespace Crow
 				selectionStart = null;
 		}
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		public override bool UpdateLayout (LayoutingType layoutType) {
 			if ((LayoutingType.Sizing | layoutType) != LayoutingType.None) {
 				if (!System.Threading.Monitor.TryEnter (linesMutex))

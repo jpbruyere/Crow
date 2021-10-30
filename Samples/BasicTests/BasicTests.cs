@@ -38,7 +38,7 @@ namespace Samples
 			//testFiles = new string [] { @"Interfaces/Stack/StretchedInFit4.crow" };
 			//testFiles = new string [] { @"Interfaces/TemplatedGroup/1.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker2.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Widget", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
@@ -63,7 +63,7 @@ namespace Samples
 				switch (key) {
 				case Key.Escape:
 					Quit ();
-					break;				
+					break;
 				case Key.F3:
 					idx--;
 					break;

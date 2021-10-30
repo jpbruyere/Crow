@@ -33,7 +33,7 @@ namespace Crow
 			}
 		}
 
-		#region GraphicObject override
+		#region Widget override
 		public override ILayoutable Parent {
 			get => base.Parent;
 			set {

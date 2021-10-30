@@ -85,7 +85,7 @@ namespace Crow {
 		/// <summary>
 		/// Keep track of expanded subnodes and closed time to unload
 		/// </summary>
-		//Dictionary<GraphicObject, Stopwatch> nodes = new Dictionary<GraphicObject, Stopwatch>();
+		//Dictionary<Widget, Stopwatch> nodes = new Dictionary<Widget, Stopwatch>();
 		internal List<Widget> nodes = new List<Widget>();//TODO:close time tracking
 		/// <summary>
 		/// Item templates file path, on disk or embedded.
@@ -353,7 +353,7 @@ namespace Crow {
 		}
 
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
@@ -725,9 +725,33 @@ namespace Crow {
 				if (SelectedIndex < Items.Count - 1)
 					SelectedIndex++;
 				break;
+			case Glfw.Key.PageUp:
+				pagedSelection (true);
+				break;
+			case Glfw.Key.PageDown:
+				pagedSelection (false);
+				break;
+			case Glfw.Key.Home:
+				SelectedIndex = 0;
+				break;
+			case Glfw.Key.End:
+				SelectedIndex = Items.Count - 1;
+				break;
 			default:
 				base.onKeyDown(sender, e);
 				break;
+			}
+		}
+
+		void pagedSelection (bool up) {
+			if (scroller != null && selectedItemContainer != null  && itemsContainer is GenericStack gs) {
+				Rectangle scrollerCb = scroller.ClientRectangle;
+				Rectangle itemCb = selectedItemContainer.Slot;
+				int itemsPerPage = gs.Orientation == Orientation.Vertical ? scrollerCb.Height / itemCb.Height : scrollerCb.Width / itemCb.Width;
+				if (up)
+					SelectedIndex = Math.Max (0, SelectedIndex - itemsPerPage);
+				else
+					SelectedIndex = Math.Min (Items.Count - 1, SelectedIndex + itemsPerPage);
 			}
 		}
 	}

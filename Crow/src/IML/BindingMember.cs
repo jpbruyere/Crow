@@ -36,7 +36,7 @@ namespace Crow.IML
 	/// - '../' => 1 level up in graphic tree
 	/// - './' or '/' => template root level
 	/// - '.Name1.Name2' current level properties
-	/// - 'name.prop' named descendant in graphic tree, search with 'FindByName' method of GraphicObject
+	/// - 'name.prop' named descendant in graphic tree, search with 'FindByName' method of Widget
 	/// </summary>
 	public class BindingMember
 	{

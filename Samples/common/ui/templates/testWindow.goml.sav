@@ -7,7 +7,7 @@
 
 		<HorizontalStack Width="0" Height="-1" Margin="10" Background="BlueCrayola">
 			<Checkbox Height="-1" Width="80"/>
-			<GraphicObject Width="0"/>
+			<Widget Width="0"/>
 			<Checkbox Height="-1" Width="80"/>
 		</HorizontalStack>
 		<Groupbox Text="test"  Height="-1" Width="-1" Margin="5">

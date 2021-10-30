@@ -1,0 +1,38 @@
+﻿<VerticalStack>
+	<EnumSelector Caption="View Style" EnumValue="{²../dv.ViewStyle}"/>
+	<Spinner Value="{²../dv.IconSize}" SmallIncrement="1" LargeIncrement="1"/>
+	<DirectoryView2 Name="dv" CurrentDirectory="/mnt/devel" Data="{/FileSystemEntries}">
+		<Template>
+			<VerticalStack>
+				<VerticalStack Background="Grey" Margin="5">
+					<Scroller Name="scroller1">
+						<Wrapper Orientation="Horizontal" Height="Stretched" Width="Fit" HorizontalAlignment="Left"
+							Name="ItemsContainer" Margin="0" Spacing="2"/>
+					</Scroller>
+				</VerticalStack>
+			</VerticalStack>
+		</Template>
+		<ItemTemplate DataType="System.IO.FileInfo">
+			<ListItem Width="Fit" Height="Fit"
+						BubbleEvents="All" Tooltip="{Name}"
+						Selected = "{Background=${ControlHighlight}}"
+						Unselected = "{Background=Transparent}">
+				<HorizontalStack Spacing="5">
+					<Image Margin="0"  Width="16" Height="16" Path="${FileIcon}" Scaled="true"/>
+					<Label Text="{Name}"  Width="Fit" Font="sans,9" />
+				</HorizontalStack>
+			</ListItem>
+		</ItemTemplate>
+		<ItemTemplate DataType="System.IO.DirectoryInfo">
+			<ListItem Width="Fit" Height="Fit"
+						BubbleEvents="All" Tooltip="{Name}"
+						Selected = "{Background=${ControlHighlight}}"
+						Unselected = "{Background=Transparent}">
+				<HorizontalStack Spacing="5">
+					<Image Margin="0"  Width="16" Height="16" Path="${FolderIcon}" Scaled="true"/>
+					<Label Text="{Name}"  Width="Fit" Font="sans,9"/>
+				</HorizontalStack>
+			</ListItem>
+		</ItemTemplate>
+	</DirectoryView2>
+</VerticalStack>

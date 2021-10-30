@@ -86,7 +86,7 @@ namespace Crow
 		}
 		#endregion
 
-		#region GraphicObject override
+		#region Widget override
 		/*[XmlIgnore]public override Rectangle ClientRectangle {
 			get {
 				Rectangle cb = base.ClientRectangle;

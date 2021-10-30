@@ -26,6 +26,6 @@
 		<!-- Experimental vkvg backend, testing only-->
 		<CrowVkvgBackend>false</CrowVkvgBackend>
 
-		<GlfwSharpVersion>0.2.12-beta</GlfwSharpVersion>
+		<GlfwSharpVersion>0.2.14</GlfwSharpVersion>
 	</PropertyGroup>
 </Project>

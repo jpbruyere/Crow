@@ -41,7 +41,7 @@ namespace Crow
 		}
 		[DefaultValue("/home")]
 		public virtual string CurrentDirectory {
-			get { return curDir; }
+			get => curDir;
 			set {
 				if (curDir == value)
 					return;
@@ -53,7 +53,7 @@ namespace Crow
 
 		[DefaultValue("*")]
 		public virtual string SearchPattern {
-			get { return searchPattern; }
+			get => searchPattern;
 			set {
 				if (searchPattern == value)
 					return;
@@ -64,7 +64,7 @@ namespace Crow
 		}
 		[DefaultValue(false)]
 		public virtual bool ShowHidden {
-			get { return showHidden; }
+			get => showHidden;
 			set {
 				if (showHidden == value)
 					return;
@@ -74,7 +74,7 @@ namespace Crow
 		}
 		[DefaultValue(true)]
 		public virtual bool ShowFiles {
-			get { return showFiles; }
+			get => showFiles;
 			set {
 				if (showFiles == value)
 					return;
@@ -83,7 +83,7 @@ namespace Crow
 			}
 		}
 		public string SelectedFile {
-			get { return _selectedFile; }
+			get => _selectedFile;
 			set {
 				if (value == _selectedFile)
 					return;
@@ -92,7 +92,7 @@ namespace Crow
 			}
 		}
 		public string SelectedDirectory {
-			get { return _selectedDir; }
+			get => _selectedDir;
 			set {
 				if (value == _selectedDir)
 					return;

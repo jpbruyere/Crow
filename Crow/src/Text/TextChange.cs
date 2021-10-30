@@ -14,8 +14,9 @@ namespace Crow.Text
         public readonly string ChangedText;
 
         public int End => Start + Length;
+        public int End2 => Start + (string.IsNullOrEmpty (ChangedText) ? 0 : CharDiff);
 
-		public int CharDiff => ChangedText.Length - Length;
+		public int CharDiff => string.IsNullOrEmpty (ChangedText) ? - Length : ChangedText.Length - Length;
         public TextChange (int position, int length, string changedText) {
             Start = position;
             Length = length;

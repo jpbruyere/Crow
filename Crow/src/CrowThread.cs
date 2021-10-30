@@ -33,7 +33,7 @@ namespace Crow
 		public void Cancel(){
 			if (thread.IsAlive & !cancelRequested){
 				cancelRequested = true;
-				while (thread.IsAlive) 
+				while (thread.IsAlive)
 					Thread.Sleep (1);
 				thread.Join ();
 			}

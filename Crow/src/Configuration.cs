@@ -135,7 +135,7 @@ namespace Crow
 		void savingThread(){
 			while(true){
 				if (isDirty)
-					Save ();				
+					Save ();
 				Thread.Sleep (100);
 			}
 		}

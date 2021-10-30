@@ -47,7 +47,7 @@ namespace Crow.IML
 
 			il.DeclareLocal (typeof (Widget));
 			il.Emit (OpCodes.Nop);
-			//set local GraphicObject to root object
+			//set local Widget to root object
 			ConstructorInfo ci = rootType.GetConstructor (
 					BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
 					null, Type.EmptyTypes, null);

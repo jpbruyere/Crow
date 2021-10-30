@@ -93,7 +93,7 @@ namespace Crow
 		}
 		#endregion
 
-		#region GraphicObject Overrides
+		#region Widget Overrides
 		public override int measureRawSize (LayoutingType lt)
 		{
 			int tmp = 0;

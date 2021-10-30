@@ -1,0 +1,91 @@
+﻿<?xml version="1.0"?>
+<FileDialog Caption="Open File" CurrentDirectory="/" SearchPattern="*.*">
+	<Template>
+		<Border Name="SizeHandle" Style="winBorder"  CornerRadius="{./CornerRadius}" Background="{./Background}">
+			<VerticalStack Spacing="0">
+				<HorizontalStack Background="${WindowTitleBarBackground}" Margin="0" Spacing="0" Height="Fit">
+					<Widget Width="5"/>
+					<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
+					<Label Name="MoveHandle" Width="Stretched" Foreground="${WindowTitleBarForeground" Margin="2" TextAlignment="Center" Text="{./Caption}" />
+					<Border CornerRadius="0" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
+						MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+						<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
+							 MouseClick="./onQuitPress"/>
+					</Border>
+					<Widget Width="5"/>
+				</HorizontalStack>
+				<Container Name="Content" MinimumSize="50,50" Background="Jet">
+					<VerticalStack Margin="1">
+						<HorizontalStack Height="Fit">
+							<Button Fit="true" Caption="Up" MouseClick="./goUpDirClick">
+								<Image Margin="2" Width="14" Height="14"
+									Path="#Crow.Icons.level-up.svg"/>
+							</Button>
+							<TextBox Style="TxtInFileDialog" Text="{²./CurrentDirectory}"/>
+						</HorizontalStack>
+						<DirectoryView ShowHidden="{²../cbShowHidden.IsChecked}" FileMask="{²../txtFileMask.Text}" ShowFiles="{²../cbShowFiles.IsChecked}"
+								Name="fv" CurrentDirectory="{./CurrentDirectory}" SelectedItemChanged="./onFVSelectedItemChanged"
+								Width="100%" Margin="0" MouseDoubleClick="./onFileSelectDblClick">
+							<Template>
+								<ListBox Name="fileView" Data="{./FileSystemEntries}"
+									SelectedItemChanged="./onSelectedItemChanged">
+									<Template>
+										<HorizontalStack>
+											<Scroller Name="scroller1">
+												<VerticalStack Height="Fit" VerticalAlignment="Top"
+													Name="ItemsContainer" Margin="0" Spacing="1"/>
+											</Scroller>
+											<ScrollBar Name="scrollbar1" Orientation="Vertical"
+												Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}"
+												CursorRatio="{../scroller1.ChildHeightRatio}"
+												LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+												Width="14" />
+										</HorizontalStack>
+									</Template>
+									<ItemTemplate>
+										<Widget Height="16" Background="Red"/>
+									</ItemTemplate>
+									<ItemTemplate DataType="System.IO.FileInfo">
+										<ListItem Height="Fit"
+													Selected = "{Background=${ControlHighlight}}"
+													Unselected = "{Background=Transparent}">
+											<HorizontalStack>
+												<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.file.svg"/>
+												<Label Text="{Name}" Width="Stretched"/>
+											</HorizontalStack>
+										</ListItem>
+									</ItemTemplate>
+									<ItemTemplate DataType="System.IO.DirectoryInfo">
+										<ListItem Height="Fit"
+													Selected = "{Background=${ControlHighlight}}"
+													Unselected = "{Background=Transparent}">
+											<HorizontalStack>
+												<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.folder.svg"/>
+												<Label Text="{Name}" Width="Stretched"/>
+												<Label Text="{LastAccessTime}" />
+											</HorizontalStack>
+										</ListItem>
+									</ItemTemplate>
+								</ListBox>
+							</Template>
+						</DirectoryView>
+						<HorizontalStack Height="Fit">
+							<TextBox Style="TxtInFileDialog" Text="{²./SelectedFile}"/>
+							<TextBox Style="TxtInFileDialog" Width="50" Name="txtFileMask" Text="{²./SearchPattern}"/>
+						</HorizontalStack>
+						<HorizontalStack Margin="5" Fit="true" HorizontalAlignment="Right">
+							<CheckBox Style="CheckBoxAlt" Name="cbShowFiles" Caption="Show Files" IsChecked="{²./ShowFiles}"/>
+							<CheckBox Style="CheckBoxAlt" Name="cbShowHidden" Caption="Show Hidden" IsChecked="{²./ShowHidden}"/>
+						</HorizontalStack>
+						<HorizontalStack Fit="true" HorizontalAlignment="Right" Margin="3" Spacing="3">
+							<Button Caption="Ok" Command="{./CMDOk}"/>
+							<Button Caption="Cancel" Command="{./CMDCancel}"/>
+						</HorizontalStack>
+					</VerticalStack>
+				</Container>
+			</VerticalStack>
+		</Border>
+
+	</Template>
+</FileDialog>
+

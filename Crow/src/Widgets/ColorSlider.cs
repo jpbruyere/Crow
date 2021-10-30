@@ -80,7 +80,7 @@ namespace Crow
 					break;
 				case ColorComponent.Green:
 					if (currentValue == currentColor.G)
-						return; 
+						return;
 					currentValue = (int)currentColor.G;
 					break;
 				case ColorComponent.Blue:
@@ -105,7 +105,7 @@ namespace Crow
 					break;
 				case ColorComponent.Value:
 					if (currentValue == currentColor.Value)
-						return; 
+						return;
 					currentValue = (int)currentColor.Value;
 					break;
 				}
@@ -120,7 +120,7 @@ namespace Crow
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (IFace.IsDown(MouseButton.Left)) {				
+			if (IFace.IsDown(MouseButton.Left)) {
 				updateMouseLocalPos (e.Position);
 				e.Handled = true;
 			}
@@ -128,7 +128,7 @@ namespace Crow
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			
+
 			if (e.Button == MouseButton.Left) {
 				updateMouseLocalPos (e.Position);
 				e.Handled = true;
@@ -191,6 +191,8 @@ namespace Crow
 			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill ();
+
+			
 
 			r = ClientRectangle;
 

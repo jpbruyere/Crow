@@ -26,7 +26,16 @@ namespace Crow
 		/// <summary>
 		/// if true, key stroke are handled in derrived class
 		/// </summary>
-		protected bool KeyEventsOverrides = false;
+		bool keyEventsOverrides;
+		public bool KeyEventsOverrides {
+			get => keyEventsOverrides;
+			set {
+				if (keyEventsOverrides == value)
+					return;
+				keyEventsOverrides = value;
+				NotifyValueChangedAuto (keyEventsOverrides);
+			}
+		}
 
 		#region public properties
 		/// <summary> Horizontal Scrolling Position </summary>
@@ -150,7 +159,7 @@ namespace Crow
 		}
 
 
-		#region GraphicObject Overrides
+		#region Widget Overrides
 		public override Rectangle ScreenCoordinates (Rectangle r)
 		{
 			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
@@ -222,7 +231,7 @@ namespace Crow
 		{
 			base.onKeyDown (sender, e);
 
-			if (KeyEventsOverrides)
+			if (keyEventsOverrides)
 				return;
 
 			switch (e.Key) {

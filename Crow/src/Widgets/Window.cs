@@ -375,7 +375,7 @@ namespace Crow
 		bool maySize => sizingHandle != null && resizable && sizingHandle.IsHover;
 		bool mayMove => moveHandle != null && movable;
 
-		#region GraphicObject Overrides
+		#region Widget Overrides
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);

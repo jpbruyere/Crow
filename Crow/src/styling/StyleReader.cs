@@ -14,9 +14,18 @@ using System.Text;
 namespace Crow
 {
 	/// <summary>
-	/// Parser for style files.
+	/// Parser for style files. Only the first occurence of a key/value pair is kept.
+	/// Theme styles will override any style, then the startup application styles have priority.
 	/// </summary>
+	/// <remark>
+	/// The order of style loading during application startup is as follow:
+	///   - Optional theme styles
+	///   - Style from entry assembly, the executable
+	///   - crowAssemblies list are loaded in order.
+	///   - default style from the crow assembly.
+	/// </remark>
 	//TODO: style key shared by different class may use only first encouneter class setter, which can cause bug.
+	//TODO: ensure alphabetic order of loading inside single assembly.
 	public class StyleReader : StreamReader {
 		enum States { classNames, members, value, endOfStatement }
 

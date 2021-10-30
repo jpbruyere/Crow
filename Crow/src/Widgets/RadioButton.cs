@@ -23,7 +23,7 @@ namespace Crow
 		public event EventHandler Checked;
 		public event EventHandler Unchecked;
 
-		#region GraphicObject overrides
+		#region Widget overrides
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			Group pg = Parent as Group;

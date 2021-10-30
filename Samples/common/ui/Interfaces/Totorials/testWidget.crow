@@ -1,0 +1,3 @@
+﻿<Container Margin="50" Background="SteelBlue" >
+  <TestWidget Background="DarkGrey" Margin="20"/>
+</Container>
