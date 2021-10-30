@@ -60,6 +60,31 @@ namespace ShowCase
 				NotifyValueChanged ("IsDirty", IsDirty);
 			}
 		}
+		public bool EncloseInTemplatedControl {
+			get => Configuration.Global.Get<bool> ("EncloseInTemplatedControl", false);
+			set {
+				if (EncloseInTemplatedControl == value)
+					return;
+				Configuration.Global.Set ("EncloseInTemplatedControl", value);
+				NotifyValueChanged (value);
+				if (!reloadChrono.IsRunning)
+					reloadChrono.Restart ();
+			}
+		}
+		public string TemplateContainerSource {
+			get => Configuration.Global.Get<string> ("TemplateContainerSource", "<Button/>");
+			set {
+				if (TemplateContainerSource == value)
+					return;
+				if (value != null && value.EndsWith ("/>"))
+					Configuration.Global.Set ("TemplateContainerSource", value.Remove (value.Length -2) + ">");
+				else
+					Configuration.Global.Set ("TemplateContainerSource", value);
+				NotifyValueChanged (TemplateContainerSource);
+				if (!reloadChrono.IsRunning)
+					reloadChrono.Restart ();
+			}
+		}
 
 		void reloadFromSource () {
 			hideError ();
@@ -67,7 +92,12 @@ namespace ShowCase
 			try {
 				lock (UpdateMutex) {
 					Instantiator inst = null;
-					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (source)))
+					string src = source;
+					if (EncloseInTemplatedControl) {
+						string tmpControl = TemplateContainerSource.Split (' ', StringSplitOptions.RemoveEmptyEntries)[0].Replace ("<","").Replace (">","");
+						src = $"{TemplateContainerSource}\n<Template>\n{source}\n</Template>\n</{tmpControl}>";
+					}
+					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (src)))
 						inst = new Instantiator (this, ms);
 					g = inst.CreateInstance ();
 					crowContainer.SetChild (g);

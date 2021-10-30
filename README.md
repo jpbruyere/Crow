@@ -54,7 +54,7 @@ The `ShowCase`sample will allow you to quickly test IML with live result.
 
 ### Requirements
 - [GLFW3](https://www.glfw.org/) for platform dependant integration.
-- [Cairo Graphic Library](https://cairographics.org/) >= 1.20, for 2d graphic rendering.
+- [Cairo Graphic Library](https://cairographics.org/) for 2d graphic rendering.
 - [rsvg library](https://developer.gnome.org/rsvg/) for svg rendering
 
 ### Documentation
