@@ -40,8 +40,8 @@ Check the [Tutorials](https://github.com/jpbruyere/Crow/wiki/Tutorials) for a qu
 The `ShowCase`sample will allow you to quickly test IML with live result.
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/wiki/jpbruyere/Crow/images/showCase.png">
-	<kbd><img src="https://raw.githubusercontent.com/wiki/jpbruyere/Crow/images/showCase.png" height="200"></kbd>
+  <a href="https://github.com/jpbruyere/Crow/blob/master/Images/chess.png">
+	<kbd><img src="https://github.com/jpbruyere/Crow/blob/master/Images/showCase.png" height="200"></kbd>
   </a>
 </p>
 
