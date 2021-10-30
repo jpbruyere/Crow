@@ -306,12 +306,12 @@ namespace Crow
 				update (new TextChange (selection.Start, selection.Length, "\t"));
 				break;
 			case Key.PageUp:
-				checkShift ();
+				checkShift (e.Modifiers);
 				LineMove (-visibleLines);
 				RegisterForRedraw ();
 				break;
 			case Key.PageDown:
-				checkShift ();
+				checkShift (e.Modifiers);
 				LineMove (visibleLines);
 				RegisterForRedraw ();
 				break;

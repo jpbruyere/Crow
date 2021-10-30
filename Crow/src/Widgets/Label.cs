@@ -598,8 +598,8 @@ namespace Crow
 			}
 			return 0;
 		}
-		protected void checkShift () {
-			if (IFace.Shift) {
+		protected void checkShift (Modifier modifier) {
+			if (modifier.HasFlag (Modifier.Shift)) {
 				if (!selectionStart.HasValue)
 					selectionStart = CurrentLoc;
 			} else
@@ -746,46 +746,46 @@ namespace Crow
 				break;
 			case Key.Home:
 				targetColumn = -1;
-				checkShift ();
-				if (IFace.Ctrl)
+				checkShift (e.Modifiers);
+				if (e.Modifiers.HasFlag (Modifier.Control))
 					CurrentLoc = new CharLocation (0, 0);
 				else
 					CurrentLoc = new CharLocation (CurrentLoc.Value.Line, 0);
 				RegisterForRedraw ();
 				break;
 			case Key.End:
-				checkShift ();
-				int l = IFace.Ctrl ? lines.Count - 1 : CurrentLoc.Value.Line;
+				checkShift (e.Modifiers);
+				int l = e.Modifiers.HasFlag (Modifier.Control) ? lines.Count - 1 : CurrentLoc.Value.Line;
 				CurrentLoc = new CharLocation (l, lines[l].Length);
 				RegisterForRedraw ();
 				break;
 			case Key.Insert:
-				if (IFace.Ctrl && !SelectionIsEmpty)
+				if (e.Modifiers.HasFlag (Modifier.Control) && !SelectionIsEmpty)
 					IFace.Clipboard = SelectedText;
 				break;
 			case Key.Left:
-				checkShift ();
-				if (IFace.Ctrl)
+				checkShift (e.Modifiers);
+				if (e.Modifiers.HasFlag (Modifier.Control))
 					GotoWordStart ();
 				else
 					MoveLeft ();
 				RegisterForRedraw ();
 				break;
 			case Key.Right:
-				checkShift ();
-				if (IFace.Ctrl)
+				checkShift (e.Modifiers);
+				if (e.Modifiers.HasFlag (Modifier.Control))
 					GotoWordEnd ();
 				else
 					MoveRight ();
 				RegisterForRedraw ();
 				break;
 			case Key.Up:
-				checkShift ();
+				checkShift (e.Modifiers);
 				LineMove (-1);
 				RegisterForRedraw ();
 				break;
 			case Key.Down:
-				checkShift ();
+				checkShift (e.Modifiers);
 				LineMove (1);
 				RegisterForRedraw ();
 				break;
