@@ -17,7 +17,6 @@ namespace Samples
 {
 	public class SampleBase : Interface
 	{
-
 		public SampleBase(IntPtr hWin) : base(800, 600, hWin) { }
 		public SampleBase() : base(800, 600, true, true) { }
 		public SampleBase(int width, int height, bool startUIThread, bool createSurface) :
