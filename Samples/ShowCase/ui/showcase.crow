@@ -7,56 +7,56 @@
 			<TextBox Text="{²CurrentDir}" Margin="2"/>
 		</HorizontalStack>
 		<DirectoryView Margin="1" Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged">
-					<Template>
-						<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}" Background="{./Background}"
-								SelectedItemChanged="./onSelectedItemChanged">
-							<ItemTemplate DataType="System.IO.FileInfo">
-								<ListItem CornerRadius="2" Margin="0" Height="Fit" Width="Stretched"
-										ContextCommands="{GetCommands}"
-										Selected="{Background=${ControlHighlight}}"
-										Unselected="{Background=Transparent}">
-									<HorizontalStack>
-										<Image Margin="1" Width="14" Height="14" Path="#Crow.Icons.file.svg"/>
-										<Label Text="{Name}" Width="Stretched"/>
-									</HorizontalStack>
-								</ListItem>
-							</ItemTemplate>
-							<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfosOrdered">
-								<ListItem ContextCommands="{GetCommands}"
-										Selected="{/exp.Background=${ControlHighlight}}"
-										Unselected="{/exp.Background=Transparent}">
-									<Expandable Name="exp" Caption="{Name}" MouseDoubleClick="/onClickForExpand" BubbleEvents="MouseWheel|Keyboard|MouseClick|ButtonDown">
-										<Template>
-											<VerticalStack>
-												<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
-														Foreground="Transparent"
-														MouseEnter="{Foreground=DimGrey}"
-														MouseLeave="{Foreground=Transparent}">
-													<HorizontalStack Background="{./Background}" Spacing="1">
-														<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
-															Path="{./Image}"
-															Visible="{./IsExpandable}"
-															SvgSub="{./IsExpanded}"
-															MouseEnter="{Background=LightGrey}"
-															MouseLeave="{Background=Transparent}"/>
-														<Image Margin="1" Width="16" Height="16"
-															Path="#Crow.Icons.folder.svg" SvgSub="{./IsExpanded}"/>
-														<Label Text="{./Caption}"/>
-													</HorizontalStack>
-												</Border>
-												<Container Name="Content" Visible="false" BubbleEvents="MouseWheel|Keyboard"/>
-											</VerticalStack>
-										</Template>
-										<HorizontalStack Height="Fit">
-											<Widget Width="12" Height="10"/>
-											<VerticalStack Height="Fit" Name="ItemsContainer"/>
-										</HorizontalStack>
-									</Expandable>
-								</ListItem>
-							</ItemTemplate>
-						</TreeView>
-					</Template>
-				</DirectoryView>
+			<Template>
+				<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}" Background="{./Background}"
+						SelectedItemChanged="./onSelectedItemChanged">
+					<ItemTemplate DataType="System.IO.FileInfo">
+						<ListItem CornerRadius="2" Margin="0" Height="Fit" Width="Stretched"
+								ContextCommands="{GetCommands}"
+								Selected="{Background=${ControlHighlight}}"
+								Unselected="{Background=Transparent}">
+							<HorizontalStack>
+								<Image Margin="1" Width="14" Height="14" Path="#Crow.Icons.file.svg"/>
+								<Label Text="{Name}" Width="Stretched"/>
+							</HorizontalStack>
+						</ListItem>
+					</ItemTemplate>
+					<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfosOrdered">
+						<ListItem ContextCommands="{GetCommands}"
+								Selected="{/exp.Background=${ControlHighlight}}"
+								Unselected="{/exp.Background=Transparent}">
+							<Expandable Name="exp" Caption="{Name}" MouseDoubleClick="/onClickForExpand" BubbleEvents="MouseWheel|Keyboard|MouseClick|ButtonDown">
+								<Template>
+									<VerticalStack>
+										<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
+												Foreground="Transparent"
+												MouseEnter="{Foreground=DimGrey}"
+												MouseLeave="{Foreground=Transparent}">
+											<HorizontalStack Background="{./Background}" Spacing="1">
+												<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+													Path="{./Image}"
+													Visible="{./IsExpandable}"
+													SvgSub="{./IsExpanded}"
+													MouseEnter="{Background=LightGrey}"
+													MouseLeave="{Background=Transparent}"/>
+												<Image Margin="1" Width="16" Height="16"
+													Path="#Crow.Icons.folder.svg" SvgSub="{./IsExpanded}"/>
+												<Label Text="{./Caption}"/>
+											</HorizontalStack>
+										</Border>
+										<Container Name="Content" Visible="false" BubbleEvents="MouseWheel|Keyboard"/>
+									</VerticalStack>
+								</Template>
+								<HorizontalStack Height="Fit">
+									<Widget Width="12" Height="10"/>
+									<VerticalStack Height="Fit" Name="ItemsContainer"/>
+								</HorizontalStack>
+							</Expandable>
+						</ListItem>
+					</ItemTemplate>
+				</TreeView>
+			</Template>
+		</DirectoryView>
 	</VerticalStack>
 	<Splitter Width="6" />
 	<VerticalStack CacheEnabled="true">
@@ -77,7 +77,7 @@
 		<Container Name="CrowContainer" Height="60%" Background="Black"/>
 		<Splitter/>
 		<VerticalStack CacheEnabled="true">
-			<HorizontalStack Height="Fit">
+			<Wrapper Orientation="Vertical" Height="Fit">
 				<Button Style="IcoButton" Command="{CMDNew}" />
 				<Button Style="IcoButton" Command="{CMDSave}" />
 				<Button Style="IcoButton" Command="{CMDSaveAs}" />
@@ -134,7 +134,24 @@
 						<Label Text="Press 'F6' to start/stop recording"/>
 					</VerticalStack>
 				</Popper>
-			</HorizontalStack>
+				<Popper Caption="Template" Width="Fit" Background="Onyx">
+					<Template>
+						<Border Background="{./Background}" MinimumSize="50,20" Name="Content" Width="Stretched" Margin="3"
+													Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
+													MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black};{caption.Foreground=White}"
+													MouseLeave="{Foreground=Transparent};{caption.Foreground=LightGrey}"
+													MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
+													MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}">
+							<Label Font="{./Font}" Name="caption" Margin="3" Foreground="LightGrey" Text="{./Caption}"/>
+						</Border>
+					</Template>
+					<VerticalStack Width="200" Height="200" Background="Jet" Margin="5">
+						<CheckBox Caption="Embed source in templated control" IsChecked="{²EncloseInTemplatedControl}"/>
+						<TextBox BubbleEvents="None" Text="{²TemplateContainerSource}" Width="Stretched" Height="Stretched" Multiline="true"
+							Tooltip="Add '*source* where you want to load the source in the editor."/>
+					</VerticalStack>
+				</Popper>
+			</Wrapper>
 			<HorizontalStack>
 				<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"
 						TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorCommands}"

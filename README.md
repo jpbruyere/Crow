@@ -40,6 +40,7 @@ Check the [Tutorials](https://github.com/jpbruyere/Crow/wiki/Tutorials) for a qu
 The `ShowCase`sample will allow you to quickly test IML with live result.
 
 <p align="center">
+<<<<<<< Updated upstream
   <a href="https://github.com/jpbruyere/Crow/blob/master/Images/showCase.png">
 	<kbd><img src="https://github.com/jpbruyere/Crow/blob/master/Images/showCase.png" height="200"></kbd>
   </a>
@@ -54,7 +55,7 @@ The `ShowCase`sample will allow you to quickly test IML with live result.
 
 ### Requirements
 - [GLFW3](https://www.glfw.org/) for platform dependant integration.
-- [Cairo Graphic Library](https://cairographics.org/) >= 1.20, for 2d graphic rendering.
+- [Cairo Graphic Library](https://cairographics.org/) for 2d graphic rendering.
 - [rsvg library](https://developer.gnome.org/rsvg/) for svg rendering
 
 ### Documentation
