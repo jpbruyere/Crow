@@ -1,0 +1,16 @@
+﻿<MyNumericControl Minimum="0" Maximum="100" Value="50" Background="Jet" >
+  <Template>
+    <VerticalStack Spacing="20" Height="Fit" Width="80%" Background="{./Background}" Margin="20">
+      <HorizontalStack Spacing="5" Fit="true">
+        <Label Text="min:"/>
+		<TextBox Text="{²./Minimum}" Width="60" TextAlignment="Right"/>
+        <Label Text="val:"/>
+		<TextBox Text="{²./Value}" Width="60" TextAlignment="Right"/>
+        <Label Text="max:"/>
+		<TextBox Text="{²./Maximum}" Width="60" TextAlignment="Right" />
+      </HorizontalStack>
+      <Gauge Height="20" Minimum="{./Minimum}" Maximum="{./Maximum}" Value="{²./Value}"
+				Background="DarkGrey" Margin="5" Foreground="CornflowerBlue"/>
+    </VerticalStack>
+  </Template>
+</MyNumericControl>

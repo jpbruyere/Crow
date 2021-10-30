@@ -60,7 +60,7 @@ namespace Crow {
 					actualValue = minValue;
 				else if (value > maxValue)
 					actualValue = maxValue;
-				else                    
+				else
 					actualValue = value;
 
 				NotifyValueChangedAuto (actualValue);
@@ -105,7 +105,7 @@ namespace Crow {
 				r.Width = (int)(cb.Width / Maximum * Value);
 				if (inverted)
 					r.Left = cb.Right - r.Width;
-			} else {				
+			} else {
 				r.Height = (int)(cb.Height / Maximum * Value);
 				if (inverted)
 					r.Top = cb.Bottom - r.Height;

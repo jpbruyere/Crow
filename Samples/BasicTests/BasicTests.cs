@@ -63,7 +63,7 @@ namespace Samples
 				switch (key) {
 				case Key.Escape:
 					Quit ();
-					break;				
+					break;
 				case Key.F3:
 					idx--;
 					break;

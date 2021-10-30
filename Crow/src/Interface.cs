@@ -22,28 +22,16 @@ using Path = System.IO.Path;
 namespace Crow
 {
 	/// <summary>
-	/// The Interface Class is the root of crow graphic trees.
+	/// Interface is the base class for building crow application.
 	/// It is thread safe allowing application to run multiple interfaces in different threads.
-	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen.
 	/// </summary>
 	/// <remarks>
 	/// The Interface contains :
 	/// 	- rendering and layouting queues and logic.
-	/// 	- helpers to load XML interfaces files directely bound to this interface
+	/// 	- helpers to load IML interfaces files directely bound to this interface
 	/// 	- global static constants and variables of CROW
 	/// 	- Keyboard and Mouse logic
-	/// 	- the resulting bitmap of the interface
 	///
-	/// the master branch and the nuget package includes an OpenTK renderer which allows
-	/// the creation of multiple threaded interfaces.
-	///
-	/// If you intend to create another renderer (GDK, vulkan, etc) the minimal step is to
-	/// put an interface instance as member of your root object and call (optionally in another thread) the update function
-	/// at regular interval. Then you have to call
-	/// mouse, keyboard and resize functions of the interface when those events occurs in the host app.
-	///
-	/// The resulting surface (a byte array in the OpenTK renderer) is made available and protected with the
-	/// RenderMutex of the interface.
 	/// </remarks>
 	public class Interface : ILayoutable, IDisposable, ICommandHost
 	{
@@ -62,10 +50,10 @@ namespace Crow
 
 		internal static List<Assembly> crowAssemblies = new List<Assembly> ();
 		/// <summary>
-		/// Add Assembly that may contains CROW ui stuf like widgets or iml.
-		/// Styling fond in that assembly are automatically loaded on addition;
+		/// Add Assembly that may contains CROW ui ressources like custom widget classes, IML, images, ...
+		/// Styling fond in those assemblies are automatically loaded on addition;
 		/// This assembly will be searched for embedded ressource resolution, extension methods, and custom widgets.
-		/// For those assembly to be added by simple name, see 'CrowAssemblyNames'.
+		/// For those assemblies to be added by simple name, see 'CrowAssemblyNames'.
 		/// </summary>
 		/// <param name="a">The assembly to add.</param>
 		public void AddCrowAssembly (Assembly a) {
@@ -79,7 +67,7 @@ namespace Crow
 		/// <summary>
 		/// Remove Assembly from the CrowAssembly list. See 'AddCrowAssembly' for details.
 		/// </summary>
-		/// <param name="a"></param>
+		/// <param name="a">The assembly to unload</param>
 		public void RemoveCrowAssembly (Assembly a) {
 			lock (UpdateMutex) {
 				if (!crowAssemblies.Contains (a))
@@ -99,7 +87,6 @@ namespace Crow
 				case "rsvg-2.40":
 					return NativeLibrary.Load("rsvg-2", assembly, null);
 			}
-			Console.WriteLine($"[UNRESOLVE] {assembly} {libraryName}");
 			return IntPtr.Zero;
 		}
 
@@ -177,12 +164,15 @@ namespace Crow
 			PerformanceMeasure.InitMeasures ();
 		}
 #if VKVG
+		/// <summary>
+		/// constant boolean telling if crow assembly was built with `VKVG` support.
+		/// </summary>
 		public const bool HaveVkvgBackend = true;
 #else
 		public const bool HaveVkvgBackend = false;
 #endif
 		/// <summary>
-		/// Create a standard Crow interface
+		/// Create a standard Crow interface.
 		/// </summary>
 		/// <param name="width">the width of the native window</param>
 		/// <param name="height">the height of the native window</param>
@@ -223,9 +213,17 @@ namespace Crow
 		IntPtr hWin;
 		Cursor currentCursor;
 		bool ownWindow;
-
+		/// <summary>
+		/// Native GLFW window handle bound to this interface.
+		/// </summary>
 		public IntPtr WindowHandle => hWin;
 
+		/// <summary>
+		/// Register GLFW window callbacs (mouse, keyboard, sizing, refresh).
+		/// This method is called on main surface initialization. To skip this step,
+		/// create the application with your own GLFW windows handle and setup the main
+		/// rendering surface by yourself.
+		/// </summary>
 		protected void registerGlfwCallbacks ()
 		{
 			windows.Add (hWin, this);
@@ -255,6 +253,9 @@ namespace Crow
 				vkCtx = new VulkanContext (this, hWin, (uint)clientRectangle.Width, (uint)clientRectangle.Height);
 #endif
 		}
+		/// <summary>
+		/// Create the main rendering surface. The default is a GLFW window with a cairo surface bound to it.
+		/// </summary>
 		protected void initSurface ()
 		{
 			Glfw3.Init ();
@@ -297,6 +298,10 @@ namespace Crow
 			}
 #endif
 		}
+		/// <summary>
+		/// ??
+		/// </summary>
+		/// <param name="r"></param>
 		public void CreateMainSurface (ref Rectangle r) {
 			surf?.Dispose();
 #if (VKVG)
@@ -343,6 +348,10 @@ namespace Crow
 #endif
 			}
 		}
+		/// <summary>
+		/// Set the main GLFW window icon.
+		/// </summary>
+		/// <param name="path"></param>
 		public void SetWindowIcon (string path) {
 			using (Stream stream = GetStreamFromPath (path)) {
 #if STB_SHARP
@@ -376,8 +385,20 @@ namespace Crow
 #endif
 			}
 		}
-
+		/// <summary>
+		/// Cache already searched extension methods to prevent searching again and again for
+		/// missing method or to speedup loading once a method is found.
+		/// </summary>
+		/// <remarks>
+		/// This cache is reseted when a crow assembly is removed, or the theme is changed.
+		/// </remarks>
 		protected Dictionary<string, MethodInfo> knownExtMethods;
+		/// <summary>
+		/// Cache already searched widget types.
+		/// </summary>
+		/// <remarks>
+		/// This cache is reseted when a crow assembly is removed, or the theme is changed.
+		/// </remarks>
 		protected Dictionary<string, Type> knownCrowWidgetTypes;
 
 		/// <summary>
@@ -396,7 +417,7 @@ namespace Crow
 				knownCrowWidgetTypes.Add (typeName, t);
 				return t;
 			}
-
+			//TODO:LoadContext may now be used there!!!
 			foreach (Type expT in Assembly.GetEntryAssembly ().GetExportedTypes ()) {
 				if (expT.Name != typeName)
 					continue;

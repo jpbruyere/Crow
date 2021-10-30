@@ -87,7 +87,7 @@
 		</VerticalStack>
 		<Splitter />
 		<VerticalStack Width="30%" Margin="5">
-			<ListBox Focusable="true" Name="colorList" Data="{TestList}" Margin="5" ItemTemplate="Interfaces/colorItem.crow" />
+			<ListBox Focusable="true" Name="colorList" Data="{TestList}" Margin="5" ItemTemplate="#ui.colorItem.crow" />
 		</VerticalStack>
 	</HorizontalStack>
 </Window>
