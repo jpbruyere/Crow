@@ -83,7 +83,15 @@ namespace Crow
 			switch (libraryName)
 			{
 				case "cairo":
-					return NativeLibrary.Load("cairo-2", assembly, null);
+					IntPtr cairoNative = NativeLibrary.Load("cairo-2", assembly, null);
+					if (cairoNative == IntPtr.Zero && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+						Console.WriteLine ("[Error] Native dlls required by crow are not found.");
+						Console.WriteLine ("You can download them here:\n\thttps://onedrive.live.com/download?cid=B3181664476E9B48&resid=B3181664476E9B48%21493&authkey=AJCso6KAKMCBfAM");
+						Console.WriteLine ("Then extract them in one of the following directory or in your build target one: ");
+						foreach (string dir in System.AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES").ToString().Split (';'))
+							Console.WriteLine ($"\t- {dir}");
+					}
+					return cairoNative;
 				/*case "glfw3":
 					return NativeLibrary.Load("glfw", assembly, null);*/
 				case "rsvg-2.40":
