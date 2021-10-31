@@ -76,26 +76,34 @@ namespace Crow
 				init_internal ();
 			}
 		}
-
+		static void nativeHelpMessage () {
+		}
 		static IntPtr resolveUnmanaged(Assembly assembly, String libraryName)
 		{
-
-			switch (libraryName)
-			{
-				case "cairo":
-					IntPtr cairoNative = NativeLibrary.Load("cairo-2", assembly, null);
-					if (cairoNative == IntPtr.Zero && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-						Console.WriteLine ("[Error] Native dlls required by crow are not found.");
-						Console.WriteLine ("You can download them here:\n\thttps://onedrive.live.com/download?cid=B3181664476E9B48&resid=B3181664476E9B48%21493&authkey=AJCso6KAKMCBfAM");
-						Console.WriteLine ("Then extract them in one of the following directory or in your build target one: ");
-						foreach (string dir in System.AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES").ToString().Split (';'))
-							Console.WriteLine ($"\t- {dir}");
-					}
-					return cairoNative;
-				/*case "glfw3":
-					return NativeLibrary.Load("glfw", assembly, null);*/
-				case "rsvg-2.40":
-					return NativeLibrary.Load("rsvg-2", assembly, null);
+			try {
+				switch (libraryName)
+				{
+					case "cairo":
+						return NativeLibrary.Load("cairo-2", assembly, null);
+					/*case "glfw3":
+						return NativeLibrary.Load("glfw", assembly, null);*/
+					case "rsvg-2.40":
+						return NativeLibrary.Load("rsvg-2", assembly, null);
+				}
+			} catch {
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+					Console.ForegroundColor = ConsoleColor.DarkRed;
+					Console.WriteLine ("Native dlls required by crow cant be found.");
+					Console.ResetColor();
+					Console.WriteLine ("You can download them here:");
+					Console.ForegroundColor = ConsoleColor.Blue;
+					Console.WriteLine ("  https://onedrive.live.com/download?cid=B3181664476E9B48&resid=B3181664476E9B48%21493&authkey=AJCso6KAKMCBfAM");
+					Console.ResetColor();
+					Console.WriteLine ("Then extract them in one of the following directories or in your project output directory.");
+					foreach (string dir in System.AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES").ToString().Split (';', StringSplitOptions.RemoveEmptyEntries))
+						Console.WriteLine ($" - {dir}");
+				}
+				Environment.Exit(0);
 			}
 			return IntPtr.Zero;
 		}
