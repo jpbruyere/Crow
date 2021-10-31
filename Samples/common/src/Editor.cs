@@ -210,7 +210,7 @@ namespace Crow
 					if (attrib.ValueToken.HasValue) {
 						TextChange tc = new TextChange (currentToken.Start, currentToken.Length, selectedSugg);
 						update (tc);
-						selectionStart = lines.GetLocation (attrib.ValueToken.Value.Start + tc.CharDiff + 1);
+						SelectionStart = lines.GetLocation (attrib.ValueToken.Value.Start + tc.CharDiff + 1);
 						CurrentLoc = lines.GetLocation (attrib.ValueToken.Value.End + tc.CharDiff - 1);
 					} else {
 						update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg + "=\"\""));
@@ -224,7 +224,10 @@ namespace Crow
 			hideOverlay ();
 			base.onMouseDown (sender, e);
 		}
-
+		public override void onMouseEnter(object sender, MouseMoveEventArgs e) {
+			base.onMouseEnter (sender, e);
+			HasFocus = true;
+		}
 		public override void onKeyDown(object sender, KeyEventArgs e)
 		{
 			TextSpan selection = Selection;
@@ -280,7 +283,7 @@ namespace Crow
 						update (new TextChange (lines[l].Start, 0, "\t"));
 				}
 
-				selectionStart = new CharLocation (lineStart, 0);
+				SelectionStart = new CharLocation (lineStart, 0);
 				CurrentLoc = new CharLocation (lineEnd, lines[lineEnd].Length);
 
 				disableSuggestions = false;
@@ -305,7 +308,7 @@ namespace Crow
 					CharLocation selStart = default, selEnd = default;
 					bool selectionNotEmpty = false;
 
-					if (HasFocus) {
+					//if (HasFocus) {
 						if (currentLoc?.Column < 0) {
 							updateLocation (gr, cb.Width, ref currentLoc);
 							NotifyValueChanged ("CurrentColumn", CurrentColumn);
@@ -322,28 +325,28 @@ namespace Crow
 								overlay.Top = p.Y;
 							}
 						}
-						if (selectionStart.HasValue) {
+						if (SelectionStart.HasValue) {
 							updateLocation (gr, cb.Width, ref selectionStart);
-							if (CurrentLoc.Value != selectionStart.Value)
+							if (CurrentLoc.Value != SelectionStart.Value)
 								selectionNotEmpty = true;
 						}
 						if (selectionNotEmpty) {
-							if (CurrentLoc.Value.Line < selectionStart.Value.Line) {
+							if (CurrentLoc.Value.Line < SelectionStart.Value.Line) {
 								selStart = CurrentLoc.Value;
-								selEnd = selectionStart.Value;
-							} else if (CurrentLoc.Value.Line > selectionStart.Value.Line) {
-								selStart = selectionStart.Value;
+								selEnd = SelectionStart.Value;
+							} else if (CurrentLoc.Value.Line > SelectionStart.Value.Line) {
+								selStart = SelectionStart.Value;
 								selEnd = CurrentLoc.Value;
-							} else if (CurrentLoc.Value.Column < selectionStart.Value.Column) {
+							} else if (CurrentLoc.Value.Column < SelectionStart.Value.Column) {
 								selStart = CurrentLoc.Value;
-								selEnd = selectionStart.Value;
+								selEnd = SelectionStart.Value;
 							} else {
-								selStart = selectionStart.Value;
+								selStart = SelectionStart.Value;
 								selEnd = CurrentLoc.Value;
 							}
 						} else
 							IFace.forceTextCursor = true;
-					}
+					//}
 
 					double spacePixelWidth = gr.TextExtents (" ").XAdvance;
 					int x = 0, y = 0;
@@ -429,7 +432,7 @@ namespace Crow
 							tok = source.Tokens[tokPtr];
 						}
 
-						if (HasFocus && selectionNotEmpty) {
+						if (selectionNotEmpty) {
 							RectangleD lineRect = new RectangleD (cb.X,	lineHeight * y + cb.Top, pixX, lineHeight);
 							RectangleD selRect = lineRect;
 

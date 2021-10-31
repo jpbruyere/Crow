@@ -81,6 +81,7 @@ Button {
 	MinimumSize = "60,22";
 	Height 		= "Fit";
 	Width 		= "Fit";
+	BubbleEvents= "None";
 }
 ButtonBorder {
 	BorderWidth="1";

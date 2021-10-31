@@ -298,7 +298,7 @@ namespace Crow
 					OnValidate (this, new ValidateEventArgs (_text));
 				break;
 			case Key.Escape:
-				selectionStart = null;
+				SelectionStart = null;
 				CurrentLoc = lines.GetLocation (selection.Start);
 				RegisterForRedraw ();
 				break;
@@ -349,7 +349,7 @@ namespace Crow
 				_text = tmp.ToString ();
 				lines.Update (change);
 				//lines.Update (_text);
-				selectionStart = null;
+				SelectionStart = null;
 
 				CurrentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
 				textMeasureIsUpToDate = false;

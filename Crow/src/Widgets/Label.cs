@@ -26,10 +26,18 @@ namespace Crow
 		/// Occurs when Text has changed.
 		/// </summary>
 		public event EventHandler<TextChangeEventArgs> TextChanged;
+		/// <summary>
+		/// Occurs when the current selected text has changed
+		/// </summary>
+		public event EventHandler<TextSelectionChangeEventArgs> SelectionChanged;
 
 		public virtual void OnTextChanged(Object sender, TextChangeEventArgs e)
 		{
 			TextChanged.Raise (this, e);
+		}
+		public virtual void OnSelectionChanged(Object sender, TextSelectionChangeEventArgs e)
+		{
+			SelectionChanged.Raise (this, e);
 		}
         //TODO:change protected to private
 
@@ -54,6 +62,8 @@ namespace Crow
 				currentLoc = value;
 				NotifyValueChanged ("CurrentLine", CurrentLine);
 				NotifyValueChanged ("CurrentColumn", CurrentColumn);
+				if (SelectionChanged != null)
+					OnSelectionChanged (this, new TextSelectionChangeEventArgs (Selection));
             }
         }
 		public virtual int CurrentLine {
@@ -137,7 +147,7 @@ namespace Crow
 				_textAlignment = value;
 
 				CurrentLoc?.ResetVisualX ();
-				selectionStart?.ResetVisualX ();
+				SelectionStart?.ResetVisualX ();
 
 				RegisterForRedraw ();
 				NotifyValueChangedAuto (_textAlignment);
@@ -170,10 +180,10 @@ namespace Crow
         }
 
 		void constraintsLocations () {
-			if (selectionStart.HasValue) {
+			if (SelectionStart.HasValue) {
 				CharLocation loc = CurrentLoc.Value;
 				int l = Math.Min (loc.Line, lines.Count - 1);
-				selectionStart = new CharLocation (l, Math.Min (loc.Column, lines[l].Length - 1));
+				SelectionStart = new CharLocation (l, Math.Min (loc.Column, lines[l].Length - 1));
 			}
 			if (CurrentLoc.HasValue) {
 				CharLocation loc = CurrentLoc.Value;
@@ -308,27 +318,27 @@ namespace Crow
 		public TextSpan Selection {
 			set {
 				if (value.IsEmpty)
-					selectionStart = null;
+					SelectionStart = null;
 				else
-					selectionStart = lines.GetLocation (value.Start);
+					SelectionStart = lines.GetLocation (value.Start);
 				CurrentLoc = lines.GetLocation (value.End);
 			}
 			get {
 				if (CurrentLoc == null)
 					return default;
 				CharLocation selStart = CurrentLoc.Value, selEnd = CurrentLoc.Value;
-				if (selectionStart.HasValue) {
-					if (CurrentLoc.Value.Line < selectionStart.Value.Line) {
+				if (SelectionStart.HasValue) {
+					if (CurrentLoc.Value.Line < SelectionStart.Value.Line) {
 						selStart = CurrentLoc.Value;
-						selEnd = selectionStart.Value;
-					} else if (CurrentLoc.Value.Line > selectionStart.Value.Line) {
-						selStart = selectionStart.Value;
+						selEnd = SelectionStart.Value;
+					} else if (CurrentLoc.Value.Line > SelectionStart.Value.Line) {
+						selStart = SelectionStart.Value;
 						selEnd = CurrentLoc.Value;
-					} else if (CurrentLoc.Value.Column < selectionStart.Value.Column) {
+					} else if (CurrentLoc.Value.Column < SelectionStart.Value.Column) {
 						selStart = CurrentLoc.Value;
-						selEnd = selectionStart.Value;
+						selEnd = SelectionStart.Value;
 					} else {
-						selStart = selectionStart.Value;
+						selStart = SelectionStart.Value;
 						selEnd = CurrentLoc.Value;
 					}
 				}
@@ -341,7 +351,17 @@ namespace Crow
 				return selection.IsEmpty ? "" : Text.AsSpan (selection.Start, selection.Length).ToString ();
 			}
         }
-		public bool SelectionIsEmpty => selectionStart.HasValue ? Selection.IsEmpty : true;
+		public bool SelectionIsEmpty => SelectionStart.HasValue ? Selection.IsEmpty : true;
+		public CharLocation? SelectionStart {
+			get => selectionStart;
+			set {
+				if (selectionStart == value)
+					return;
+				selectionStart = value;
+				if (SelectionChanged != null)
+					OnSelectionChanged (this, new TextSelectionChangeEventArgs (Selection));
+			}
+		}
 
 		protected virtual void measureTextBounds (Context gr) {
 			fe = gr.FontExtents;
@@ -380,23 +400,23 @@ namespace Crow
 					NotifyValueChanged ("CurrentColumn", CurrentColumn);
 				} else
 					updateLocation (gr, cb.Width, ref currentLoc);
-				if (selectionStart.HasValue) {
+				if (SelectionStart.HasValue) {
 					updateLocation (gr, cb.Width, ref selectionStart);
-					if (CurrentLoc.Value != selectionStart.Value)
+					if (CurrentLoc.Value != SelectionStart.Value)
 						selectionNotEmpty = true;
 				}
 				if (selectionNotEmpty) {
-					if (CurrentLoc.Value.Line < selectionStart.Value.Line) {
+					if (CurrentLoc.Value.Line < SelectionStart.Value.Line) {
 						selStart = CurrentLoc.Value;
-						selEnd = selectionStart.Value;
-					} else if (CurrentLoc.Value.Line > selectionStart.Value.Line) {
-						selStart = selectionStart.Value;
+						selEnd = SelectionStart.Value;
+					} else if (CurrentLoc.Value.Line > SelectionStart.Value.Line) {
+						selStart = SelectionStart.Value;
 						selEnd = CurrentLoc.Value;
-					} else if (CurrentLoc.Value.Column < selectionStart.Value.Column) {
+					} else if (CurrentLoc.Value.Column < SelectionStart.Value.Column) {
 						selStart = CurrentLoc.Value;
-						selEnd = selectionStart.Value;
+						selEnd = SelectionStart.Value;
 					} else {
-						selStart = selectionStart.Value;
+						selStart = SelectionStart.Value;
 						selEnd = CurrentLoc.Value;
 					}
 				} else
@@ -600,10 +620,10 @@ namespace Crow
 		}
 		protected void checkShift (Modifier modifier) {
 			if (modifier.HasFlag (Modifier.Shift)) {
-				if (!selectionStart.HasValue)
-					selectionStart = CurrentLoc;
+				if (!SelectionStart.HasValue)
+					SelectionStart = CurrentLoc;
 			} else
-				selectionStart = null;
+				SelectionStart = null;
 		}
 
 		#region Widget overrides
@@ -670,7 +690,7 @@ namespace Crow
 		{
 			base.onFocused (sender, e);
 			if (CurrentLoc == null) {
-				selectionStart = new CharLocation (0, 0);
+				SelectionStart = new CharLocation (0, 0);
 				CurrentLoc = new CharLocation (lines.Count - 1, lines[lines.Count - 1].Length);
 			}
 			RegisterForRedraw ();
@@ -702,9 +722,9 @@ namespace Crow
 				targetColumn = -1;
 				if (HasFocus) {
 					if (!IFace.Shift)
-						selectionStart = hoverLoc;
-					else if (!selectionStart.HasValue)
-						selectionStart = CurrentLoc;
+						SelectionStart = hoverLoc;
+					else if (!SelectionStart.HasValue)
+						SelectionStart = CurrentLoc;
 					CurrentLoc = hoverLoc;
 					IFace.forceTextCursor = true;
 					RegisterForRedraw ();
@@ -718,10 +738,10 @@ namespace Crow
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			if (e.Button != MouseButton.Left || !HasFocus || !selectionStart.HasValue)
+			if (e.Button != MouseButton.Left || !HasFocus || !SelectionStart.HasValue)
 				return;
-			if (selectionStart.Value == CurrentLoc.Value)
-				selectionStart = null;
+			if (SelectionStart.Value == CurrentLoc.Value)
+				SelectionStart = null;
 		}
 		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e)
 		{
@@ -730,7 +750,7 @@ namespace Crow
 				return;
 
 			GotoWordStart ();
-			selectionStart = CurrentLoc;
+			SelectionStart = CurrentLoc;
 			GotoWordEnd ();
 			RegisterForRedraw ();
 		}
@@ -741,7 +761,7 @@ namespace Crow
 
 			switch (e.Key) {
 			case Key.Escape:
-				selectionStart = null;
+				SelectionStart = null;
 				RegisterForRedraw ();
 				break;
 			case Key.Home:

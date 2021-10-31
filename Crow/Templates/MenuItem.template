@@ -4,17 +4,15 @@
 		Foreground = "{./Foreground}" BubbleEvents="All"
 		IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
 		<Template>
-			
-					<Border Name="border1"
-							MinimumSize = "60,0"
-							Foreground="Transparent"
-							Background="{./Background}">
-							<Label Text="{./Caption}"
-								Foreground="{./Foreground}"
-								Margin="2" HorizontalAlignment="Left"
-								Font="{./Font}"	/>
-					</Border>
-			
+			<Border Name="border1"
+					MinimumSize = "60,0"
+					Foreground="Transparent"
+					Background="{./Background}">
+					<Label Text="{./Caption}"
+						Foreground="{./Foreground}"
+						Margin="2" HorizontalAlignment="Left"
+						Font="{./Font}"	/>
+			</Border>
 		</Template>
 		<Border Foreground="DimGrey" Width="{../PopWidth}" Height="{../PopHeight}" Background="${MenuBackground}">
 			<VerticalStack Name="ItemsContainer" Width="Stretched" />

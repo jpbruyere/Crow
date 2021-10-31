@@ -83,9 +83,9 @@
 				<Button Style="IcoButton" Command="{CMDSaveAs}" />
 				<Button Style="IcoButton" Command="{CMDUndo}" />
 				<Button Style="IcoButton" Command="{CMDRedo}" />
-				<!--<Button Style="IcoButton" Command="{CMDCut}" />
+				<Button Style="IcoButton" Command="{CMDCut}" />
 				<Button Style="IcoButton" Command="{CMDCopy}" />
-				<Button Style="IcoButton" Command="{CMDPaste}" />-->
+				<Button Style="IcoButton" Command="{CMDPaste}" />
 				<Popper RootDataLevel="true" IsVisible="{DebugLoggingEnabled}" Fit="true">
 					<Template>
 						<CheckBox IsChecked="{²./IsPopped}">
@@ -146,7 +146,7 @@
 						</Border>
 					</Template>
 					<VerticalStack Width="200" Height="200" Background="Jet" Margin="5">
-						<CheckBox Caption="Embed source in templated control" IsChecked="{²EncloseInTemplatedControl}"/>
+						<CheckBox Caption="Embed source in template" IsChecked="{²EncloseInTemplatedControl}"/>
 						<TextBox BubbleEvents="None" Text="{²TemplateContainerSource}" Width="Stretched" Height="Stretched" Multiline="true"
 							Tooltip="Add '*source* where you want to load the source in the editor."/>
 					</VerticalStack>
@@ -155,8 +155,8 @@
 			<HorizontalStack>
 				<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"
 						TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorCommands}"
+						SelectionChanged="onEditorSelectionChanged"
 						Foreground="DarkGrey" Background="White" MouseWheelSpeed="20"/>
-						<!--SelectionChanged="onSelectedTextChanged"-->
 				<ScrollBar Value="{²../tb.ScrollY}"
 						LargeIncrement="{../tb.PageHeight}" SmallIncrement="1"
 						CursorRatio="{../tb.ChildHeightRatio}" Maximum="{../tb.MaxScrollY}" />

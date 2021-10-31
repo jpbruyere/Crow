@@ -106,7 +106,7 @@ namespace Crow
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			command?.Execute (this);
-			e.Handled = true;
+			//e.Handled = true;
 			base.onMouseClick (sender, e);
 		}
 

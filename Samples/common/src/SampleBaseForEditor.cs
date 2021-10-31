@@ -27,12 +27,11 @@ namespace Samples
 
 			if (string.IsNullOrEmpty (CurrentDir))
 				CurrentDir = Path.Combine (Directory.GetCurrentDirectory (), "Interfaces");
-
 		}
 
 		protected const string _defaultFileName = "unnamed.txt";
 		protected string source = "", origSource;
-		protected TextBox editor;
+		protected Editor editor;
 		bool debugLogRecording;
 
 
@@ -148,7 +147,10 @@ namespace Samples
 		protected TextSpan selection;
 		protected string SelectedText =>
 				selection.IsEmpty ? "" : Source.AsSpan (selection.Start, selection.Length).ToString ();
-
+		public void onEditorSelectionChanged(Object sender, TextSelectionChangeEventArgs e) {
+			selection = e.Selection;
+			CMDCut.CanExecute = CMDCopy.CanExecute = !selection.IsEmpty;
+		}
 		protected void undo () {
 			if (undoStack.TryPop (out TextChange tch)) {
 				redoStack.Push (tch.Inverse (source));
@@ -182,6 +184,7 @@ namespace Samples
 		}
 		protected void copy () {
 			Clipboard = SelectedText;
+			CMDPaste.CanExecute = !string.IsNullOrEmpty (Clipboard);
 		}
 		protected void paste () {
 			applyChange (new TextChange (selection.Start, selection.Length, Clipboard));
@@ -276,6 +279,10 @@ namespace Samples
 			disableTextChangedEvent = true;
 			Source = tmp.ToString ();
 			disableTextChangedEvent = false;
+			editor.SelectionStart = null;
+			editor.SetCursorPosition (change.Start + change.ChangedText.Length);
+
+			forceTextCursor = true;
 		}
 		protected void applyChange (TextChange change) {
 			undoStack.Push (change.Inverse (source));
@@ -315,12 +322,6 @@ namespace Samples
 			if (disableTextChangedEvent)
 				return;
 			applyChange (e.Change);
-		}
-
-		protected void onSelectedTextChanged (object sender, EventArgs e) {
-			selection = (sender as Label).Selection;
-			Console.WriteLine($"selection:{selection.Start} length:{selection.Length}");
-			CMDCut.CanExecute = CMDCopy.CanExecute = !selection.IsEmpty;
 		}
 		protected void textView_KeyDown (object sender, Crow.KeyEventArgs e) {
 			if (Ctrl) {

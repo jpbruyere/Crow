@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -25,7 +25,7 @@ namespace Crow
 		#region Public properties
 		[DefaultValue(false)]
 		public bool IsOpened {
-			get { return isOpened; }
+			get => isOpened;
 			set {
 				if (isOpened == value)
 					return;
@@ -149,7 +149,7 @@ namespace Crow
 		{
 			if (command != null) {
 				command.Execute (this);
-				closeMenu ();
+				CloseMenu ();
 			}
 			if (hasClick)
 				base.onMouseClick (sender, e);
@@ -159,8 +159,8 @@ namespace Crow
 					m.AutomaticOpening = false;
 
 		}
-		void closeMenu () {
-			MenuItem tmp = LogicalParent as MenuItem;
+		public void CloseMenu () {
+			MenuItem tmp = this;
 			while (tmp != null) {
 				tmp.IsOpened = false;
 				tmp.Background = Colors.Transparent;

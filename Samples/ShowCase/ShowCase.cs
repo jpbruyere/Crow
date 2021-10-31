@@ -111,7 +111,7 @@ namespace ShowCase
 		}
 
 		void showError (Exception ex) {
-			Console.WriteLine (ex);
+			Debug.WriteLine (ex);
 			NotifyValueChanged ("ErrorMessage", ex);
 			NotifyValueChanged ("ShowError", true);
 		}
@@ -127,7 +127,7 @@ namespace ShowCase
 
 			Load ("#ShowCase.showcase.crow").DataSource = this;
 			crowContainer = FindByName ("CrowContainer") as Container;
-			editor = FindByName ("tb") as TextBox;
+			editor = FindByName ("tb") as Editor;
 
 			if (!File.Exists (CurrentFile))
 				newFile ();

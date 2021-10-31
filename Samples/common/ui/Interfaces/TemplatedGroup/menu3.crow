@@ -13,7 +13,7 @@
 					</Template>
 					<VerticalStack Margin="0" Name="ItemsContainer" Fit="true" Background="Jet"/>
 				</Popper>
-			</Template>		
+			</Template>
 			<ItemTemplate DataType="Crow.Command" Path="#Crow.MenuButton.template"/>
 			<ItemTemplate DataType="Crow.CommandGroup" Data="Commands">
 				<Popper PopDirection="Right" Caption="{Caption}" IsEnabled="{CanExecute}" Width="Stretched"
@@ -25,10 +25,10 @@
 							<Label Text="{./Caption}"   Width="Fit" Height="Stretched"/>
 							<Label Text="..."/>
 						</HorizontalStack>
-					</Template>		
+					</Template>
 					<VerticalStack Margin="0" Name="ItemsContainer" Width="{../PopWidth}" Height="{../PopHeight}" Background="${MenuBackground}"/>
 				</Popper>
-			</ItemTemplate>						
+			</ItemTemplate>
 		</MenuItem>
 	</ItemTemplate>
 </Menu>

@@ -6,8 +6,11 @@ using System;
 
 namespace Crow
 {
+	/// <summary>
+	/// Occurs when the selection has changed.
+	/// </summary>
 	public class SelectionChangeEventArgs: EventArgs
-	{		
+	{
 		public object NewValue;
 
 		public SelectionChangeEventArgs (object _newValue) : base()
