@@ -325,7 +325,7 @@ namespace Samples
 		protected void textView_KeyDown (object sender, Crow.KeyEventArgs e) {
 			if (Ctrl) {
 				if (e.Key == Glfw.Key.W) {
-					if (Shift)
+					if (e.Modifiers.HasFlag(Modifier.Shift))
 						CMDRedo.Execute ();
 					else
 						CMDUndo.Execute ();

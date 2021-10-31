@@ -263,7 +263,7 @@ namespace Crow
 
 				disableSuggestions = true;
 
-				if (IFace.Shift) {
+				if (e.Modifiers.HasFlag(Modifier.Shift)) {
 					for (int l = lineStart; l <= lineEnd; l++) {
 						if (Text[lines[l].Start] == '\t')
 							update (new TextChange (lines[l].Start, 1, ""));

@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <HorizontalStack Background="DarkGrey" >
 	<VerticalStack  Width="25%">
-		<HorizontalStack Height="Fit" Margin="2" Background="Onyx">
-			<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.level-up.svg" MouseClick="./goUpDirClick"
-						 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />
-			<TextBox Text="{²CurrentDir}" Margin="2"/>
+		<HorizontalStack Height="Fit" Margin="3" Background="Onyx" Spacing="2">
+			<TextBox Text="{²CurrentDir}" Margin="2" ClipToClientRect="true"/>
+			<Image Margin="2" Width="20" Height="20" Path="#Crow.Icons.level-up.svg" MouseClick="./goUpDirClick" Focusable="true"
+						 Background="Grey" MouseEnter="{Background=SeaGreen}" MouseLeave="{Background=Grey}" Tooltip="go the the parent directory" />
 		</HorizontalStack>
 		<DirectoryView Margin="1" Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged">
 			<Template>
