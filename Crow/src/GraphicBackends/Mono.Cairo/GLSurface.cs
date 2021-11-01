@@ -34,7 +34,6 @@ namespace Crow.Drawing {
 
 	public class GLSurface : Surface
 	{
-		
 		public GLSurface (IntPtr ptr, bool own) : base (ptr, own)
 		{}
 

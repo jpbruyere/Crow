@@ -11,7 +11,7 @@ using Crow.Drawing;
 namespace Crow
 {
 	/// <summary>
-	/// Base class for all templated widget
+	/// Base class for all templated widget.
 	/// </summary>
 	public abstract class TemplatedControl : PrivateContainer
 	{
@@ -42,13 +42,14 @@ namespace Crow
 		/// Template path or IML fragment.
 		/// </summary>
 		/// <remark>
-		/// The 'null' default value with the 'NOT_SET' field init value  force a loading
-		/// of the default template by passing the first equality check.
+		/// If both Template property and inline template are present, the second has priority.
 		/// </remark>
 		[DefaultValue(null)]
 		public string Template {
 			get => _template;
 			set {
+				//The 'null' default value with the 'NOT_SET' field init value  force a loading
+				// of the default template by passing the first equality check.
 				if (_template == value)
 					return;
 				_template = value;
@@ -112,17 +113,16 @@ namespace Crow
 		#endregion
 
 		/// <summary>
-		/// Loads the template. Each TemplatedControl MUST provide a default template
-		/// or have an inlined template in iml.
+		/// Loads the template. Each TemplatedControl should provide a default template
+		/// otherwise it must have an inlined template in iml.
 		/// It must be an embedded ressource with ID = fullTypeName.template
-		/// Entry assembly is search first, then the one where the type is defined
 		/// </summary>
 		/// <Remark>
-		/// Setting the default template path in style will provide an interned string for itor search.
 		/// </Remark>
 		/// <param name="template">Optional template instance</param>
 		protected virtual void loadTemplate(Widget template = null)
 		{
+			// Setting the default template path in style will provide an interned string for itor search.
 			if (this.child != null)//template change, bindings has to be reset
 				this.ClearTemplateBinding();
 

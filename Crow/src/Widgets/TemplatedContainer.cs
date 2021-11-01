@@ -7,7 +7,7 @@ namespace Crow
 {
 	/// <summary>
 	/// base class for new containers that will use templates.
-	/// 
+	///
 	/// TemplatedControl's **must** provide a widget of the [`Container`](Container) class named **_'Content'_** inside their template tree
 	/// </summary>
 	public class TemplatedContainer : TemplatedControl

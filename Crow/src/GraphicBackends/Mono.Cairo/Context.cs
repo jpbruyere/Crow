@@ -38,7 +38,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Crow.Drawing {	
+namespace Crow.Drawing {
 
 	[Obsolete ("Renamed Cairo.Context per suggestion from cairo binding guidelines.")]
 	public class Graphics : Context {

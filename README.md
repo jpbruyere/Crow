@@ -24,20 +24,20 @@
 </p>
 </h1>
 
-**Open source widget toolkit** and rendering engine for building portable graphical interfaces in `C#`, featuring a `declarative language` for ui called [IML](https://github.com/jpbruyere/Crow/wiki/using-iml) with [Styling](https://github.com/jpbruyere/Crow/wiki/Styling), [Templates](https://github.com/jpbruyere/Crow/wiki/Templates) and a [binding system](https://github.com/jpbruyere/Crow/wiki/first-binding) to connect your `c#` code to your `ui` components easily.
+**C.R.O.W.** is an open source widget toolkit and rendering engine for building portable graphical interfaces in `C#`.
 
 <p align="center">
-  <a href="https://github.com/jpbruyere/Crow/blob/master/Images/crowEdit.png">
+  <a href="https://github.com/jpbruyere/CrowEdit">
 	<kbd><img src="https://github.com/jpbruyere/Crow/blob/master/Images/crowEdit.png" height="200"></kbd>
   </a>
-  <a href="https://github.com/jpbruyere/Crow/blob/master/Images/chess.png">
+  <a href="https://github.com/jpbruyere/vkChess.net">
 	<kbd><img src="https://github.com/jpbruyere/Crow/blob/master/Images/chess.png" height="200"></kbd>
   </a>
 </p>
 
 Check the [Tutorials](https://github.com/jpbruyere/Crow/wiki/Tutorials) for a quick introduction.
 
-The `ShowCase` sample will allow you to quickly test IML with live result.
+The `ShowCase` sample will allow you to quickly test **IML** with live result.
 
 <p align="center">
   <a href="https://github.com/jpbruyere/Crow/blob/master/Images/showCase2.png">
@@ -45,7 +45,9 @@ The `ShowCase` sample will allow you to quickly test IML with live result.
   </a>
 </p>
 
-Visit the [wiki](https://github.com/jpbruyere/Crow/wiki) and the samples for documentation. Due to the early state of this project and the frequent changes, some part of the docs may be outdated. C.R.O.W. is in **beta** development state, api could change, but most of it is quiet stabilized.
+Visit the [wiki](https://github.com/jpbruyere/Crow/wiki) and the [samples](https://github.com/jpbruyere/Crow/wiki/Tutorials) for documentation.
+
+_Due to the early state of this project and the frequent changes, some part of the docs may be outdated. It is in **beta** development state, api could change, but most of it is quiet stabilized._
 
 Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issues)
 
