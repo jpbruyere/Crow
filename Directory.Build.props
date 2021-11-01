@@ -4,10 +4,10 @@
 		<IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)\</IntermediateOutputPath>
 		<License>MIT</License>
 		<Authors>Jean-Philippe Bruyère</Authors>
-		<LangVersion>7.3</LangVersion>
+		<!--<LangVersion>7.3</LangVersion>-->
 
-		<CrowVersion>0.9.8</CrowVersion>
-		<CrowPackageVersion>$(CrowVersion)</CrowPackageVersion>
+		<CrowVersion>0.9.9</CrowVersion>
+		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
 
 		<!-- If you dont have a native libstb on your system, enable the managed version of stb here
 				TODO: this could be detected on startup or install automatically-->
@@ -26,6 +26,6 @@
 		<!-- Experimental vkvg backend, testing only-->
 		<CrowVkvgBackend>false</CrowVkvgBackend>
 
-		<GlfwSharpVersion>0.2.14</GlfwSharpVersion>
+		<GlfwSharpVersion>0.2.15-beta</GlfwSharpVersion>
 	</PropertyGroup>
 </Project>

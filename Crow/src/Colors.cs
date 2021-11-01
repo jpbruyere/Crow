@@ -3,9 +3,6 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-//using FastEnumUtility;
 
 namespace Crow
 {
@@ -188,6 +185,7 @@ namespace Crow
 				(((uint)Math.Round (b * 255.0)) << 8) +
 				(((uint)Math.Round (a * 255.0)));
 		}
+
 		public Color (ReadOnlySpan<double> rgba) {
 			value =
 				(((uint)Math.Round (rgba[0] * 255.0)) << 24) +

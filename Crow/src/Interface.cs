@@ -76,8 +76,7 @@ namespace Crow
 				init_internal ();
 			}
 		}
-		static void nativeHelpMessage () {
-		}
+#if !NET48
 		static IntPtr resolveUnmanaged(Assembly assembly, String libraryName)
 		{
 			try {
@@ -107,13 +106,14 @@ namespace Crow
 			}
 			return IntPtr.Zero;
 		}
-
+#endif
 
 		#region CTOR
 		static Interface ()
 		{
+#if !NET48
 			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).ResolvingUnmanagedDll += resolveUnmanaged;
-
+#endif
 			CROW_CONFIG_ROOT =
 				System.IO.Path.Combine (
 					Environment.GetFolderPath (Environment.SpecialFolder.UserProfile),

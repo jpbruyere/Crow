@@ -2,7 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 <!--		<TargetFrameworks>netstandard2.0</TargetFrameworks>-->
-		<TargetFramework>netcoreapp3.0</TargetFramework>
+		<TargetFrameworks>net48;netcoreapp3.0</TargetFrameworks>
+		<TargetFramework>net48</TargetFramework>
 
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
 		<PackageVersion>$(CrowPackageVersion)</PackageVersion>
@@ -34,9 +35,11 @@
 		<DefineConstants>$(DefineConstants);DEBUG;TRACE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
-	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
+		<PackageReference Include="System.IO.Compression" Version="4.3.0" />
+		<PackageReference Include="System.Memory" Version="4.5.4" />
 	</ItemGroup>
 	<ItemGroup>
 		<!--<PackageReference Include="FastEnum" Version="1.5.3" />-->
