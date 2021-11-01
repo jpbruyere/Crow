@@ -136,13 +136,13 @@
 				</Popper>
 				<Popper Caption="Template" Width="Fit" Background="Onyx">
 					<Template>
-						<Border Background="{./Background}" MinimumSize="50,20" Name="Content" Width="Stretched" Margin="3"
+						<Border Background="{./Background}" MinimumSize="50,20" Name="Content" Width="Stretched" Margin="0"
 													Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
 													MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black};{caption.Foreground=White}"
 													MouseLeave="{Foreground=Transparent};{caption.Foreground=LightGrey}"
 													MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
 													MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}">
-							<Label Font="{./Font}" Name="caption" Margin="3" Foreground="LightGrey" Text="{./Caption}"/>
+							<Label Font="{./Font}" Name="caption" Margin="2" Foreground="LightGrey" Text="{./Caption}"/>
 						</Border>
 					</Template>
 					<VerticalStack Width="200" Height="200" Background="Jet" Margin="5">

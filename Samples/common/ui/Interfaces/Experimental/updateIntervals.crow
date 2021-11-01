@@ -1,0 +1,8 @@
+﻿<VerticalStack Margin="20">
+	<Slider Template="#ui.slider.tmp" Height="Fit" Background="0.1,0.1,0.2,0.8"
+			Minimum="1" Maximum="50" SmallIncrement="1" LargeIncrement="10"
+			Caption="Crow Update Interval (ms)" Value="{²CrowUpdateInterval}" />
+	<Slider Template="#ui.slider.tmp" Height="Fit" Background="0.1,0.1,0.2,0.8"
+			Minimum="1" Maximum="50" SmallIncrement="1" LargeIncrement="10"
+			Caption="GLFW polling Interval (ms)" Value="{²CrowPollingInterval}" />
+</VerticalStack>

@@ -37,8 +37,8 @@ namespace ShowCase
 				app.SetWindowIcon ("#Crow.Icons.crow.png");
 				//app.Theme = @"C:\Users\Jean-Philippe\source\Crow\Themes\TestTheme";
 				CurrentProgramInstance = app;
-				Interface.UPDATE_INTERVAL = 50;
-				Interface.POLLING_INTERVAL = 5;
+				//Interface.UPDATE_INTERVAL = 50;
+				//Interface.POLLING_INTERVAL = 5;
 
 				app.Run ();
 			}
@@ -169,5 +169,24 @@ namespace ShowCase
             }
             return base.OnKeyDown (e);
         }
+
+		public int CrowUpdateInterval {
+			get => Crow.Interface.UPDATE_INTERVAL;
+			set {
+				if (Crow.Interface.UPDATE_INTERVAL == value)
+					return;
+				Crow.Interface.UPDATE_INTERVAL = value;
+				NotifyValueChanged (Crow.Interface.UPDATE_INTERVAL);
+			}
+		}
+		public int CrowPollingInterval {
+			get => Crow.Interface.POLLING_INTERVAL;
+			set {
+				if (Crow.Interface.POLLING_INTERVAL == value)
+					return;
+				Crow.Interface.POLLING_INTERVAL = value;
+				NotifyValueChanged (Crow.Interface.POLLING_INTERVAL);
+			}
+		}
     }
 }

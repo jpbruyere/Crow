@@ -5,8 +5,8 @@
 							MouseLeave="{Foreground=Transparent};{caption.Foreground=LightGrey}"
 							MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
 							MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}">
-	<HorizontalStack Margin="2">
+	<HorizontalStack Margin="1">
 		<Image Style="Icon" Path="{./Icon}"/>
-		<Label Font="{./Font}" Name="caption" Margin="3" Foreground="LightGrey" Text="{./Caption}"/>
+		<Label Font="{./Font}" Name="caption" Margin="2" Foreground="LightGrey" Text="{./Caption}"/>
 	</HorizontalStack>
 </Border>

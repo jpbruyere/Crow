@@ -1,0 +1,11 @@
+﻿<VerticalStack Background="{./Background}" Margin="5">
+	<Label Text="{./Caption}"/>
+	<Group Height="20">
+		<Gauge Height="50%" Foreground="${ControlHighlight}" Background="Onyx" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"/>
+		<Border Name="Cursor" Background="White" BorderWidth="2" Foreground="Grey"
+				MouseEnter="{Foreground=${ControlHighlight}}"
+				MouseLeave="{Foreground=Grey}" >
+			<Label Text="{./Value}" Foreground="Black"/>
+		</Border>
+	</Group>
+</VerticalStack>
