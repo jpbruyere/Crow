@@ -188,5 +188,7 @@ namespace ShowCase
 				NotifyValueChanged (Crow.Interface.POLLING_INTERVAL);
 			}
 		}
+		public IEnumerable<System.Runtime.Loader.AssemblyLoadContext> AllLoadContexts =>
+			System.Runtime.Loader.AssemblyLoadContext.All;
     }
 }

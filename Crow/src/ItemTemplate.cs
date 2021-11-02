@@ -226,7 +226,6 @@ namespace Crow
 			il = dm.GetILGenerator (256);
 			System.Reflection.Emit.Label end = il.DefineLabel ();
 			System.Reflection.Emit.Label test = il.DefineLabel ();
-
 			//get the dataSource of the arg0
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);
@@ -241,15 +240,20 @@ namespace Crow
 				}else
 					emitGetSubData(il, dataType);
 			}
-			il.Emit (OpCodes.Isinst, typeof(System.Collections.ICollection));
 			il.Emit (OpCodes.Dup);//duplicate children for testing if it's a collection for childs counting
+			il.Emit (OpCodes.Isinst, typeof(System.Collections.ICollection));
 			il.Emit (OpCodes.Brtrue, test);//if true, jump to perform count
-			il.Emit (OpCodes.Pop);//pop null
-			il.Emit (OpCodes.Ldc_I4_0);//push false
+			il.Emit (OpCodes.Isinst, typeof(System.Collections.IEnumerable));//test if enumerable
+			System.Reflection.Emit.Label pushTrue = il.DefineLabel ();
+			il.Emit (OpCodes.Brtrue, pushTrue);
+			il.Emit (OpCodes.Ldc_I4_0);//is not an enumerable, so push false for return
+			il.Emit (OpCodes.Br, end);
+			il.MarkLabel (pushTrue);
+			il.Emit (OpCodes.Ldc_I4_1);//is an enumerable, so push true for return
 			il.Emit (OpCodes.Br, end);
 
 			il.MarkLabel (test);
-
+			il.Emit (OpCodes.Isinst, typeof(System.Collections.ICollection));
 			il.Emit (OpCodes.Callvirt, CompilerServices.miGetColCount);
 			il.Emit (OpCodes.Ldc_I4_0);
 			il.Emit (OpCodes.Cgt);
@@ -260,31 +264,41 @@ namespace Crow
 			HasSubItems = (BooleanTestOnInstance)dm.CreateDelegate (typeof(BooleanTestOnInstance));
 			#endregion
 		}
+		static void emitcallvirtornot (ILGenerator il, MethodInfo mi) {
+			if (mi.IsStatic)
+				il.Emit (OpCodes.Call, mi);
+			else
+				il.Emit (OpCodes.Callvirt, mi);
+		}
 		//data is on the stack
 		void emitGetSubData(ILGenerator il, Type dataType){
 			if (dataType.IsValueType)
 				il.Emit (OpCodes.Unbox_Any, dataType);
-			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});
-			if (miGetDatas == null)
-				miGetDatas = iface.SearchExtMethod (dataType, fetchMethodName);
+			MemberInfo miGetData = dataType.GetMember (fetchMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				.FirstOrDefault(mmi => (mmi is MethodInfo mmmi && mmmi.GetParameters().Length == 0) || mmi.MemberType != MemberTypes.Method);
 
-			if (miGetDatas == null) {//in last resort, search among properties
-				PropertyInfo piDatas = dataType.GetProperty (fetchMethodName);
-				if (piDatas == null) {
-					FieldInfo fiDatas = dataType.GetField (fetchMethodName);
-					if (fiDatas == null)//and among fields
-						throw new Exception ("Fetch data member not found in ItemTemplate: " + fetchMethodName);
-					il.Emit (OpCodes.Ldfld, fiDatas);
-					return;
-				}
-				miGetDatas = piDatas.GetGetMethod ();
-				if (miGetDatas == null)
-					throw new Exception ("Write only property for fetching data in ItemTemplate: " + fetchMethodName);
+			if (miGetData == null) {
+				MethodInfo extMethd = iface.SearchExtMethod (dataType, fetchMethodName);
+				if (extMethd == null)
+					throw new Exception ("Fetch data member not found in ItemTemplate: " + fetchMethodName);
+				emitcallvirtornot (il, extMethd);
+				return;
 			}
-            if (miGetDatas.IsStatic)
-			    il.Emit (OpCodes.Call, miGetDatas);
-            else
-                il.Emit (OpCodes.Callvirt, miGetDatas);
+			if (miGetData is MethodInfo mi) {
+				emitcallvirtornot (il, mi);
+				return;
+			}
+			if (miGetData is PropertyInfo pi) {
+				if (!pi.CanRead)
+					throw new Exception ("Write only property for fetching data in ItemTemplate: " + fetchMethodName);
+				emitcallvirtornot (il, pi.GetGetMethod ());
+				//il.Emit (OpCodes.Call, pi.GetGetMethod ());
+				return;
+			}
+			if (miGetData is FieldInfo fi) {
+				il.Emit (OpCodes.Ldfld, fi);
+				return;
+			}
         }
 	}
 
