@@ -19,14 +19,21 @@ namespace Crow
 		#endregion
 
 		#region implemented abstract members of TemplatedControl
+		Widget cursorParent;
 		protected override void loadTemplate (Widget template = null)
 		{
+			if (cursorParent != null) {
+				cursorParent.LayoutChanged -= HandleCursorContainerLayoutChanged;
+				cursorParent = null;
+			}
 			base.loadTemplate (template);
 
 			cursor = child.FindByName ("Cursor");
 			if (cursor == null)
 				return;
-			(cursor.Parent as Widget).LayoutChanged += HandleCursorContainerLayoutChanged;//too difficult to unregister
+			cursorParent = cursor.Parent as Widget;
+			cursorParent.LayoutChanged += HandleCursorContainerLayoutChanged;
+
 			updateCursorWidgetProps ();
 		}
 
@@ -35,9 +42,6 @@ namespace Crow
 			computeCursorPosition ();
 		}
 		#endregion
-
-
-
 
 		protected override void registerUpdate ()
 			=> RegisterForLayouting (LayoutingType.ArrangeChildren);
@@ -221,20 +225,33 @@ namespace Crow
 			base.onMouseMove (sender, e);
 		}
 		#endregion
-
-		public void OnDecrease (object sender, MouseButtonEventArgs e)
+		/// <summary>
+		/// Handler to decrease current value by `SmallIncrement`
+		/// </summary>
+		/// <param name="sender">event sender</param>
+		/// <param name="e">event argument</param>
+		public void OnDecrease (object sender, EventArgs e)
 		{
 			Value -= SmallIncrement;
 		}
-		public void OnIncrease (object sender, MouseButtonEventArgs e)
+		/// <summary>
+		/// Handler to increase current value by `SmallIncrement`
+		/// </summary>
+		/// <param name="sender">event sender</param>
+		/// <param name="e">event argument</param>
+		public void OnIncrease (object sender, EventArgs e)
 		{
 			Value += SmallIncrement;
 		}
 
 		protected override void Dispose(bool disposing)
 		{
-			base.Dispose(disposing);
+			if (cursorParent != null) {
+				cursorParent.LayoutChanged -= HandleCursorContainerLayoutChanged;
+				cursorParent = null;
+			}
 
+			base.Dispose(disposing);
 		}
 	}
 }

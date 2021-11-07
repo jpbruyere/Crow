@@ -124,6 +124,7 @@ namespace Crow.Text
 			}
 			return new CharLocation (result, absolutePosition - lines[result].Start);
 		}
+		[Obsolete]
 		public void UpdateLineLengthInPixel (int index, int lengthInPixel) {
 			lines[index].LengthInPixel = lengthInPixel;
 		}

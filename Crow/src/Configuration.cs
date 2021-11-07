@@ -46,12 +46,12 @@ namespace Crow
 	}
 	/// <summary>
 	/// Application wide Configuration store utility
-	/// 
-	/// configuration files are automatically stored in **_user/.config/appname/app.config_** on close and every minutes
-	/// if some items have changed.
+	///
+	/// configuration files are automatically stored in **_user/.config/appname/appname.config_** on close and at interval defined by
+	/// the static field `Configuration.AUTO_SAVE_INTERVAL` but only if some items have changed.
 	/// New items are automaticaly added on first use. Configuration class expose one templated Get and one Templated Set, so
 	/// creating, storing and retrieving config items is simple as:
-	/// 
+	///
 	/// ```csharp\n
 	///     //storing\n
 	///     Configuration.Global.Set ("Option1", 42);\n
@@ -59,39 +59,61 @@ namespace Crow
 	///     int op1 = Configuration.Global.Get<int> ("Option1");\n
 	/// ```\n
 	/// </summary>
-	/// 
+	///
 	/// **.config**  file are simple text files with per line, a key/value pair of the form `option=value`. Keys have to be unique
 	/// in the application scope.
-	/// 
+	///
 	/// When running the application for the first time, some default options may be necessary. Their can be defined
 	/// in a special embedded resource text file with the key '**appname.default.config**'
+	///
+	/// You may also provide a default value when you fetch an item:
+	/// ```csharp\n
+	///     int op1 = Configuration.Global.Get<int> ("Option1", 10);\n
+	/// ```\n
+	///
 	public class Configuration
 	{
 		volatile bool isDirty = false;
 		string configPath;
 		Dictionary<string, ConfigItem> items = new Dictionary<string, ConfigItem> ();
 		static Configuration  globalConfig;
-
-		public static Configuration Global { get { return globalConfig; } }
-
+		/// <summary>
+		/// Interval in milliseconds between configuration file saving. Save is done only if an item has changed.
+		/// Default value is 200.
+		/// </summary>
+		public static int AUTO_SAVE_INTERVAL = 200;
+		/// <summary>
+		/// Default application wide store for configuration items. It's created and updated automaticaly when needed.
+		/// It's path is: **_user/.config/appname/appname.config_**.
+		/// </summary>
+		public static Configuration Global => globalConfig;
+		/// <summary>
+		/// Create a custom configuration store with the provided path.
+		/// </summary>
+		/// <param name="path">the full path where to save this configuration store.</param>
+		/// <param name="defaultConf">an optional text stream with default values.</param>
 		public Configuration (string path, Stream defaultConf = null) {
 			configPath = path;
 			if (File.Exists (configPath)) {
 				using (Stream s = new FileStream (configPath, FileMode.Open))
 					load (s);
-				
-			} else if (defaultConf != null) {				
+
+			} else if (defaultConf != null) {
 				load (defaultConf);
 			}
 			startSavingThread ();
 		}
 		/// <summary>
-		/// Create readonly configuration
+		/// Create a readonly configuration
 		/// </summary>
 		/// <param name="defaultConf"></param>
-		public Configuration (Stream defaultConf = null) {			
+		public Configuration (Stream defaultConf = null) {
 			load (defaultConf);
 		}
+		/// <summary>
+		/// Get the application configuration directory full path.
+		/// </summary>
+		/// <returns>application configuration directory full path</returns>
 		public static string AppConfigPath => Path.Combine (
 			Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".config") ,
 			Assembly.GetEntryAssembly ().GetName().Name);
@@ -121,6 +143,10 @@ namespace Crow
 			globalConfig = new Configuration (globalConfigPath);
 		}
 
+		/// <summary>
+		/// Get all the configuration item names currently present in this configuration store.
+		/// </summary>
+		/// <value>configuration item names</value>
 		public string[] Names {
 			get {
 				return items.Keys.ToArray ();
@@ -139,6 +165,13 @@ namespace Crow
 				Thread.Sleep (100);
 			}
 		}
+		/// <summary>
+		/// Try to fetch a configuration item by name.
+		/// </summary>
+		/// <param name="key">the configuration item name</param>
+		/// <param name="result">the current value, or the type default if not found in store.</param>
+		/// <typeparam name="T">The type of the configuration item</typeparam>
+		/// <returns>true if the item was present, false otherwise</returns>
 		public bool TryGet<T> (string key, out T result) {
 			if (items.ContainsKey (key)){
 				result = items [key].GetValue<T> ();
@@ -148,21 +181,27 @@ namespace Crow
 			return false;
 		}
 		/// <summary>
-		/// retrive the value of the configuration key given in parameter
+		/// Retrieve an item from this configuration store identified by the key given in parameter
 		/// </summary>
-		/// <param name="key">option name</param>
+		/// <param name="key">configuration item name</param>
+		/// <typeparam name="T">the type of the configuration item</typeparam>
+		/// <returns>The current value or the default one if not yet defined.</returns>
 		public T Get<T>(string key)
 		{
 			return !items.ContainsKey (key) ? default(T) : items [key].GetValue<T> ();
 		}
 		/// <summary>
-		/// retrive the value of the configuration key given in parameter
+		/// Retrieve an item from this configuration store identified by the key given in parameter, or
+		/// return the default value provided as parameter.
 		/// </summary>
-		/// <param name="key">option name</param>
+		/// <param name="key">configuration item name</param>
+		/// <param name="defaultValue">a default value in case this item is not yet present in the configuration store</param>
+		/// <typeparam name="T">the type of the configuration item</typeparam>
+		/// <returns>The current value or the default one if not yet defined.</returns>
 		public T Get<T>(string key, T defaultValue)
 		{
 			return !items.ContainsKey (key) ? defaultValue : items [key].GetValue<T> ();
-		}		
+		}
 		/// <summary>
 		/// store the value of the configuration key given in parameter
 		/// </summary>
@@ -177,6 +216,9 @@ namespace Crow
 				items[key].Set (value);
 			isDirty = true;
 		}
+		/// <summary>
+		/// Save this configuration store with the path provided on creation. This is done automaticaly normaly.
+		/// </summary>
 		public void Save(){
 			using (Stream s = new FileStream(configPath,FileMode.Create)){
 				using (StreamWriter sw = new StreamWriter (s)) {

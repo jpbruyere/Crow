@@ -7,7 +7,7 @@
 		<Template>
 			<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
 				Background="{./Background}"/>
-		</Template>		
+		</Template>
 		<VerticalStack Margin="0" Name="ItemsContainer" Fit="true" Background="Jet"/>
 	</Popper>
 </ItemTemplate>

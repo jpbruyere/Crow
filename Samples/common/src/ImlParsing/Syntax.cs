@@ -8,13 +8,13 @@ using System.Linq;
 namespace Crow
 {
 	public class SyntaxException : Exception {
-		public readonly Token Token;		
+		public readonly Token Token;
 		public SyntaxException(string message, Token token = default, Exception innerException = null)
 				: base (message, innerException) {
 			Token = token;
 		}
 	}
-	public class SyntaxAnalyser {		
+	public class SyntaxAnalyser {
 		XmlSource source;
 		IEnumerable<Token> tokens => source.Tokens;
 		public SyntaxNode Root => CurrentNode;
@@ -44,7 +44,7 @@ namespace Crow
 			throw new SyntaxException ("Unexpected end of source");
 		}
 
-		Token accept (IEnumerator<Token> iter, TokenType acceptedTokenType) {				
+		Token accept (IEnumerator<Token> iter, TokenType acceptedTokenType) {
 			if (iter.Current.Type == acceptedTokenType)
 				return iter.Current;
 			else
@@ -58,7 +58,7 @@ namespace Crow
 			Token eltOpen = iter.Current;
 			moveNextOrThrow (iter);
 			Token eltName = accept (iter, TokenType.ElementName);
-			
+
 			List<SyntaxNode> attributes = readAttributes (iter);
 
 			if (iter.Current.Type == TokenType.EmptyElementClosing || iter.Current.Type == TokenType.ClosingSign)
@@ -70,7 +70,7 @@ namespace Crow
 			Token eltOpen = iter.Current;
 			moveNextOrThrow (iter);
 			Token eltName = accept (iter, TokenType.ElementName);
-			moveNextOrThrow (iter);			
+			moveNextOrThrow (iter);
 			return new ElementEndTagSyntax(source, eltOpen, eltName, accept (iter, TokenType.ClosingSign));
 		}*/
 
@@ -87,7 +87,7 @@ namespace Crow
 			Exceptions = new List<SyntaxException> ();
 			CurrentNode = new IMLRootSyntax (source);
 			previousTok = default;
-			iter = tokens.GetEnumerator ();			
+			iter = tokens.GetEnumerator ();
 
 			bool notEndOfSource = iter.MoveNext ();
 			while (notEndOfSource) {
@@ -100,7 +100,7 @@ namespace Crow
 						} else if (iter.Current.Type == TokenType.ElementName)
 							tag.NameToken = iter.Current;
 						else if (iter.Current.Type == TokenType.ClosingSign) {
-							tag.EndToken = iter.Current;						
+							tag.EndToken = iter.Current;
 							CurrentNode = tag.Parent;
 							CurrentNode.RemoveChild (tag);
 							CurrentNode = CurrentNode.AddChild (new ElementSyntax (tag));
@@ -113,13 +113,13 @@ namespace Crow
 							Exceptions.Add (new SyntaxException  ("Unexpected Token", iter.Current));
 							CurrentNode.EndToken = previousTok;
 							CurrentNode = CurrentNode.Parent;
-							continue;						
+							continue;
 						}
 					} else if (CurrentNode is ElementSyntax elt) {
 						if (iter.Current.Type == TokenType.ElementOpen)
 							CurrentNode = CurrentNode.AddChild (new ElementStartTagSyntax (iter.Current));
-						else if (iter.Current.Type == TokenType.EndElementOpen) {						
-							elt.EndTag = new ElementEndTagSyntax (iter.Current);						
+						else if (iter.Current.Type == TokenType.EndElementOpen) {
+							elt.EndTag = new ElementEndTagSyntax (iter.Current);
 							CurrentNode = elt.AddChild (elt.EndTag);
 						}
 					} else if (CurrentNode is AttributeSyntax attrib) {
@@ -139,7 +139,7 @@ namespace Crow
 							Exceptions.Add (new SyntaxException  ("Unexpected Token", iter.Current));
 							CurrentNode.EndToken = previousTok;
 							CurrentNode = CurrentNode.Parent;
-							continue;						
+							continue;
 						}
 					} else if (CurrentNode is ElementEndTagSyntax eltEndTag) {
 						if (iter.Current.Type == TokenType.ElementName)
@@ -151,7 +151,7 @@ namespace Crow
 							Exceptions.Add (new SyntaxException  ("Unexpected Token", iter.Current));
 							eltEndTag.EndToken = eltEndTag.Parent.EndToken = previousTok;
 							CurrentNode = CurrentNode.Parent.Parent;
-							continue;						
+							continue;
 						}
 					} else if (CurrentNode is IMLRootSyntax) {
 						switch (iter.Current.Type) {
@@ -179,11 +179,11 @@ namespace Crow
 							Exceptions.Add (new SyntaxException  ("Unexpected Token", iter.Current));
 							pi.EndToken = previousTok;
 							CurrentNode = CurrentNode.Parent;
-							continue;						
+							continue;
 						}
 					}
 				}
-				
+
 				previousTok = iter.Current;
 				notEndOfSource = iter.MoveNext ();
 			}
@@ -191,16 +191,16 @@ namespace Crow
 				if (!CurrentNode.EndToken.HasValue)
 					CurrentNode.EndToken = previousTok;
 				CurrentNode = CurrentNode.Parent;
-			}			
+			}
 		}
 	}
 	public class SyntaxNode {
 		public SyntaxNode Parent { get; private set; }
 		List<SyntaxNode> children = new List<SyntaxNode> ();
-		
+
 		public readonly Token StartToken;
 		public Token? EndToken { get; internal set; }
-		public SyntaxNode (Token tokStart, Token? tokEnd = null) {			
+		public SyntaxNode (Token tokStart, Token? tokEnd = null) {
 			StartToken = tokStart;
 			EndToken = tokEnd;
 		}
@@ -271,7 +271,7 @@ namespace Crow
 		protected ElementTagSyntax (Token startTok)
 			: base (startTok) {
 		}
-	}	
+	}
 	public class ElementStartTagSyntax : ElementTagSyntax {
 		public ElementStartTagSyntax (Token startTok)
 			: base (startTok) {
@@ -282,11 +282,11 @@ namespace Crow
 			: base (startTok) {
 		}
 	}
-	
+
 	public class EmptyElementSyntax : SyntaxNode {
 		public readonly ElementStartTagSyntax StartTag;
 		public EmptyElementSyntax (ElementStartTagSyntax startNode) : base (startNode.StartToken, startNode.EndToken) {
-			StartTag = startNode;			
+			StartTag = startNode;
 			AddChild (StartTag);
 		}
 	}
@@ -298,7 +298,7 @@ namespace Crow
 		public override bool IsComplete => base.IsComplete & StartTag.IsComplete & (EndTag != null && EndTag.IsComplete);
 
 		public ElementSyntax (ElementStartTagSyntax startTag)
-			: base (startTag.StartToken) {			
+			: base (startTag.StartToken) {
 			StartTag = startTag;
 			AddChild (StartTag);
 		}
@@ -307,9 +307,9 @@ namespace Crow
 	public class AttributeSyntax : SyntaxNode {
 		public Token? NameToken { get; internal set; }
 		public Token? EqualToken { get; internal set; }
-		public Token? ValueOpenToken { get; internal set; }		
-		public Token? ValueCloseToken { get; internal set; }		
-		public Token? ValueToken { get; internal set; }		
+		public Token? ValueOpenToken { get; internal set; }
+		public Token? ValueCloseToken { get; internal set; }
+		public Token? ValueToken { get; internal set; }
 		public AttributeSyntax (Token startTok) : base  (startTok) {}
 		public override bool IsComplete => base.IsComplete & NameToken.HasValue & EqualToken.HasValue & ValueToken.HasValue & ValueOpenToken.HasValue & ValueCloseToken.HasValue;
 	}

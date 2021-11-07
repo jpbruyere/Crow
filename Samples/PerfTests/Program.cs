@@ -14,26 +14,6 @@ namespace PerfTests
 {
 	class TestInterface : Interface
 	{
-#if NETCOREAPP
-		static IntPtr resolveUnmanaged (Assembly assembly, String libraryName) {
-
-			switch (libraryName)
-			{
-				case "cairo":
-					return NativeLibrary.Load("cairo-2", assembly, null);
-				case "glfw3":
-					return  NativeLibrary.Load("glfw", assembly, null);
-				case "rsvg-2.40":
-					return  NativeLibrary.Load("rsvg-2", assembly, null);
-			}
-			Console.WriteLine ($"[UNRESOLVE] {assembly} {libraryName}");
-			return IntPtr.Zero;
-		}
-
-		static TestInterface () {
-			System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll+=resolveUnmanaged;
-		}
-#endif
 		readonly int count = 10, updateCycles = 0;
 		readonly bool screenOutput = false;
 		readonly string inDirectory = null;//directory to test

@@ -127,7 +127,7 @@ namespace Samples
 
 		public ActionCommand CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit, CMDShowLeftPane,
 					CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions;
-		public CommandGroup EditorCommands => new CommandGroup (CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDSave, CMDSaveAs);
+		public CommandGroup EditorFileCommands, EditorEditCommands, EditorAllCommands;
 		protected virtual void initCommands ()
 		{
 			CMDNew	= new ActionCommand ("New", new Action (onNewFile), "#Icons.blank-file.svg");
@@ -139,6 +139,11 @@ namespace Samples
 			CMDCut	= new ActionCommand ("Cut", new Action (cut), "#Icons.scissors.svg", false);
 			CMDCopy = new ActionCommand ("Copy", new Action (copy), "#Icons.copy-file.svg", false);
 			CMDPaste= new ActionCommand ("Paste", new Action (paste), "#Icons.paste-on-document.svg", false);
+
+			EditorFileCommands = new CommandGroup ("File", CMDSave, CMDSaveAs, CMDQuit);
+			EditorEditCommands  = new CommandGroup ("Edit", CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste);
+
+			EditorAllCommands = new CommandGroup (EditorFileCommands, EditorEditCommands);
 		}
 
 

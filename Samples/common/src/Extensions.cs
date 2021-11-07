@@ -1,20 +1,25 @@
 
 
+using System.IO;
 using System.Reflection;
 using Crow;
 
 namespace Samples {
 	public static class Extensions {
 
-		public static CommandGroup GetCommands (this System.IO.DirectoryInfo di) =>
+		public static CommandGroup GetCommands (this DirectoryInfo di) =>
 			new CommandGroup(
-				new ActionCommand ("Set as root", ()=> {SampleBaseForEditor.CurrentProgramInstance.CurrentDir = di.FullName;})
+				new ActionCommand ("Set as root", ()=> {SampleBaseForEditor.CurrentProgramInstance.CurrentDir = di.FullName;})/*,
+				new ActionCommand ("New Directory", (sender0) => {
+					Directory.CreateDirectory (Path.Combine (di.FullName, "new directory"));
+					Widget listContainer = ((sender0 as Widget).LogicalParent as Widget).DataSource as Widget;
+				})*/
 			);
-		public static CommandGroup GetCommands (this System.IO.FileInfo fi) =>
+		public static CommandGroup GetCommands (this FileInfo fi) =>
 			new CommandGroup(
 				new ActionCommand ("Delete", (sender0) => {
 					MessageBox.ShowModal (SampleBaseForEditor.CurrentProgramInstance, MessageBox.Type.YesNo, $"Delete {fi.Name}?").Yes += (sender, e) => {
-						System.IO.File.Delete(fi.FullName);
+						File.Delete(fi.FullName);
 						Widget listContainer = ((sender0 as Widget).LogicalParent as Widget).DataSource as Widget;
 						(listContainer.Parent as Group).RemoveChild(listContainer);
 					};
