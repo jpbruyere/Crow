@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -6,7 +6,8 @@ using System;
 using System.IO;
 
 using System.Collections.Generic;
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -24,7 +25,7 @@ namespace Crow
 	}
 	/// <summary>
 	/// virtual class for loading and drawing picture in the interface
-	/// 
+	///
 	/// Every loaded resources are stored in a dictonary with their path as key and shared
 	/// among interface elements
 	/// </summary>
@@ -72,7 +73,7 @@ namespace Crow
 		/// <param name="gr">drawing Backend context</param>
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">used for svg only</param>
-		public abstract void Paint(Interface iFace, Context ctx, Rectangle rect, string subPart = "");
+		public abstract void Paint(Interface iFace, IContext ctx, Rectangle rect, string subPart = "");
 		public abstract bool IsLoaded { get; }
 		public abstract void load (Interface iface);
 		#region Operators
@@ -84,12 +85,12 @@ namespace Crow
 		{
 			if (string.IsNullOrEmpty (path))
 				return null;
-			
+
 			Picture _pic = null;
 
-			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) 
+			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture))
 				_pic = new SvgPicture (path);
-			else 
+			else
 				_pic = new BmpPicture (path);
 
 			return _pic;

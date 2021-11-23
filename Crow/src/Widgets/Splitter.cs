@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.ComponentModel;
+using Drawing2D;
 
 namespace Crow
 {
@@ -37,11 +38,11 @@ namespace Crow
 		public override ILayoutable Parent {
 			get => base.Parent;
 			set {
-				if (value != null) {			
+				if (value != null) {
 					GenericStack gs = value as GenericStack;
 					if (gs == null)
 						throw new Exception ("Splitter may only be child of stack");
-					
+
 				}
 				base.Parent = value;
 			}
@@ -54,9 +55,9 @@ namespace Crow
 			else
 				IFace.MouseCursor = MouseCursor.sb_v_double_arrow;
 		}
-				
+
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
-		{						
+		{
 			GenericStack gs = Parent as GenericStack;
 			Rectangle gsRect = gs.ClientRectangle;
 			Point m = gs.ScreenPointToLocal (e.Position);
@@ -66,7 +67,7 @@ namespace Crow
 				lock (IFace.UpdateMutex) {
 					Widget w0 = gs.Children[ptrSplit - 1];
 					Widget w1 = gs.Children[ptrSplit + 1];
-					if (gs.Orientation == Orientation.Horizontal) {					
+					if (gs.Orientation == Orientation.Horizontal) {
 						int x = m.X - Slot.Width / 2 - gs.Spacing;
 
 						if (x > w0.Slot.Left + w0.MinimumSize.Width &&
@@ -76,14 +77,14 @@ namespace Crow
 									w0.Width = new Measure((int)Math.Round (100.0 * (x - w0.Slot.X) / (double)gsRect.Width), Unit.Percent);
 								else
 									w0.Width = x - w0.Slot.X;
-							}							
+							}
 							if (w1.Width != Measure.Stretched) {
 								x += Slot.Width + 2 * gs.Spacing;
 								if (w1.Width.IsRelativeToParent)
 									w1.Width = new Measure((int)Math.Round (100.0 * (w1.Slot.Right - x) / (double)gsRect.Width), Unit.Percent);
 								else
 									w1.Width = w1.Slot.Right - x;
-							}				
+							}
 						}
 					} else {
 						int y = m.Y - Slot.Height / 2 - gs.Spacing;
@@ -102,17 +103,17 @@ namespace Crow
 									w1.Height = new Measure((int)Math.Round (100.0 * (w1.Slot.Bottom - y) / (double)gsRect.Height), Unit.Percent);
 								else
 									w1.Height = w1.Slot.Bottom - y;
-							}				
+							}
 						}
 					}
 				}
 				e.Handled = true;
 			}
 
-			
+
 			base.onMouseMove (sender, e);
 		}
-		
+
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			GenericStack gs = Parent as GenericStack;
@@ -128,7 +129,7 @@ namespace Crow
 					Height = Measure.Stretched;
 			}
 			return base.UpdateLayout (layoutType);
-		}		
+		}
 		#endregion
 	}
 }

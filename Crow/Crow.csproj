@@ -51,13 +51,13 @@
 		<PackageReference Include="StbImageSharp" Version="2.22.4" />
 	</ItemGroup>
 
-	<PropertyGroup Condition=" '$(CrowDebugLogEnabled)' == 'true'" >
+	<PropertyGroup Condition=" '$(CrowDebugLogEnabled)' == 'true'">
 		<DefineConstants>$(DefineConstants);DEBUG_LOG</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(CrowDebugStatsEnabled)' == 'true'" >
+	<PropertyGroup Condition=" '$(CrowDebugStatsEnabled)' == 'true'">
 		<DefineConstants>$(DefineConstants);DEBUG_STATS</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(CrowDesignModeEnabled)' == 'true'" >
+	<PropertyGroup Condition=" '$(CrowDesignModeEnabled)' == 'true'">
 		<DefineConstants>$(DefineConstants);DESIGN_MODE</DefineConstants>
 	</PropertyGroup>
 	<!--<ItemGroup>
@@ -74,8 +74,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(CrowVkvgBackend)' != 'true'">
-		<Compile Include="src\GraphicBackends\Mono.Cairo\**\*.*"
-			Exclude="src\GraphicBackends\Mono.Cairo\NativeMethods-internal.cs" />
+		<Compile Include="src\GraphicBackends\Mono.Cairo\**\*.*" Exclude="src\GraphicBackends\Mono.Cairo\NativeMethods-internal.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -91,5 +90,9 @@
 		</EmbeddedResource>
 		<Compile Include="Properties\AssemblyInfo.cs" />
 		<Compile Remove="src\Widgets\ColorPicker2.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Drawing2D\Drawing2D.csproj" />
 	</ItemGroup>
 </Project>

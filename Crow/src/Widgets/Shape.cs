@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2022  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -6,7 +6,8 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -39,7 +40,7 @@ namespace Crow
 		char[] buffer = new char[20];
 		double readDouble ()
 		{
-			int length = 0;			
+			int length = 0;
 
 			while (Peek () >= 0) {
 				buffer[length] = (char)Read ();
@@ -54,7 +55,7 @@ namespace Crow
 			}
 			return double.Parse (buffer.AsSpan(0, length));
 		}
-		public void Draw (Context gr, bool measure = false)
+		public void Draw (IContext gr, bool measure = false)
 		{
 			char c;
 
@@ -178,7 +179,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// View box 
+		/// View box
 		/// </summary>
 		[DefaultValue ("32,32")]
 		public Size Size {
@@ -194,7 +195,7 @@ namespace Crow
 			}
 		}
 
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			base.onDraw (gr);
 
@@ -243,7 +244,7 @@ namespace Crow
 				if (size != default (Size))
 					contentSize = size;
 				else {
-					using (Context ctx = new Context (IFace.surf)) {
+					using (IContext ctx = new Context (IFace.surf)) {
 						using (PathParser parser = new PathParser (path))
 							parser.Draw (ctx, true);
 						Rectangle r = ctx.StrokeExtents ();

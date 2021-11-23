@@ -1,9 +1,11 @@
-﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Drawing;
+
+using Drawing2D;
+
 using static Crow.Logger;
 namespace Crow
 {
@@ -183,7 +185,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Height);
 			}
 		}
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
@@ -207,13 +209,13 @@ namespace Crow
 
 			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
-		protected override void UpdateCache (Context ctx)
+		protected override void UpdateCache (IContext ctx)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (!Clipping.IsEmpty) {
-				using (Context gr = new Context (bmp)) {
+				using (IContext gr = new Context (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();

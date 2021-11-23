@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 
-using Crow.Drawing;
+
 
 namespace Crow
 {
@@ -171,7 +171,7 @@ namespace Crow
 			else
 				return _pic.Dimensions.Height + 2 * Margin;
 		}
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			base.onDraw (gr);
 

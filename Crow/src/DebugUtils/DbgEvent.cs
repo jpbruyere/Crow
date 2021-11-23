@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Drawing2D;
 
 namespace Crow.DebugLogger
 {

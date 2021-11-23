@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Xml.Serialization;
-using Crow.Drawing;
+
+using Drawing2D;
 
 using Glfw;
 
@@ -200,7 +201,7 @@ namespace Crow
 					break;
 				}
 	            Surface dragImg = IFace.CreateSurface (r.Width, r.Height);
-				using (Context gr = new Context(dragImg)) {
+				using (IContext gr = new Context(dragImg)) {
 					gr.LineWidth = 1;
 					gr.Rectangle (0,0,r.Width,r.Height);
 					gr.SetSource (0.2,0.3,0.9,0.5);

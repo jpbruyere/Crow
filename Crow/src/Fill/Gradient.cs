@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
 
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -58,7 +59,7 @@ namespace Crow
 
 		#region implemented abstract members of Fill
 
-		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle))
 		{
 			Crow.Drawing.Gradient grad = null;
 			switch (GradientType) {

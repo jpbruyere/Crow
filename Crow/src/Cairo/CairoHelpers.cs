@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Drawing;
+using Drawing2D;
 
 namespace Crow
 {
     public static class CairoHelpers
-    {		
+    {
 		public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
 		{
 		    if (val.CompareTo(min) < 0) return min;
@@ -33,18 +33,18 @@ namespace Crow
 
             return arr[minp];
         }
-		public static void CairoRectangle(Context gr, RectangleD r, double radius, double stroke = 0.0)
+		public static void CairoRectangle(IContext gr, RectangleD r, double radius, double stroke = 0.0)
 		{
 			if (radius > 0)
 				DrawRoundedRectangle (gr, r, radius, stroke);
 			else
 				gr.Rectangle (r, stroke);
 		}
-		public static void CairoCircle(Context gr, RectangleD r)
+		public static void CairoCircle(IContext gr, RectangleD r)
 		{
 			gr.Arc(r.X + r.Width/2.0, r.Y + r.Height/2.0, Math.Min(r.Width,r.Height)/2.0, 0, 2.0*Math.PI);
 		}
-		public static void DrawRoundedRectangle(Context gr, RectangleD r, double radius, double stroke = 0.0)
+		public static void DrawRoundedRectangle(IContext gr, RectangleD r, double radius, double stroke = 0.0)
         {
 			if (stroke>0.0) {
 				gr.LineWidth = stroke;
@@ -54,7 +54,7 @@ namespace Crow
 			}else
 				DrawRoundedRectangle(gr, r.X, r.Y, r.Width, r.Height, radius);
         }
-        public static void DrawRoundedRectangle(Context gr, double x, double y, double width, double height, double radius)
+        public static void DrawRoundedRectangle(IContext gr, double x, double y, double width, double height, double radius)
         {
             //gr.Save();
 
@@ -72,7 +72,7 @@ namespace Crow
             gr.ClosePath();
             //gr.Restore();
         }
-        public static void StrokeRaisedRectangle(Context gr, Rectangle r, double width = 1)
+        public static void StrokeRaisedRectangle(IContext gr, Rectangle r, double width = 1)
         {
             //gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);
@@ -91,7 +91,7 @@ namespace Crow
 
             //gr.Restore();
         }
-        public static void StrokeLoweredRectangle(Context gr, Rectangle r, double width = 1)
+        public static void StrokeLoweredRectangle(IContext gr, Rectangle r, double width = 1)
         {
             //gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);

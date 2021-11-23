@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.0</TargetFramework>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
+
+		<Title>Drawing 2D Library</Title>
+		<Description>
+		2d shapes and drawing interfaces used in C.R.O.W and Vke.net.
+		</Description>
+		<License>MIT</License>
+		<Authors>Jean-Philippe Bruyère</Authors>
+		<RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+		<PackageTags>Crow 2D GUI Widget Interface C# Net</PackageTags>
+		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+
+		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
+		<PackageCopyright>Copyright 2022</PackageCopyright>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="src\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Enums.NET" Version="4.0.0" />
+	</ItemGroup>
+
+
+</Project>

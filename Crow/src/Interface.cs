@@ -15,9 +15,11 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using Crow.IML;
-using Crow.Drawing;
+
 using Glfw;
 using Path = System.IO.Path;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -179,14 +181,9 @@ namespace Crow
 			hWin = glfwWindowHandle;
 			PerformanceMeasure.InitMeasures ();
 		}
-#if VKVG
-		/// <summary>
-		/// constant boolean telling if crow assembly was built with `VKVG` support.
-		/// </summary>
-		public const bool HaveVkvgBackend = true;
-#else
-		public const bool HaveVkvgBackend = false;
-#endif
+		IDevice dev;
+		public IDevice Device => dev;
+
 		/// <summary>
 		/// Create a standard Crow interface.
 		/// </summary>
@@ -323,7 +320,7 @@ namespace Crow
 #if (VKVG)
 			vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
 #else
-			surf = new ImageSurface (Format.Argb32, r.Width, r.Height);
+			surf = new ImageSurface (Format.ARGB32, r.Width, r.Height);
 #endif
 		}
 		public Surface CreateSurface (ref Rectangle r) {
@@ -1188,7 +1185,7 @@ namespace Crow
 		/// 	- Drawing
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
-		public void Update(Context ctx = null){
+		public void Update(IContext ctx = null){
 
 			CrowThread[] tmpThreads;
 			lock (CrowThreads) {
@@ -1308,7 +1305,7 @@ namespace Crow
 			PerformanceMeasure.End (PerformanceMeasure.Kind.Clipping);
 			DbgLogger.EndEvent (DbgEvtType.ClippingRegistration, true);
 		}
-		void clear(Context ctx) {
+		void clear(IContext ctx) {
 			for (int i = 0; i < clipping.NumRectangles; i++)
 				ctx.Rectangle (clipping.GetRectangle (i));
 
@@ -1345,7 +1342,7 @@ namespace Crow
 
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
-		protected virtual void processDrawing(Context ctx){
+		protected virtual void processDrawing(IContext ctx){
 			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
 
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
@@ -1429,7 +1426,7 @@ namespace Crow
 			RegisterClip (w.ScreenCoordinates (w.Slot));
 		}
 		[Conditional ("DEBUG_HIGHLIGHT_FOCUS")]
-		void debugHighlightFocus (Context ctx) {
+		void debugHighlightFocus (IContext ctx) {
 			if (HoverWidget!= null) {
 				ctx.SetSource (Colors.Purple);
 				ctx.Rectangle (HoverWidget.ScreenCoordinates (HoverWidget.Slot), 1);
@@ -1456,7 +1453,7 @@ namespace Crow
 		internal Rectangle? textCursor = null;//last printed cursor, used to clear it.
 		public bool forceTextCursor = true;//when true, cursor is printed even if blinkingCursor.elapsed is not reached.
 		Stopwatch blinkingCursor = Stopwatch.StartNew ();
-		void drawTextCursor (Context ctx) {
+		void drawTextCursor (IContext ctx) {
 			if (forceTextCursor) {
 				if (FocusedWidget is IEditableTextWidget lab) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {

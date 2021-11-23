@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-using Crow.Drawing;
+
 using System.Diagnostics;
 
 namespace Samples
@@ -390,7 +390,7 @@ namespace Samples
 			initCommands();
 			base.OnInitialized();
 		}
-		protected override void processDrawing(Context ctx)
+		protected override void processDrawing(IContext ctx)
 		{
 			base.processDrawing(ctx);
 		}

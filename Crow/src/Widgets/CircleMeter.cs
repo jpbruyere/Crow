@@ -1,10 +1,11 @@
-// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.ComponentModel;
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow {
 	public class CircleMeter : Gauge {
@@ -14,7 +15,7 @@ namespace Crow {
 		#endregion
 
 		double startAngle, endAngle;
-		int lineWidth, backgroundLineWidth;		
+		int lineWidth, backgroundLineWidth;
 		/// <summary>
 		/// Starting andle in degree corresponding to the minimum value
 		/// </summary>
@@ -60,7 +61,7 @@ namespace Crow {
 		}
 		/// <summary>
 		/// Line width used to draw the background arc from start to end angle
-		/// </summary>		
+		/// </summary>
 		[DefaultValue (10)]
 		public int BackgroundLineWidth {
 			get => backgroundLineWidth;
@@ -73,7 +74,7 @@ namespace Crow {
 			}
 		}
 		const double rad = Math.PI * 2.0 / 360.0;
-		protected override void onDraw (Context gr) {
+		protected override void onDraw (IContext gr) {
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
 			/*Rectangle r = new Rectangle (Slot.Size);
@@ -112,7 +113,7 @@ namespace Crow {
 					gr.Arc (r.CenterD, radius, sArad, sArad + valAngle);
 				else
 					gr.ArcNegative (r.CenterD, radius, sArad, sArad + valAngle);
-				gr.Stroke ();				
+				gr.Stroke ();
 			/*} else {
 				double valAngle = (sArad - sErad) * valRatio;
 			}*/

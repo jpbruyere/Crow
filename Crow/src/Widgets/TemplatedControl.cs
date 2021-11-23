@@ -6,7 +6,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Xml;
-using Crow.Drawing;
+
 
 namespace Crow
 {
@@ -92,7 +92,7 @@ namespace Crow
 		///this allow applying root background to random template's component
 		/// </summary>
 		/// <param name="gr">Backend context</param>
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 

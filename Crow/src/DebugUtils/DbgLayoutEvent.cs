@@ -1,10 +1,8 @@
 ﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-using System;
-using System.Collections.Generic;
-using System.Threading;
 
+using Drawing2D;
 namespace Crow.DebugLogger
 {
 	public class DbgLayoutEvent : DbgWidgetEvent
@@ -49,6 +47,6 @@ namespace Crow.DebugLogger
 					return Colors.Orange;
 				}
 			}
-		}			
+		}
 	}
 }

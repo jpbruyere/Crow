@@ -4,7 +4,7 @@
 
 using System;
 using System.ComponentModel;
-using Crow.Drawing;
+
 
 namespace Crow {
 	public class ScrollingStack : GenericStack {
@@ -101,7 +101,7 @@ namespace Crow {
 			NotifyValueChanged ("ChildRatio", Math.Min (1.0, (double)Children.Count / visibleItems));
 		}
 
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
@@ -132,11 +132,11 @@ namespace Crow {
 
 			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
-		protected override void UpdateCache (Context ctx)
+		protected override void UpdateCache (IContext ctx)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			if (!Clipping.IsEmpty) {
-				using (Context gr = new Context (bmp)) {
+				using (IContext gr = new Context (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();

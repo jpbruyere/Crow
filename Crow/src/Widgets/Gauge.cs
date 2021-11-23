@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.ComponentModel;
 
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow {
 	public class Gauge : Widget
@@ -93,7 +94,7 @@ namespace Crow {
 		}
 		#endregion
 
-		protected override void onDraw (Context gr) {
+		protected override void onDraw (IContext gr) {
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
 			base.onDraw (gr);

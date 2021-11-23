@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2022  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -11,11 +11,11 @@ using System.Runtime.CompilerServices;
 
 using System.Diagnostics;
 using Crow.IML;
-using Crow.Drawing;
+
 using System.Threading;
 using Glfw;
 using System.Linq;
-
+using Drawing2D;
 
 #if DESIGN_MODE
 using System.Xml;
@@ -1927,7 +1927,7 @@ namespace Crow
 		}
 		#endregion
 
-		protected void setFontForContext (Context gr) {
+		protected void setFontForContext (IContext gr) {
 #if VKVG
 			gr.FontFace = Font.Name;
 			gr.FontSize = (uint)Font.Size;
@@ -1942,7 +1942,7 @@ namespace Crow
 
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
-		protected virtual void onDraw(Context gr)
+		protected virtual void onDraw(IContext gr)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
 
@@ -1978,7 +1978,7 @@ namespace Crow
 			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
 			DbgLogger.StartEvent (DbgEvtType.GOCreateContext, this);
-			using (Context gr = new Context (bmp)) {
+			using (IContext gr = new Context (bmp)) {
 				DbgLogger.EndEvent (DbgEvtType.GOCreateContext);
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
@@ -1988,7 +1988,7 @@ namespace Crow
 
 			DbgLogger.EndEvent (DbgEvtType.GORecreateCache);
 		}
-		protected void paintCache(Context ctx, Rectangle rb) {
+		protected void paintCache(IContext ctx, Rectangle rb) {
 			DbgLogger.StartEvent(DbgEvtType.GOPaintCache, this);
 			if (clearBackground) {
 				ctx.Operator = Operator.Clear;
@@ -2003,7 +2003,7 @@ namespace Crow
 #endif
 			DbgLogger.EndEvent(DbgEvtType.GOPaintCache);
 		}
-		protected virtual void UpdateCache(Context ctx){
+		protected virtual void UpdateCache(IContext ctx){
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
 			DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
@@ -2012,7 +2012,7 @@ namespace Crow
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
-		public virtual void Paint (Context ctx)
+		public virtual void Paint (IContext ctx)
 		{
 			if (!IsVisible)
 				return;
@@ -2071,7 +2071,7 @@ namespace Crow
 
 			DbgLogger.EndEvent (DbgEvtType.GOPaint);
 		}
-		void paintDisabled(Context gr, Rectangle rb){
+		void paintDisabled(IContext gr, Rectangle rb){
 			//gr.Operator = Operator.Xor;
 			gr.SetSource (0.2, 0.2, 0.2, 0.8);
 			gr.Rectangle (rb);

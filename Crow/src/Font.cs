@@ -3,7 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Drawing;
+
 
 namespace Crow
 {
@@ -40,7 +40,7 @@ namespace Crow
 		}
 
 		public FontSlant Slant {
-			get{ 
+			get{
 				switch (Style) {
 				case FontStyle.Italic:
 					return FontSlant.Italic;
@@ -50,19 +50,19 @@ namespace Crow
 			}
 		}
 		public FontWeight Wheight {
-			get{ 
+			get{
 				switch (Style) {
 				case FontStyle.Bold:
 					return FontWeight.Bold;
 				default:
 					return FontWeight.Normal;
-				}			
+				}
 			}
 		}
 
 		#region Operators
 		public static implicit operator string(Font c) => c.ToString();
-		
+
 		public static implicit operator Font(string s) => (Font)Parse(s);
 		#endregion
 
@@ -90,7 +90,7 @@ namespace Crow
 					f.Style = EnumsNET.Enums.Parse<FontStyle> (tmp.Slice (ioc + 1).ToString (), true);
 				}
 			}
-			return f;			
+			return f;
 		}
 	}
 }

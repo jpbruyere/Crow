@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -6,7 +6,9 @@ using System;
 using System.ComponentModel;
 
 using Crow.Text;
-using Crow.Drawing;
+
+using Drawing2D;
+
 using Glfw;
 
 namespace Crow
@@ -175,7 +177,7 @@ namespace Crow
 			base.OnLayoutChanges (layoutType);
 			updateMaxScrolls (layoutType);
 		}
-		protected override void drawContent (Context gr) {
+		protected override void drawContent (IContext gr) {
 			gr.Translate (-scrollX, -scrollY);
 			base.drawContent (gr);
 			gr.Translate (scrollX, scrollY);
@@ -185,7 +187,7 @@ namespace Crow
 		protected override void updateHoverLocation (Point mouseLocalPos) {
 			base.updateHoverLocation (mouseLocalPos + new Point (ScrollX, ScrollY));
 		}
-		protected override void measureTextBounds (Context gr) {
+		protected override void measureTextBounds (IContext gr) {
 			base.measureTextBounds (gr);
 			updateMaxScrolls (LayoutingType.Height);
 			updateMaxScrolls (LayoutingType.Width);

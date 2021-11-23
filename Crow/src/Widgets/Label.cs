@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2022  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -7,8 +7,9 @@ using System.Linq;
 
 using System.ComponentModel;
 using Glfw;
-using Crow.Drawing;
+
 using Crow.Text;
+using Drawing2D;
 
 namespace Crow
 {
@@ -363,7 +364,7 @@ namespace Crow
 			}
 		}
 
-		protected virtual void measureTextBounds (Context gr) {
+		protected virtual void measureTextBounds (IContext gr) {
 			fe = gr.FontExtents;
 			te = new TextExtents ();
 
@@ -386,7 +387,7 @@ namespace Crow
 			cachedTextSize.Width = lines[longestLine].LengthInPixel;
 			textMeasureIsUpToDate = true;
 		}
-		protected virtual void drawContent (Context gr) {
+		protected virtual void drawContent (IContext gr) {
 			Rectangle cb = ClientRectangle;
 			fe = gr.FontExtents;
 			double lineHeight = fe.Ascent + fe.Descent;
@@ -513,7 +514,7 @@ namespace Crow
 			int hoverLine = _multiline ?
 				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
 			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
-			using (Context gr = new Context (IFace.surf)) {
+			using (IContext gr = new Context (IFace.surf)) {
 				setFontForContext (gr);
 				updateLocation (gr, ClientRectangle.Width, ref hoverLoc);
 			}
@@ -526,7 +527,7 @@ namespace Crow
 				return null;
 			return cursor;
 		}
-		public virtual bool DrawCursor (Context ctx, out Rectangle rect) {
+		public virtual bool DrawCursor (IContext ctx, out Rectangle rect) {
 			if (CurrentLoc == null) {
 				rect = default;
 				return false;
@@ -563,7 +564,7 @@ namespace Crow
 			return true;
 		}
 
-		protected void updateLocation (Context gr, int clientWidth, ref CharLocation? location) {
+		protected void updateLocation (IContext gr, int clientWidth, ref CharLocation? location) {
 			if (location == null)
 				return;
 			CharLocation loc = location.Value;
@@ -647,7 +648,7 @@ namespace Crow
 				getLines ();
 
 			if (!textMeasureIsUpToDate) {
-				using (Context gr = new Context (IFace.surf)) {
+				using (IContext gr = new Context (IFace.surf)) {
 					setFontForContext (gr);
 					measureTextBounds (gr);
 				}
@@ -656,32 +657,34 @@ namespace Crow
 			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
 
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
+			try {
+				base.onDraw (gr);
 
-			base.onDraw (gr);
+				setFontForContext (gr);
 
-			setFontForContext (gr);
+				if (!textMeasureIsUpToDate) {
+					lock (linesMutex)
+						measureTextBounds (gr);
+				}
 
-			if (!textMeasureIsUpToDate) {
+				if (ClipToClientRect) {
+					gr.Save ();
+					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+					gr.Clip ();
+				}
+
 				lock (linesMutex)
-					measureTextBounds (gr);
-            }
+					drawContent (gr);
 
-			if (ClipToClientRect) {
-				gr.Save ();
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-				gr.Clip ();
+				if (ClipToClientRect)
+					gr.Restore ();
+
+			} finally {
+				DbgLogger.EndEvent (DbgEvtType.GODraw);
 			}
-
-			lock (linesMutex)
-				drawContent (gr);
-
-			if (ClipToClientRect)
-				gr.Restore ();
-
-			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
 		#endregion
 

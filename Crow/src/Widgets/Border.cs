@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 using System;
 using System.ComponentModel;
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -100,7 +101,7 @@ namespace Crow
 			int tmp = base.measureRawSize (lt);
 			return tmp < 0 ? tmp : tmp + 2 * BorderWidth;
 		}*/
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			drawborder2 (gr);
 
@@ -114,7 +115,7 @@ namespace Crow
 
 			//gr.Restore ();
 		}
-		void drawborder2(Context gr){
+		void drawborder2(IContext gr){
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			//rBack.Inflate (-Margin);
@@ -201,7 +202,7 @@ namespace Crow
 				}
 			}
 		}
-		void drawborder1(Context gr){
+		void drawborder1(IContext gr){
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			//rBack.Inflate (-Margin);

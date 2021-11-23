@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Crow.Drawing;
+using Drawing2D;
 
 namespace Crow
 {
@@ -17,7 +17,7 @@ namespace Crow
 	{
 		#region Cairo extensions
 
-		public static void Rectangle(this Context ctx, Rectangle r, double stroke = 0.0)
+		public static void Rectangle(this IContext ctx, Rectangle r, double stroke = 0.0)
 		{
 			if (stroke > 0.0) {
 				ctx.LineWidth = stroke;
@@ -51,7 +51,7 @@ namespace Crow
 		public static PointD Multiply(this PointD p1, double v){
 			return new PointD(p1.X * v, p1.Y * v);
 		}
-		public static void DrawCote(this Context ctx, PointD p1, PointD p2,
+		public static void DrawCote(this IContext ctx, PointD p1, PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
 		{
 			PointD vDir = p2.Substract(p1);
@@ -88,7 +88,7 @@ namespace Crow
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
 		}
-		public static void DrawCoteInverse(this Context ctx, PointD p1, PointD p2,
+		public static void DrawCoteInverse(this IContext ctx, PointD p1, PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
 		{
 			PointD vDir = p2.Substract(p1);
@@ -120,7 +120,7 @@ namespace Crow
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
 		}
-		public static void DrawCoteFixed(this Context ctx, PointD p1, PointD p2,
+		public static void DrawCoteFixed(this IContext ctx, PointD p1, PointD p2,
 			double stroke = 1.0, double coteWidth = 3.0)
 		{
 			PointD vDir = p2.Substract(p1);

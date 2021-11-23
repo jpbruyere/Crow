@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.IO;
 
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -67,7 +68,7 @@ namespace Crow
 
 		#region implemented abstract members of Fill
 		public override bool IsLoaded => hSVG != null;
-		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle))
 		{
 			if (hSVG == null)
 				load (iFace);
@@ -92,7 +93,7 @@ namespace Crow
 #else
 			using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
 #endif
-				using (Context gr = new Context (tmp)) {
+				using (IContext gr = new Context (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
@@ -111,7 +112,7 @@ namespace Crow
 		/// <param name="gr">drawing Backend context</param>
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">limit rendering to this coma separated list of svg part identified with their svg 'id' attribute.</param>
-		public override void Paint (Interface iFace, Context gr, Rectangle rect, string subPart = "")
+		public override void Paint (Interface iFace, IContext gr, Rectangle rect, string subPart = "")
 		{
 			if (hSVG == null)
 				load (iFace);

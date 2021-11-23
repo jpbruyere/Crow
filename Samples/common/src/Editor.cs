@@ -6,12 +6,14 @@ using System;
 using Glfw;
 using Crow.Text;
 using System.Collections.Generic;
-using Crow.Drawing;
+
 using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Collections;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -293,7 +295,7 @@ namespace Crow
 			base.onKeyDown(sender, e);
 		}
 
-		protected override void drawContent (Context gr) {
+		protected override void drawContent (IContext gr) {
 			try {
 				lock(TokenMutex) {
 					if (source == null || source.Tokens.Length == 0) {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -6,7 +6,8 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -103,12 +104,12 @@ namespace Crow
 			image = new byte[bitmapSize];
 			System.Runtime.InteropServices.Marshal.Copy (data.Scan0, image, 0, bitmapSize);
 
-			bitmap.UnlockBits (data);           
+			bitmap.UnlockBits (data);
 		}*/
 
 		#region implemented abstract members of Fill
 		public override bool IsLoaded => image != null;
-		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle))
 		{
 			if (image == null)
 				load (iFace);
@@ -133,14 +134,14 @@ namespace Crow
 #else
 			using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
 #endif
-				using (Context gr = new Context (tmp)) {
+				using (IContext gr = new Context (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
 #if VKVG
-					using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height)) 
+					using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height))
 #else
-					using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) 
+					using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width))
 #endif
 					{
 						gr.SetSource (imgSurf, 0,0);
@@ -148,7 +149,7 @@ namespace Crow
 					}
 				}
 				ctx.SetSource (tmp);
-			}				
+			}
 		}
 #endregion
 
@@ -159,7 +160,7 @@ namespace Crow
 		/// <param name="gr">drawing Backend context</param>
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">used for svg only</param>
-		public override void Paint (Interface iFace, Context gr, Rectangle rect, string subPart = "")
+		public override void Paint (Interface iFace, IContext gr, Rectangle rect, string subPart = "")
 		{
 			if (image == null)
 				load (iFace);
@@ -188,11 +189,11 @@ namespace Crow
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 
 #if VKVG
-			using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height)) 
+			using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height))
 #else
-			using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) 
-#endif			
-			{				
+			using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width))
+#endif
+			{
 				gr.SetSource (imgSurf, 0,0);
 				gr.Paint ();
 			}

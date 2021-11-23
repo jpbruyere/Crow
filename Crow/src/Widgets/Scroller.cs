@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.ComponentModel;
-using Crow.Drawing;
+
 using Glfw;
+using Drawing2D;
 
 namespace Crow
 {
@@ -189,7 +190,7 @@ namespace Crow
 				return;
 			updateMaxScroll(layoutType);
 		}
-		protected override void onDraw (Context gr)
+		protected override void onDraw (IContext gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 

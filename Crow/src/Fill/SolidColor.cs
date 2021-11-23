@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -10,7 +10,8 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.Diagnostics;
 
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -25,7 +26,7 @@ namespace Crow
 		#endregion
 
 		#region implemented abstract members of Fill
-		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default)
+		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default)
 		{
 			ctx.SetSource (color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0);
 		}

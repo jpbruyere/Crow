@@ -20,11 +20,13 @@ namespace ShowCase
 	class Showcase : SampleBaseForEditor
 	{
 		DbgEvtType[] logEvts = {
-			DbgEvtType.MouseEnter,
+			DbgEvtType.IFace,
+			DbgEvtType.Widget
+			/*DbgEvtType.MouseEnter,
 			DbgEvtType.MouseLeave,
 			DbgEvtType.WidgetMouseDown,
 			DbgEvtType.WidgetMouseUp,
-			DbgEvtType.WidgetMouseClick,
+			DbgEvtType.WidgetMouseClick,*/
 		};
 		static void Main ()
 		{

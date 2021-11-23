@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2022  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -6,7 +6,8 @@ using System;
 using System.ComponentModel;
 
 using Glfw;
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -136,7 +137,7 @@ namespace Crow
 			base.onMouseDown (sender, e);
 		}
 
-		protected override void onDraw (Context gr) {
+		protected override void onDraw (IContext gr) {
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
 			base.onDraw (gr);

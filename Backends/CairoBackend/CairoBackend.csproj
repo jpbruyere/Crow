@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="src\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Drawing2D\Drawing2D.csproj" />
+	</ItemGroup>
+
+</Project>

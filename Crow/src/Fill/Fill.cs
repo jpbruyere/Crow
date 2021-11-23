@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using Crow.Drawing;
+
+using Drawing2D;
 
 namespace Crow
 {
@@ -17,13 +18,13 @@ namespace Crow
 		/// </summary>
 		/// <param name="ctx">backend context</param>
 		/// <param name="bounds">paint operation bounding box, unused for SolidColor</param>
-		public abstract void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle));
+		public abstract void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle));
 		public static Fill Parse (string s){
 			ReadOnlySpan<char> tmp = s.AsSpan ();
 			if (tmp.Length == 0)
 				return null;
 			if (tmp.Length > 8 && tmp.Slice (1, 8).SequenceEqual ("gradient"))
-				return (Fill)Gradient.Parse (s);			
+				return (Fill)Gradient.Parse (s);
 			if (tmp.EndsWith (".svg", StringComparison.OrdinalIgnoreCase) ||
 				tmp.EndsWith (".png", StringComparison.OrdinalIgnoreCase) ||
 				tmp.EndsWith (".jpg", StringComparison.OrdinalIgnoreCase) ||

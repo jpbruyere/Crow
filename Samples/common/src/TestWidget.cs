@@ -1,11 +1,11 @@
 //Tutorial
 using Crow;
-using Crow.Drawing;
+
 using Glfw;
 
 namespace TestWidget {
 	public class TestWidget : Widget {
-		protected override void onDraw (Context gr) {
+		protected override void onDraw (IContext gr) {
 			base.onDraw (gr);
 			gr.SetSource (myColor);
 			gr.Rectangle (ClientRectangle);
