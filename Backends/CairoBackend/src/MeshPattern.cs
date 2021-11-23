@@ -30,7 +30,7 @@
 using System;
 using Drawing2D;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 
 	public class MeshPattern : Pattern
 	{

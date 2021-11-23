@@ -62,21 +62,21 @@ namespace Crow
 	#endif
 			Dimensions = new Size (stbi.Width, stbi.Height);
 #else
-				using (StbImage stbi = new StbImage (stream)) {
-					image = new byte [stbi.Size];
+			using (StbImage stbi = new StbImage (stream)) {
+				image = new byte [stbi.Size];
 	#if VKVG
-					Marshal.Copy (stbi.Handle, image, 0, stbi.Size);
+				Marshal.Copy (stbi.Handle, image, 0, stbi.Size);
 	#else
-					for (int i = 0; i < stbi.Size; i+=4) {
-						//rgba to argb for cairo. ???? looks like bgra to me.
-						image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
-						image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
-						image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
-						image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
-					}
-	#endif
-					Dimensions = new Size (stbi.Width, stbi.Height);
+				for (int i = 0; i < stbi.Size; i+=4) {
+					//rgba to argb for cairo. ???? looks like bgra to me.
+					image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
+					image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
+					image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
+					image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
 				}
+	#endif
+				Dimensions = new Size (stbi.Width, stbi.Height);
+			}
 #endif
 		}
 		internal static sharedPicture CreateSharedPicture (Stream stream) {
@@ -129,21 +129,13 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-#if VKVG
-			using (Surface tmp = new Surface (iFace.vkvgDevice, bounds.Width, bounds.Height)) {
-#else
-			using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
-#endif
-				using (IContext gr = new Context (tmp)) {
+			using (ISurface tmp = iFace.Device.CreateSurface (bounds.Width, bounds.Height)) {
+				using (IContext gr = iFace.Device.CreateContext (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
-#if VKVG
-					using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height))
-#else
-					using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width))
-#endif
-					{
+
+					using (ISurface imgSurf = iFace.Device.CreateSurface (bounds.Width, bounds.Height)) {
 						gr.SetSource (imgSurf, 0,0);
 						gr.Paint ();
 					}
@@ -151,7 +143,7 @@ namespace Crow
 				ctx.SetSource (tmp);
 			}
 		}
-#endregion
+		#endregion
 
 		/// <summary>
 		/// paint the image in the rectangle given in arguments according

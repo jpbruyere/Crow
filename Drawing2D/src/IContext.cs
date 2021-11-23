@@ -14,11 +14,11 @@ namespace Drawing2D
 		double LineWidth { get; set; }
 		LineJoin LineJoin { get; set; }
 		LineCap LineCap { get; set; }
-		uint FontSize { get; set; }
-		string FontFace { get; set; }
+		void SetFontSize (double scale);
+		void SelectFontFace (string family, FontSlant slant, FontWeight weight);
 		Operator Operator { get; set; }
 		FillRule FillRule { get; set; }
-		FontExtents FontExtents { get; set; }
+		FontExtents FontExtents { get; }
 		Antialias Antialias  { get; set; }
 		TextExtents TextExtents (ReadOnlySpan<char> s, int tabSize = 4);
 		void TextExtents (ReadOnlySpan<char> s, int tabSize, out TextExtents extents);

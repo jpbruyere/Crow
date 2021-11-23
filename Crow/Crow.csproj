@@ -44,13 +44,6 @@
 		<PackageReference Include="glfw-sharp" Version="$(GlfwSharpVersion)" />
 	</ItemGroup>
 
-	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
-		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
-	</PropertyGroup>
-	<ItemGroup Condition=" '$(CrowStbSharp)' == 'true'">
-		<PackageReference Include="StbImageSharp" Version="2.22.4" />
-	</ItemGroup>
-
 	<PropertyGroup Condition=" '$(CrowDebugLogEnabled)' == 'true'">
 		<DefineConstants>$(DefineConstants);DEBUG_LOG</DefineConstants>
 	</PropertyGroup>

@@ -30,7 +30,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Crow.Drawing
+namespace Crow.CairoBackend
 {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct Glyph

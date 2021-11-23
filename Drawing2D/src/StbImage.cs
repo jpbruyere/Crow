@@ -1,11 +1,11 @@
-// Copyright (c) 2019  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+// Copyright (c) 2019-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Crow {
+namespace Drawing2D {
     public class StbImage : IDisposable {
         const string stblib = "stb";
 

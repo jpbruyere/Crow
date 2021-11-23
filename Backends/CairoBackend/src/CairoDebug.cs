@@ -28,8 +28,8 @@
 
 using System;
 
-namespace Crow.Drawing {
-
+namespace Crow.CairoBackend
+{
 	static class CairoDebug
 	{
 		static System.Collections.Generic.Dictionary<IntPtr,string> traces;

@@ -3,7 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using Drawing2D;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 
 
 	public sealed class SvgHandle : IDisposable {
@@ -43,12 +43,12 @@ namespace Crow.Drawing {
 			Raw = rsvg_handle_new();
 		}
 		public  SvgHandle (byte[] data)
-		{			
+		{
 			Raw = rsvg_handle_new_from_data(data, new UIntPtr ((ulong) (data == null ? 0 : data.Length)), out IntPtr error);
 			if (error != IntPtr.Zero) throw new Exception (error.ToString());
 		}
 		public SvgHandle (string file_name)
-		{			
+		{
 			Raw = rsvg_handle_new_from_file(file_name, out IntPtr error);
 			if (error != IntPtr.Zero) throw new Exception (error.ToString());
 		}
@@ -60,10 +60,10 @@ namespace Crow.Drawing {
 
 		public void Render(Context cr) =>
 			rsvg_handle_render_cairo (Raw, cr == null ? IntPtr.Zero : cr.Handle);
-		
+
 		public void Render (Context cr, string id) =>
 			rsvg_handle_render_cairo_sub (Raw, cr == null ? IntPtr.Zero : cr.Handle, id);
-		
+
 		[StructLayout(LayoutKind.Sequential)]
 		struct DimensionData {
 
@@ -79,7 +79,7 @@ namespace Crow.Drawing {
 					return DimensionData.Zero;
 				return (DimensionData) Marshal.PtrToStructure (raw, typeof (DimensionData));
 			}
-		}		
+		}
 		public Size Dimensions {
 			get {
 				DimensionData dimension_data;
@@ -91,9 +91,9 @@ namespace Crow.Drawing {
 			}
 		}
 
-		public void Dispose() {			
+		public void Dispose() {
 			bool raw_ret = rsvg_handle_close(Raw, out IntPtr error);
-			if (error != IntPtr.Zero) throw new Exception (error.ToString());			
+			if (error != IntPtr.Zero) throw new Exception (error.ToString());
 		}
 	}
 }

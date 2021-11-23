@@ -244,7 +244,7 @@ namespace Crow
 				if (size != default (Size))
 					contentSize = size;
 				else {
-					using (IContext ctx = new Context (IFace.surf)) {
+					using (IContext ctx = IFace.Device.CreateContext (IFace.surf)) {
 						using (PathParser parser = new PathParser (path))
 							parser.Draw (ctx, true);
 						Rectangle r = ctx.StrokeExtents ();

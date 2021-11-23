@@ -35,7 +35,7 @@ using System;
 using System.Runtime.InteropServices;
 using Drawing2D;
 
-namespace Crow.Drawing
+namespace Crow.CairoBackend
 {
 	// sort the functions like in the following page so it is easier to find what is missing
 	// http://cairographics.org/manual/index-all.html

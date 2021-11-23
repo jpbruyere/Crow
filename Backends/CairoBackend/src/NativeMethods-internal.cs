@@ -34,8 +34,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using Drawing2D;
 
-namespace Cairo
+namespace Crow.CairoBackend
 {
 	// sort the functions like in the following page so it is easier to find what is missing
 	// http://cairographics.org/manual/index-all.html

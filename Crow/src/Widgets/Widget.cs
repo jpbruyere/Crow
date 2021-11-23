@@ -189,7 +189,7 @@ namespace Crow
 #endif
 
 		/// <summary>
-		/// The interface this widget is bound to when instantiated, 
+		/// The interface this widget is bound to when instantiated,
 		/// </summary>
 		public readonly Interface IFace = null;
 
@@ -330,7 +330,7 @@ namespace Crow
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
 		public bool IsQueueForClipping = false;
 		/// <summary>drawing Cache, if null, a redraw is done on repaint, cached or not</summary>
-		public Surface bmp;
+		public ISurface bmp;
 		/// <summary>
 		/// If the widget dirty state is set to true, a full redraw will be triggered on paint.
 		/// </summary>
@@ -1928,16 +1928,7 @@ namespace Crow
 		#endregion
 
 		protected void setFontForContext (IContext gr) {
-#if VKVG
-			gr.FontFace = Font.Name;
-			gr.FontSize = (uint)Font.Size;
 
-#else
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
-#endif
 		}
 
 		#region Rendering
@@ -1978,9 +1969,8 @@ namespace Crow
 			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
 			DbgLogger.StartEvent (DbgEvtType.GOCreateContext, this);
-			using (IContext gr = new Context (bmp)) {
+			using (IContext gr = IFace.Device.CreateContext (bmp)) {
 				DbgLogger.EndEvent (DbgEvtType.GOCreateContext);
-				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
 

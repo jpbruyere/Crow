@@ -31,5 +31,13 @@
 		<PackageReference Include="Enums.NET" Version="4.0.0" />
 	</ItemGroup>
 
+	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
+		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup Condition=" '$(CrowStbSharp)' == 'true'">
+		<Compile Remove="src\StbImage.cs" />
+		<PackageReference Include="StbImageSharp" Version="2.22.4" />
+	</ItemGroup>
+
 
 </Project>

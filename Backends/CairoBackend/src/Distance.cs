@@ -34,7 +34,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 
 	public struct Distance
 	{

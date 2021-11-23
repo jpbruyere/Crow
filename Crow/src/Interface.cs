@@ -122,11 +122,6 @@ namespace Crow
 			if (!Directory.Exists (CROW_CONFIG_ROOT))
 				Directory.CreateDirectory (CROW_CONFIG_ROOT);
 
-			FontRenderingOptions = new FontOptions ();
-			FontRenderingOptions.Antialias = Antialias.Subpixel;
-			FontRenderingOptions.HintMetrics = HintMetrics.On;
-			FontRenderingOptions.HintStyle = HintStyle.Full;
-			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 		}
 		/// <summary>
 		/// Each time this array is set, the resolved Assemblies will be
@@ -288,27 +283,7 @@ namespace Crow
 			initBackend ();
 			vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
 #else
-			switch (Environment.OSVersion.Platform) {
-			case PlatformID.MacOSX:
-				break;
-			case PlatformID.Unix:
-				IntPtr disp = Glfw3.GetX11Display ();
-				IntPtr nativeWin = Glfw3.GetX11Window (hWin);
-				Int32 scr = Glfw3.GetX11DefaultScreen (disp);
-				IntPtr visual = Glfw3.GetX11DefaultVisual (disp, scr);
-				surf = new XlibSurface (disp, nativeWin, visual, clientRectangle.Width, clientRectangle.Height);
-				break;
-			case PlatformID.Win32NT:
-			case PlatformID.Win32S:
-			case PlatformID.Win32Windows:
-				IntPtr hWin32 = Glfw3.GetWin32Window (hWin);
-				IntPtr hdc = Glfw3.GetWin32DC (hWin32);
-				surf = new Win32Surface (hdc);
-				break;
-			case PlatformID.Xbox:
-			case PlatformID.WinCE:
-				throw new PlatformNotSupportedException ("Unable to create cairo surface.");
-			}
+
 #endif
 		}
 		/// <summary>
@@ -323,42 +298,10 @@ namespace Crow
 			surf = new ImageSurface (Format.ARGB32, r.Width, r.Height);
 #endif
 		}
-		public Surface CreateSurface (ref Rectangle r) {
-#if (VKVG)
-			return new Surface (vkvgDevice, r.Width, r.Height);
-#else
-			return surf.CreateSimilar (Content.ColorAlpha, r.Width, r.Height);
-#endif
-		}
-		public Surface CreateSurface (int width, int height) {
-#if (VKVG)
-			return new Surface (vkvgDevice, width, height);
-#else
-			return surf.CreateSimilar (Content.ColorAlpha, width, height);
-#endif
-		}
-		public Surface CreateSurface (IntPtr existingSurfaceHandle) {
-#if (VKVG)
-			return new Surface (vkvgDevice, existingSurfaceHandle);
-#else
-			return Surface.Lookup (existingSurfaceHandle, false);
-#endif
-		}
-		public Surface CreateSurfaceForData (IntPtr data, int width, int height) {
-#if (VKVG)
-			throw new NotImplementedException ();
-#else
-			return new ImageSurface (data, Format.Argb32, width, height, width * 4);
-#endif
-		}
 		public IntPtr SurfacePointer {
 			get {
 				lock(UpdateMutex)
-#if (VKVG)
-					return (vkCtx as OffscreenVulkanContext).bitmap;
-#else
 					return surf.Handle;
-#endif
 			}
 		}
 		/// <summary>
@@ -679,10 +622,6 @@ namespace Crow
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
 		public static int MaxDiscardCount = 5;
-		/// <summary> Global font rendering settings for Cairo </summary>
-		public static FontOptions FontRenderingOptions;
-		/// <summary> Global font rendering settings for Cairo </summary>
-		public static Antialias Antialias = Antialias.Subpixel;
 
 		/// <summary>
 		/// Each control need a ref to the root interface containing it, if not set in Widget.currentInterface,
@@ -712,8 +651,8 @@ namespace Crow
 		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
 		#endregion
 
-		/// <summary>Main Cairo surface</summary>
-		public Surface surf;
+		/// <summary>Main backend surface</summary>
+		public ISurface surf;
 
 		#region Public Fields
 		/// <summary>Graphic Tree of this interface</summary>
@@ -767,7 +706,7 @@ namespace Crow
 		public DragDropEventArgs DragAndDropOperation = null;
 		internal Widget dragndropHover;
 
-		public Surface DragImage = null;
+		public ISurface DragImage = null;
 		public Rectangle DragImageBounds, lastDragImageBounds;
 		public bool DragImageFolowMouse;//prevent dragImg to be moved by mouse
 		public void ClearDragImage () {
@@ -780,7 +719,7 @@ namespace Crow
 				DragImageBounds = lastDragImageBounds = default;
 			}
 		}
-		public void CreateDragImage (Surface img, Rectangle bounds, bool followMouse = true) {
+		public void CreateDragImage (ISurface img, Rectangle bounds, bool followMouse = true) {
 			lock (UpdateMutex) {
 				if (DragImage != null)
 					ClearDragImage ();

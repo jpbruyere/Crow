@@ -13,10 +13,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 	public class XcbSurface : Surface
 	{
 		internal XcbSurface (IntPtr handle, bool owns) : base (handle, owns)
@@ -46,7 +46,7 @@ namespace Crow.Drawing {
 			return new XcbSurface (ptr, true);
 		}
 		public override void SetSize (int width, int height)
-		{			
+		{
 			NativeMethods.cairo_xcb_surface_set_size (Handle, width, height);
 		}
 	}

@@ -215,7 +215,7 @@ namespace Crow
 
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (!Clipping.IsEmpty) {
-				using (IContext gr = new Context (bmp)) {
+				using (IContext gr = IFace.Device.CreateContext (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();

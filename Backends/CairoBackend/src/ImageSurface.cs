@@ -34,8 +34,9 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Drawing2D;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 
 	public class ImageSurface : Surface
 	{
@@ -70,7 +71,7 @@ namespace Crow.Drawing {
 		}
 
 		public override int Width => NativeMethods.cairo_image_surface_get_width (Handle);
-		public override int Height => NativeMethods.cairo_image_surface_get_height (Handle);		
+		public override int Height => NativeMethods.cairo_image_surface_get_height (Handle);
 
 		public byte[] Data {
 			get {

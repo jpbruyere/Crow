@@ -25,9 +25,9 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Drawing2D;
 
-namespace Crow.Drawing {
-   
+namespace Crow.CairoBackend {
 	public class ScaledFont : IDisposable
 	{
 		protected IntPtr handle = IntPtr.Zero;

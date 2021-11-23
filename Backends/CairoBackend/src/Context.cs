@@ -39,15 +39,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Drawing2D;
 
-namespace Crow.Drawing {
-
-	[Obsolete ("Renamed Cairo.Context per suggestion from cairo binding guidelines.")]
-	public class Graphics : Context {
-		public Graphics (IntPtr state) : base (state) {}
-		public Graphics (Surface surface) : base (surface) {}
-	}
-
-	public class Context : IDisposable
+namespace Crow.CairoBackend
+{
+	public class Context : IContext
 	{
 		IntPtr handle = IntPtr.Zero;
 
@@ -81,7 +75,7 @@ namespace Crow.Drawing {
 			}
 		}
 
-		public Context (Surface surface) : this (NativeMethods.cairo_create (surface.Handle), true)
+		public Context (ISurface surface) : this (NativeMethods.cairo_create (surface.Handle), true)
 		{
 		}
 
@@ -698,17 +692,6 @@ namespace Crow.Drawing {
 			NativeMethods.cairo_identity_matrix (handle);
 		}
 
-		[Obsolete ("Use SetFontSize() instead.")]
-		public void FontSetSize (double scale)
-		{
-			SetFontSize (scale);
-		}
-
-		[Obsolete ("Use SetFontSize() instead.")]
-		public double FontSize {
-			set { SetFontSize (value); }
-		}
-
 		public Matrix FontMatrix {
 			get {
 				Matrix m;
@@ -809,12 +792,6 @@ namespace Crow.Drawing {
 		public void CopyPage ()
 		{
 			NativeMethods.cairo_copy_page (handle);
-		}
-
-		[Obsolete ("Use SelectFontFace() instead.")]
-		public void FontFace (string family, FontSlant slant, FontWeight weight)
-		{
-			SelectFontFace (family, slant, weight);
 		}
 
 		public void SetContextFontFace (FontFace value)

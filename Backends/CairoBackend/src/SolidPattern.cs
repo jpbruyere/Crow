@@ -28,8 +28,8 @@
 //
 
 using System;
-using Color = Crow.Color;
-namespace Crow.Drawing {
+using Color = Drawing2D.Color;
+namespace Crow.CairoBackend {
 
 	public class SolidPattern : Pattern
 	{

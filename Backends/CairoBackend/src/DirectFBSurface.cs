@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 	public class DirectFBSurface : Surface
 	{
 		internal DirectFBSurface (IntPtr handle, bool owns) : base (handle, owns)

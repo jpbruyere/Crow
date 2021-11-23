@@ -28,9 +28,7 @@
 
 using System;
 
-namespace Crow.Drawing {
-
-	
+namespace Crow.CairoBackend {
 	public enum SurfaceType
 	{
 		Image,

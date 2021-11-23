@@ -30,7 +30,7 @@
 
 using System;
 
-namespace Crow.Drawing
+namespace Crow.CairoBackend
 {
 	//[Flags]
 	public enum Content

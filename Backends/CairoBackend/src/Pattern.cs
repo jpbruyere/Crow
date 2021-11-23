@@ -29,8 +29,9 @@
 
 using System;
 using System.Collections;
+using Drawing2D;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
    
 	public class Pattern : IDisposable
 	{

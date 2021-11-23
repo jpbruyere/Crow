@@ -13,6 +13,8 @@ namespace Drawing2D
 		void GetDpy (out int hdpy, out int vdpy);
 		void SetDpy (int hdpy, int vdpy);
 		ISurface CreateSurface (int width, int height);
+		
+		IContext CreateContext (ISurface surf);
 	}
 }
 

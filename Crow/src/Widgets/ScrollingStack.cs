@@ -4,7 +4,7 @@
 
 using System;
 using System.ComponentModel;
-
+using Drawing2D;
 
 namespace Crow {
 	public class ScrollingStack : GenericStack {
@@ -136,7 +136,7 @@ namespace Crow {
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			if (!Clipping.IsEmpty) {
-				using (IContext gr = new Context (bmp)) {
+				using (IContext gr = IFace.Device.CreateContext (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();

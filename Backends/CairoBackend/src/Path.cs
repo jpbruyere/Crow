@@ -32,7 +32,7 @@ using System;
 using System.Runtime.InteropServices;
 
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 
 	public class Path : IDisposable
 	{

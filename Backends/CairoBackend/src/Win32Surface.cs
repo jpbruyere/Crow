@@ -13,10 +13,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,14 +28,14 @@
 
 using System;
 
-namespace Crow.Drawing {
-	
+namespace Crow.CairoBackend {
+
 	public class Win32Surface : Surface
 	{
 		internal Win32Surface (IntPtr handle, bool owns) : base (handle, owns)
 		{
 		}
-		
+
 		public Win32Surface (IntPtr hdc)
 			: base (NativeMethods.cairo_win32_surface_create (hdc), true)
 		{

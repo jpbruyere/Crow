@@ -24,7 +24,7 @@ using System;
 using System.Runtime.InteropServices;
 using Drawing2D;
 
-namespace Crow.Drawing
+namespace Crow.CairoBackend
 {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct RectangleList {

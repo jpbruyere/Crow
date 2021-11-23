@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 using System.Threading;
-
+using Drawing2D;
 using static Crow.Logger;
 
 
@@ -251,7 +251,7 @@ namespace Crow
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			if (!Clipping.IsEmpty) {
-				using (IContext gr = new Context (bmp)) {
+				using (IContext gr = IFace.Device.CreateContext (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();

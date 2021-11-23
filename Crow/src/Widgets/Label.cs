@@ -514,8 +514,9 @@ namespace Crow
 			int hoverLine = _multiline ?
 				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
 			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
-			using (IContext gr = new Context (IFace.surf)) {
-				setFontForContext (gr);
+			using (IContext gr = IFace.Device.CreateContext (IFace.surf)) {
+				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				gr.SetFontSize (Font.Size);
 				updateLocation (gr, ClientRectangle.Width, ref hoverLoc);
 			}
 		}
@@ -533,7 +534,8 @@ namespace Crow
 				return false;
 			}
 			if (!CurrentLoc.Value.HasVisualX) {
-				setFontForContext (ctx);
+				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				ctx.SetFontSize (Font.Size);
 				lock (linesMutex) {
 					if (currentLoc?.Column < 0) {
 						updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
@@ -648,8 +650,9 @@ namespace Crow
 				getLines ();
 
 			if (!textMeasureIsUpToDate) {
-				using (IContext gr = new Context (IFace.surf)) {
-					setFontForContext (gr);
+				using (IContext gr = IFace.Device.CreateContext (IFace.surf)) {
+					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+					gr.SetFontSize (Font.Size);
 					measureTextBounds (gr);
 				}
 			}
@@ -663,7 +666,8 @@ namespace Crow
 			try {
 				base.onDraw (gr);
 
-				setFontForContext (gr);
+				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				gr.SetFontSize (Font.Size);
 
 				if (!textMeasureIsUpToDate) {
 					lock (linesMutex)

@@ -28,15 +28,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+using Drawing2D;
+using Glfw;
 
-namespace Crow.Drawing
+namespace Crow.CairoBackend
 {
-	public class Device : IDisposable
+	public class Device : IDevice
 	{
 		IntPtr handle = IntPtr.Zero;
+		/// <summary> Global font rendering settings for Cairo </summary>
+		FontOptions FontRenderingOptions;
+		/// <summary> Global font rendering settings for Cairo </summary>
+		Antialias Antialias = Antialias.Subpixel;
 
 		protected Device()
 		{
+			FontRenderingOptions = new FontOptions ();
+			FontRenderingOptions.Antialias = Antialias.Subpixel;
+			FontRenderingOptions.HintMetrics = HintMetrics.On;
+			FontRenderingOptions.HintStyle = HintStyle.Full;
+			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 		}
 
 		protected Device (IntPtr ptr) : this (ptr, true)
@@ -94,7 +105,49 @@ namespace Crow.Drawing
 				return;
 
 			NativeMethods.cairo_device_destroy (handle);
+
+			FontRenderingOptions.Dispose ();
 			handle = IntPtr.Zero;
+		}
+
+		public void GetDpy(out int hdpy, out int vdpy)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void SetDpy(int hdpy, int vdpy)
+		{
+			throw new NotImplementedException();
+		}
+
+		public virtual ISurface CreateSurface(int width, int height)
+		{
+			throw new NotImplementedException();
+		}
+		public ISurface CreateSurface (IntPtr nativeWindoPointer, int width, int height) {
+			switch (Environment.OSVersion.Platform) {
+			case PlatformID.Unix:
+				IntPtr disp = Glfw3.GetX11Display ();
+				IntPtr nativeWin = Glfw3.GetX11Window (nativeWindoPointer);
+				Int32 scr = Glfw3.GetX11DefaultScreen (disp);
+				IntPtr visual = Glfw3.GetX11DefaultVisual (disp, scr);
+				return new XlibSurface (disp, nativeWin, visual, width, height);
+			case PlatformID.Win32NT:
+			case PlatformID.Win32S:
+			case PlatformID.Win32Windows:
+				IntPtr hWin32 = Glfw3.GetWin32Window (nativeWindoPointer);
+				IntPtr hdc = Glfw3.GetWin32DC (hWin32);
+				return new Win32Surface (hdc);
+			}
+			throw new PlatformNotSupportedException ("Unable to create cairo surface.");
+		}
+
+		public virtual IContext CreateContext(ISurface surf)
+		{
+			Context gr = new Context (surf);
+			gr.FontOptions = FontRenderingOptions;
+			gr.Antialias = Antialias;
+			throw new NotImplementedException();
 		}
 	}
 }

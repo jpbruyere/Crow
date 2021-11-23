@@ -21,10 +21,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -36,7 +36,7 @@
 
 using System;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 
 	public class XlibSurface : Surface
 	{
@@ -68,8 +68,8 @@ namespace Crow.Drawing {
 		public int Depth => NativeMethods.cairo_xlib_surface_get_depth (Handle);
 		public IntPtr Display => NativeMethods.cairo_xlib_surface_get_display (Handle);
 		public IntPtr Drawable => NativeMethods.cairo_xlib_surface_get_drawable (Handle);
-		public override int Width => NativeMethods.cairo_xlib_surface_get_width (Handle);		
-		public override int Height => NativeMethods.cairo_xlib_surface_get_height (Handle);		
+		public override int Width => NativeMethods.cairo_xlib_surface_get_width (Handle);
+		public override int Height => NativeMethods.cairo_xlib_surface_get_height (Handle);
 
 		public IntPtr Screen => NativeMethods.cairo_xlib_surface_get_screen (Handle);
 		public IntPtr Visual=> NativeMethods.cairo_xlib_surface_get_visual (Handle);

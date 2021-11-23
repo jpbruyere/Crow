@@ -37,9 +37,9 @@ using System;
 using System.Collections;
 using Drawing2D;
 
-namespace Crow.Drawing {
+namespace Crow.CairoBackend {
 
-	public class Surface : IDisposable
+	public class Surface : ISurface
 	{
 		IntPtr handle = IntPtr.Zero;
 
@@ -225,6 +225,21 @@ namespace Crow.Drawing {
 
 		public uint ReferenceCount {
 			get { return NativeMethods.cairo_surface_get_reference_count (handle); }
+		}
+
+		public void WriteTo(IntPtr bitmap)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Clear()
+		{
+			throw new NotImplementedException();
+		}
+
+		public ISurface CreateSimilar(int width, int height)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
