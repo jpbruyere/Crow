@@ -1168,7 +1168,7 @@ namespace Crow
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOInitialization, this);
 
-			Clipping = IFace.Device.CreateRegion ();
+			Clipping = IFace.Backend.CreateRegion ();
 			Type thisType = this.GetType ();
 
 			if (!string.IsNullOrEmpty (style)) {
@@ -1954,12 +1954,13 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
-			bmp = IFace.Device.CreateSurface (Slot.Width, Slot.Height);
+			//bmp = IFace.Device.CreateSurface (Slot.Width, Slot.Height);
+			bmp = IFace.Backend.CreateSurface (Slot.Width, Slot.Height);
 
 			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
 			DbgLogger.StartEvent (DbgEvtType.GOCreateContext, this);
-			using (IContext gr = IFace.Device.CreateContext (bmp)) {
+			using (IContext gr = IFace.Backend.CreateContext (bmp)) {
 				DbgLogger.EndEvent (DbgEvtType.GOCreateContext);
 				onDraw (gr);
 			}

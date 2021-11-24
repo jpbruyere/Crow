@@ -200,8 +200,8 @@ namespace Crow
 					r.Inflate (r.Width / -3, r.Height / -3);
 					break;
 				}
-	            ISurface dragImg = IFace.Device.CreateSurface (r.Width, r.Height);
-				using (IContext gr = IFace.Device.CreateContext (dragImg)) {
+	            ISurface dragImg = IFace.Backend.CreateSurface (r.Width, r.Height);
+				using (IContext gr = IFace.Backend.CreateContext (dragImg)) {
 					gr.LineWidth = 1;
 					gr.Rectangle (0,0,r.Width,r.Height);
 					gr.SetSource (0.2,0.3,0.9,0.5);

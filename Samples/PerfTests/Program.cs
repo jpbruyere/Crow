@@ -64,7 +64,7 @@ namespace PerfTests
 		}
 
 		public TestInterface (string[] args, int width = 800, int height = 600)
-			: base (width, height, false, false)
+			: base (width, height, true, false)
 		{
 			string outDir = null;
 
@@ -141,15 +141,10 @@ namespace PerfTests
 				writer.WriteLine ("Path;MinEllapsed;MaxEllapsed;MeanEllapsed;MedianEllapsed;sigmaEllapsed;MinMem;MaxMem;MeanMem;MedianMem;sigmaMem;MinAlloc;MaxAlloc;MeanAlloc;MedianAlloc;sigmaAlloc");
 			}
 
-			if (screenOutput) {
-				initBackend ();
+			if (screenOutput)
 				initSurface ();
-			} else {
-				SolidBackground = false;
-				initBackend (true);
-
-				CreateMainSurface (ref clientRectangle);
-			}
+			else
+				initBackend ();
 
 			initDictionaries ();
 			loadStyling ();
@@ -163,6 +158,15 @@ namespace PerfTests
 				outStream.Dispose ();
             }
         }
+		protected override void initBackend()
+		{
+			if (screenOutput)
+				backend = new Crow.CairoBackend.ImageBackend (WindowHandle, clientRectangle.Width, clientRectangle.Height);
+			else
+				backend = new Crow.CairoBackend.ImageBackend (clientRectangle.Width, clientRectangle.Height);
+
+			clipping = Backend.CreateRegion ();
+		}
 
 		struct Measures
         {

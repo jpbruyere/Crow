@@ -54,7 +54,7 @@ namespace Crow
 
 		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle))
 		{
-			IGradient grad = iFace.Device.CreateGradient (Type, bounds);
+			IGradient grad = iFace.Backend.CreateGradient (Type, bounds);
 			foreach (ColorStop cs in Stops) {
 				if (cs == null)
 					continue;

@@ -50,6 +50,54 @@ namespace Crow
 		}
 		#endregion
 
+		#region Static and constants
+		//initial capacity for layouting and clipping queues.
+		const int INIT_QUEUE_CAPACITY = 512;
+		/// <summary>Time interval in milisecond between Updates of the interface</summary>
+		public static int UPDATE_INTERVAL = 5;
+		/// <summary>
+		/// Time interval in milisecond between Glfw polling for devices. Wait is done in
+		/// the 'UpdateFrame' method in the 'Run' cycle and may be overriden.
+		/// </summary>
+		public static int POLLING_INTERVAL = 1;
+		/// <summary>Crow configuration root path</summary>
+		public static string CROW_CONFIG_ROOT;
+		/// <summary>If true, mouse focus is given when mouse is over control</summary>
+		public static bool FOCUS_ON_HOVER = false;
+		/// <summary>If true, newly focused window will be put on top</summary>
+		public static bool RAISE_WIN_ON_FOCUS = true;
+		/// <summary> Threshold to catch borders for sizing </summary>
+		public static int BorderThreshold = 3;
+		/// <summary> delay before tooltip appears </summary>
+		public static int TOOLTIP_DELAY = 500;
+		/// <summary>Double click threshold in milisecond</summary>
+		public static int DOUBLECLICK_TRESHOLD = 320;//max duration between two mouse_down evt for a dbl clk in milisec.
+		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
+		public static int DEVICE_REPEAT_DELAY = 600;
+		/// <summary> Time interval in millisecond between device event repeat</summary>
+		public static int DEVICE_REPEAT_INTERVAL = 100;
+		public static float WheelIncrement = 1;
+		/// <summary>Tabulation size in Text controls</summary>
+		public static int TAB_SIZE = 4;
+		[Obsolete]public static string LineBreak = "\n";
+		/// <summary> Allow rendering of interface in development environment </summary>
+		public static bool DesignerMode = false;
+		/// <summary> Disable caching for a widget if this threshold is reached </summary>
+		public const int MaxCacheSize = 2048;
+		/// <summary> Above this count, the layouting is discard from the current
+		/// update cycle and requeued for the next</summary>
+		public static int MaxLayoutingTries = 30;
+		/// <summary> Above this count, the layouting is discard for the widget and it
+		/// will not be rendered on screen </summary>
+		public static int MaxDiscardCount = 5;
+
+		/// <summary>
+		/// Each control need a ref to the root interface containing it, if not set in Widget.currentInterface,
+		/// the ref of this one will be stored in Widget.currentInterface
+		/// </summary>
+		//protected static Interface CurrentInterface;
+		#endregion
+
 		internal static List<Assembly> crowAssemblies = new List<Assembly> ();
 		/// <summary>
 		/// Add Assembly that may contains CROW ui ressources like custom widget classes, IML, images, ...
@@ -77,8 +125,6 @@ namespace Crow
 				crowAssemblies.Remove (a);
 				init_internal ();
 			}
-		}
-		static void nativeHelpMessage () {
 		}
 		static IntPtr resolveUnmanaged(Assembly assembly, String libraryName)
 		{
@@ -171,33 +217,31 @@ namespace Crow
 		/// <param name="height">the height of the window</param>
 		/// <param name="glfwWindowHandle">A valid GLFW window handle</param>
 		/// <returns></returns>
-		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, false, false)
+		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, true, false)
 		{
 			hWin = glfwWindowHandle;
 			PerformanceMeasure.InitMeasures ();
 		}
-		IDevice dev;
-		public IDevice Device => dev;
-
 		/// <summary>
 		/// Create a standard Crow interface.
 		/// </summary>
 		/// <param name="width">the width of the native window</param>
 		/// <param name="height">the height of the native window</param>
-		/// <param name="startUIThread">If 'yes' start the ui update (InterfaceThread method) in a dedicated thread</param>
+		/// <param name="singleThreaded">If 'false' start the ui update (InterfaceThread method) in a dedicated thread</param>
 		/// <param name="createSurface">If 'yes', create the main rendering surface on the native window</param>
-		public Interface (int width = 800, int height = 600, bool startUIThread = true, bool createSurface = true)
+		public Interface (int width = 800, int height = 600, bool singleThreaded = false, bool createSurface = true)
 		{
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 			//CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
+			SingleThreaded = singleThreaded;
 
 			if (createSurface)
 				initSurface ();
 
 			PerformanceMeasure.InitMeasures ();
 
-			if (startUIThread) {
+			if (!SingleThreaded) {
 				Thread t = new Thread (InterfaceThread) {
 					IsBackground = true
 				};
@@ -206,6 +250,57 @@ namespace Crow
 		}
 		#endregion
 
+		#region IDisposable Support
+		private bool disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					disposeContextMenus ();
+					Backend.Dispose ();
+				}
+
+				currentCursor?.Dispose ();
+
+				if (ownWindow) {
+					Glfw3.DestroyWindow (hWin);
+					Glfw3.Terminate ();
+				}
+
+				disposedValue = true;
+			}
+		}
+		~Interface() {
+			Dispose(false);
+		}
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
+
+
+		/// <summary>
+		/// Cache already searched extension methods to prevent searching again and again for
+		/// missing method or to speedup loading once a method is found.
+		/// </summary>
+		/// <remarks>
+		/// This cache is reseted when a crow assembly is removed, or the theme is changed.
+		/// </remarks>
+		protected Dictionary<string, MethodInfo> knownExtMethods;
+		/// <summary>
+		/// Cache already searched widget types.
+		/// </summary>
+		/// <remarks>
+		/// This cache is reseted when a crow assembly is removed, or the theme is changed.
+		/// </remarks>
+		protected Dictionary<string, Type> knownCrowWidgetTypes;
+		/// <summary>Client rectangle in the host context</summary>
+		protected Rectangle clientRectangle;
 #if MEASURE_TIME
 		public PerformanceMeasure[] PerfMeasures => PerformanceMeasure.Measures;
 #endif
@@ -214,12 +309,77 @@ namespace Crow
 		static Dictionary<IntPtr, Interface> windows = new Dictionary<IntPtr, Interface> ();
 		/** GLFW window native pointer and current native handle for mouse cursor */
 		IntPtr hWin;
+		protected IBackend backend;//backend device
+		/// <summary>Clipping rectangles on the root context</summary>
+		protected IRegion clipping;
+		static string backendDeviceTypeString = "Crow.CairoBackend.Device";
 		Cursor currentCursor;
 		bool ownWindow;
+		/// <summary>
+		/// If `true`, UI updates will be handle in the `Run()` method, so in the main thread of the application along with GLFW events polling.
+		/// If `false`, A dedicated thread will be started for the UI updates.
+		/// </summary>
+		public readonly bool SingleThreaded;
 		/// <summary>
 		/// Native GLFW window handle bound to this interface.
 		/// </summary>
 		public IntPtr WindowHandle => hWin;
+		public IBackend Backend => backend;
+		/// <summary>Main backend surface</summary>
+		public ISurface MainSurface => backend.MainSurface;
+		public IntPtr SurfacePointer {
+			get {
+				lock(UpdateMutex)
+					return MainSurface.Handle;
+			}
+		}
+
+		#region Public Fields
+		/// <summary>Graphic Tree of this interface</summary>
+		public List<Widget> GraphicTree = new List<Widget>();
+		/// <summary>Interface's resulting bitmap</summary>
+		public byte[] bmp;
+		/// <summary>resulting bitmap limited to last redrawn part</summary>
+		public byte[] dirtyBmp;
+		/// <summary>True when host has to repaint Interface</summary>
+		public bool IsDirty;
+		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
+		public Rectangle DirtyRect;
+		/// <summary>Locked for each layouting operation</summary>
+		public object LayoutMutex = new object();
+		/// <summary>Sync mutex between host and Crow for rendering operations (bmp, dirtyBmp,...)</summary>
+		public object RenderMutex = new object();
+		/// <summary>Global lock of the update cycle</summary>
+		public object UpdateMutex = new object();
+		/// <summary>Global lock of the clipping queue</summary>
+		public object ClippingMutex = new object();
+		//TODO:share resource instances
+		/// <summary>
+		/// Store loaded resources instances shared among controls to reduce memory footprint
+		/// </summary>
+		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
+		/// <summary>The Main layouting queue.</summary>
+		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> (INIT_QUEUE_CAPACITY);
+		/// <summary>Store discarded lqi between two updates</summary>
+		public Queue<LayoutingQueueItem> DiscardQueue;
+		/// <summary>Main drawing queue, holding layouted controls</summary>
+		public Queue<Widget> ClippingQueue = new Queue<Widget>(INIT_QUEUE_CAPACITY);
+		//TODO:use object instead for complex copy paste
+		public string Clipboard {
+			get => Glfw3.GetClipboardString (hWin);
+			set => Glfw3.SetClipboardString (hWin, value);
+		}
+		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
+		/// on the first instance creation of a IML item.
+		/// </summary>
+		public Dictionary<String, Instantiator> Instantiators;
+		/// <summary>
+		/// Item templates stored with their index
+		/// </summary>
+		public Dictionary<String, ItemTemplate> ItemTemplates;
+
+		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
+		#endregion
 
 		/// <summary>
 		/// Register GLFW window callbacs (mouse, keyboard, sizing, refresh).
@@ -240,19 +400,10 @@ namespace Crow
 #endif
 			Glfw3.SetWindowRefreshCallback (hWin, HandleWindowRefreshDelegate);
 		}
-#if VKVG
-		protected VulkanContextBase vkCtx;
-		internal Device vkvgDevice => vkCtx.VkvgDevice;
 
-		/// <summary>
-		/// Create the VulkanContext with swapchain support. Override it to use another vulkan backend.
-		/// </summary>
-#endif
-		static string backendDeviceTypeString = "Crow.CairoBackend.Device";
-		protected void initBackend (bool offscreen = false) {
-
-			dev = new Crow.CairoBackend.Device ();
-			clipping = dev.CreateRegion ();
+		protected virtual void initBackend () {
+			backend = new Crow.CairoBackend.ImageBackend (hWin, clientRectangle.Width, clientRectangle.Height);
+			clipping = Backend.CreateRegion ();
 		}
 		/// <summary>
 		/// Create the main rendering surface. The default is a GLFW window with a cairo surface bound to it.
@@ -261,88 +412,23 @@ namespace Crow
 		{
 			Glfw3.Init ();
 
-			Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
+			Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
+			Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 3);
+			//Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 0);
+			Glfw3.WindowHint (WindowAttribute.ContextCreationApi, Constants.EglContextApi);
+
 			Glfw3.WindowHint (WindowAttribute.Resizable, 1);
 			Glfw3.WindowHint (WindowAttribute.Decorated, 1);
 
 			hWin = Glfw3.CreateWindow (clientRectangle.Width, clientRectangle.Height, "win name", MonitorHandle.Zero, IntPtr.Zero);
 			if (hWin == IntPtr.Zero)
-				throw new Exception ("[GLFW3] Unable to create vulkan Window");
+				throw new Exception ("[GLFW3] Unable to create Window");
 			ownWindow = true;
 
 			registerGlfwCallbacks ();
 
 			initBackend ();
-
-			CreateMainSurface (ref clientRectangle);
 		}
-		/// <summary>
-		/// ??
-		/// </summary>
-		/// <param name="r"></param>
-		public void CreateMainSurface (ref Rectangle r) {
-			surf?.Dispose();
-			surf = Device.CreateSurface (hWin, r.Width, r.Height);
-		}
-		public IntPtr SurfacePointer {
-			get {
-				lock(UpdateMutex)
-					return surf.Handle;
-			}
-		}
-		/// <summary>
-		/// Set the main GLFW window icon.
-		/// </summary>
-		/// <param name="path"></param>
-		public void SetWindowIcon (string path) {
-			using (Stream stream = GetStreamFromPath (path)) {
-#if STB_SHARP
-				StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
-				byte[] image = new byte[stbi.Data.Length];
-				//rgba to argb for cairo.
-				for (int i = 0; i < stbi.Data.Length; i += 4) {
-					image[i] = stbi.Data[i + 2];
-					image[i + 1] = stbi.Data[i + 1];
-					image[i + 2] = stbi.Data[i];
-					image[i + 3] = stbi.Data[i + 3];
-				}
-				Glfw.Image icon = new Glfw.Image ((uint)stbi.Width, (uint)stbi.Height, image);
-				Glfw3.SetWindowIcon (hWin, 1, ref icon);
-				icon.Dispose();
-
-#else
-				using (StbImage stbi = new StbImage (stream)) {
-					byte[] image = new byte [stbi.Size];
-					//rgba to argb for cairo.
-					for (int i = 0; i < stbi.Size; i+=4) {
-						image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
-						image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
-						image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
-						image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
-					}
-					Glfw.Image icon = new Glfw.Image ((uint)stbi.Width, (uint)stbi.Height, image);
-					Glfw3.SetWindowIcon (hWin, 1, ref icon);
-					icon.Dispose();
-				}
-#endif
-			}
-		}
-		/// <summary>
-		/// Cache already searched extension methods to prevent searching again and again for
-		/// missing method or to speedup loading once a method is found.
-		/// </summary>
-		/// <remarks>
-		/// This cache is reseted when a crow assembly is removed, or the theme is changed.
-		/// </remarks>
-		protected Dictionary<string, MethodInfo> knownExtMethods;
-		/// <summary>
-		/// Cache already searched widget types.
-		/// </summary>
-		/// <remarks>
-		/// This cache is reseted when a crow assembly is removed, or the theme is changed.
-		/// </remarks>
-		protected Dictionary<string, Type> knownCrowWidgetTypes;
-
 		/// <summary>
 		/// search for graphic object type in crow assembly, if not found,
 		/// search for type independently of namespace in all the loaded assemblies
@@ -403,17 +489,34 @@ namespace Crow
 			return mi;
 		}
 
-		#region events delegates
+		#region Events
+		//public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
+		////public event EventHandler Quit;
+		public event EventHandler Initialized;
 
+		public event EventHandler StartDragOperation;
+		public event EventHandler EndDragOperation;
+		public event EventHandler<KeyEventArgs> KeyDown;
+		public event EventHandler<KeyEventArgs> KeyUp;
+
+		//public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		//public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+		//public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		//public event EventHandler<MouseButtonEventArgs> MouseClick;
+		//public event EventHandler<MouseMoveEventArgs> MouseMove;
+		//public event EventHandler<KeyEventArgs> KeyDown;
+		//public event EventHandler<KeyPressEventArgs> KeyPress;
+		/*public event EventHandler<KeyEventArgs> KeyboardKeyDown;
+		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
+		#region events delegates
 		static CursorPosDelegate HandleCursorPosDelegate = (window, xPosition, yPosition) => {
-			windows [window].OnMouseMove ((int)(xPosition / windows [window].ZoomFactor), (int)(yPosition / windows [window].ZoomFactor));
+			windows [window].OnMouseMove ((int)(xPosition), (int)(yPosition));
 		};
 		static MouseButtonDelegate HandleMouseButtonDelegate = (IntPtr window, MouseButton button, InputAction action, Modifier mods) => {
 			if (action == InputAction.Release)
 				windows [window].OnMouseButtonUp (button);
 			else//press and repeat
 				windows [window].OnMouseButtonDown (button);
-
 		};
 		static ScrollDelegate HandleScrollDelegate = (IntPtr window, double xOffset, double yOffset) => {
 			windows [window].OnMouseWheelChanged ((int)yOffset);
@@ -438,23 +541,52 @@ namespace Crow
 		static WindowDelegate HandleWindowRefreshDelegate = (IntPtr window) => {
 			windows [window].registerRefreshClientRectangle ();
 		};
-
+		#endregion
 		#endregion
 
 		public string WindowTitle {
 			set => Glfw3.SetWindowTitle (hWin, value);
 		}
+		/// <summary>
+		/// Set the main GLFW window icon.
+		/// </summary>
+		/// <param name="path"></param>
+		public void SetWindowIcon (string path) {
+			using (Stream stream = GetStreamFromPath (path)) {
+#if STB_SHARP
+				StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+				byte[] image = new byte[stbi.Data.Length];
+				//rgba to argb for cairo.
+				for (int i = 0; i < stbi.Data.Length; i += 4) {
+					image[i] = stbi.Data[i + 2];
+					image[i + 1] = stbi.Data[i + 1];
+					image[i + 2] = stbi.Data[i];
+					image[i + 3] = stbi.Data[i + 3];
+				}
+				Glfw.Image icon = new Glfw.Image ((uint)stbi.Width, (uint)stbi.Height, image);
+				Glfw3.SetWindowIcon (hWin, 1, ref icon);
+				icon.Dispose();
 
+#else
+				using (StbImage stbi = new StbImage (stream)) {
+					byte[] image = new byte [stbi.Size];
+					//rgba to argb for cairo.
+					for (int i = 0; i < stbi.Size; i+=4) {
+						image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
+						image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
+						image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
+						image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
+					}
+					Glfw.Image icon = new Glfw.Image ((uint)stbi.Width, (uint)stbi.Height, image);
+					Glfw3.SetWindowIcon (hWin, 1, ref icon);
+					icon.Dispose();
+				}
+#endif
+			}
+		}
 		public bool Running {
 			get => !Glfw3.WindowShouldClose (hWin);
 			set => Glfw3.SetWindowShouldClose (hWin, value == true ? 0 : 1);
-		}
-		public virtual void InterfaceThread ()
-		{
-			while (!Glfw3.WindowShouldClose (hWin)) {
-				Update ();
-				Thread.Sleep (UPDATE_INTERVAL);
-			}
 		}
 		protected virtual void OnInitialized ()
 		{
@@ -484,29 +616,38 @@ namespace Crow
 			loadThemeFiles ();
 			initContextMenus ();
 		}
+		public virtual void InterfaceThread ()
+		{
+			while (!Glfw3.WindowShouldClose (hWin)) {
+				Update ();
+				Thread.Sleep (UPDATE_INTERVAL);
+			}
+		}
 		/// <summary>
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
 		/// </summary>
 		public virtual void Run () {
 			Init ();
 
-			while (!Glfw3.WindowShouldClose (hWin)) {
-				Glfw3.PollEvents ();
-				UpdateFrame ();
+			if (SingleThreaded) {
+				while (!Glfw3.WindowShouldClose (WindowHandle)) {
+					Glfw3.PollEvents ();
+					Update();
+					UpdateFrame ();
+					Thread.Sleep (UPDATE_INTERVAL);
+				}
+			} else {
+				while (!Glfw3.WindowShouldClose (hWin)) {
+					Glfw3.PollEvents ();
+					UpdateFrame ();
+					Thread.Sleep (POLLING_INTERVAL);
+				}
 			}
 
 			Terminate ();
 		}
 		public virtual void Terminate () {}
-		public virtual void UpdateFrame () {
-#if VKVG
-			Update ();
-			Thread.Sleep (UPDATE_INTERVAL);
-#else
-			Thread.Sleep (POLLING_INTERVAL);
-#endif
-		}
-
+		public virtual void UpdateFrame () {}
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
 
 		public bool Shift => Glfw3.GetKey(hWin, Key.LeftShift) == InputAction.Press ||
@@ -532,164 +673,18 @@ namespace Crow
 		}
 #endif
 
-		#region IDisposable Support
-		private bool disposedValue = false; // To detect redundant calls
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposedValue)
-			{
-				if (disposing)
-				{
-					disposeContextMenus ();
-					dev.Dispose ();
-				}
 
-				currentCursor?.Dispose ();
 
-				if (ownWindow) {
-					Glfw3.DestroyWindow (hWin);
-					Glfw3.Terminate ();
-				}
 
-				disposedValue = true;
-			}
-		}
-		~Interface() {
-			Dispose(false);
-		}
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-		#endregion
 
-		#region Static and constants
-		//initial capacity for layouting and clipping queues.
-		const int INIT_QUEUE_CAPACITY = 512;
-		/// <summary>Time interval in milisecond between Updates of the interface</summary>
-		public static int UPDATE_INTERVAL = 5;
-		/// <summary>
-		/// Time interval in milisecond between Glfw polling for devices. Wait is done in
-		/// the 'UpdateFrame' method in the 'Run' cycle and may be overriden.
-		/// </summary>
-		public static int POLLING_INTERVAL = 1;
-		/// <summary>Crow configuration root path</summary>
-		public static string CROW_CONFIG_ROOT;
-		/// <summary>If true, mouse focus is given when mouse is over control</summary>
-		public static bool FOCUS_ON_HOVER = false;
-		/// <summary>If true, newly focused window will be put on top</summary>
-		public static bool RAISE_WIN_ON_FOCUS = true;
-		/// <summary> Threshold to catch borders for sizing </summary>
-		public static int BorderThreshold = 3;
-		/// <summary> delay before tooltip appears </summary>
-		public static int TOOLTIP_DELAY = 500;
-		/// <summary>Double click threshold in milisecond</summary>
-		public static int DOUBLECLICK_TRESHOLD = 320;//max duration between two mouse_down evt for a dbl clk in milisec.
-		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
-		public static int DEVICE_REPEAT_DELAY = 600;
-		/// <summary> Time interval in millisecond between device event repeat</summary>
-		public static int DEVICE_REPEAT_INTERVAL = 100;
-		public static float WheelIncrement = 1;
-		/// <summary>Tabulation size in Text controls</summary>
-		public static int TAB_SIZE = 4;
-		[Obsolete]public static string LineBreak = "\n";
-		/// <summary> Allow rendering of interface in development environment </summary>
-		public static bool DesignerMode = false;
-		/// <summary> Disable caching for a widget if this threshold is reached </summary>
-		public const int MaxCacheSize = 2048;
-		/// <summary> Above this count, the layouting is discard from the current
-		/// update cycle and requeued for the next</summary>
-		public static int MaxLayoutingTries = 30;
-		/// <summary> Above this count, the layouting is discard for the widget and it
-		/// will not be rendered on screen </summary>
-		public static int MaxDiscardCount = 5;
 
-		/// <summary>
-		/// Each control need a ref to the root interface containing it, if not set in Widget.currentInterface,
-		/// the ref of this one will be stored in Widget.currentInterface
-		/// </summary>
-		//protected static Interface CurrentInterface;
-		#endregion
-
-		#region Events
-		//public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
-		////public event EventHandler Quit;
-		public event EventHandler Initialized;
-
-		public event EventHandler StartDragOperation;
-		public event EventHandler EndDragOperation;
-		public event EventHandler<KeyEventArgs> KeyDown;
-		public event EventHandler<KeyEventArgs> KeyUp;
-
-		//public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
-		//public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
-		//public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
-		//public event EventHandler<MouseButtonEventArgs> MouseClick;
-		//public event EventHandler<MouseMoveEventArgs> MouseMove;
-		//public event EventHandler<KeyEventArgs> KeyDown;
-		//public event EventHandler<KeyPressEventArgs> KeyPress;
-		/*public event EventHandler<KeyEventArgs> KeyboardKeyDown;
-		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
-		#endregion
-
-		/// <summary>Main backend surface</summary>
-		public ISurface surf;
-
-		#region Public Fields
-		/// <summary>Graphic Tree of this interface</summary>
-		public List<Widget> GraphicTree = new List<Widget>();
-		/// <summary>Interface's resulting bitmap</summary>
-		public byte[] bmp;
-		/// <summary>resulting bitmap limited to last redrawn part</summary>
-		public byte[] dirtyBmp;
-		/// <summary>True when host has to repaint Interface</summary>
-		public bool IsDirty;
-		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
-		public Rectangle DirtyRect;
-		/// <summary>Locked for each layouting operation</summary>
-		public object LayoutMutex = new object();
-		/// <summary>Sync mutex between host and Crow for rendering operations (bmp, dirtyBmp,...)</summary>
-		public object RenderMutex = new object();
-		/// <summary>Global lock of the update cycle</summary>
-		public object UpdateMutex = new object();
-		/// <summary>Global lock of the clipping queue</summary>
-		public object ClippingMutex = new object();
-		//TODO:share resource instances
-		/// <summary>
-		/// Store loaded resources instances shared among controls to reduce memory footprint
-		/// </summary>
-		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
-		/// <summary>The Main layouting queue.</summary>
-		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> (INIT_QUEUE_CAPACITY);
-		/// <summary>Store discarded lqi between two updates</summary>
-		public Queue<LayoutingQueueItem> DiscardQueue;
-		/// <summary>Main drawing queue, holding layouted controls</summary>
-		public Queue<Widget> ClippingQueue = new Queue<Widget>(INIT_QUEUE_CAPACITY);
-		//TODO:use object instead for complex copy paste
-		public string Clipboard {
-			get => Glfw3.GetClipboardString (hWin);
-			set => Glfw3.SetClipboardString (hWin, value);
-		}
-		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
-		/// on the first instance creation of a IML item.
-		/// </summary>
-		public Dictionary<String, Instantiator> Instantiators;
-		/// <summary>
-		/// Item templates stored with their index
-		/// </summary>
-		public Dictionary<String, ItemTemplate> ItemTemplates;
-
-		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
-
+		#region DragAndDrop
 		public bool DragAndDropInProgress => DragAndDropOperation != null;
 		public Widget DropTarget => DragAndDropOperation?.DropTarget;
-
 		public DragDropEventArgs DragAndDropOperation = null;
 		internal Widget dragndropHover;
-
 		public ISurface DragImage = null;
 		public Rectangle DragImageBounds, lastDragImageBounds;
 		public bool DragImageFolowMouse;//prevent dragImg to be moved by mouse
@@ -713,15 +708,6 @@ namespace Crow
 				DragImageFolowMouse = followMouse;
 			}
 		}
-		#endregion
-
-		#region Private Fields
-		/// <summary>Client rectangle in the host context</summary>
-		protected Rectangle clientRectangle;
-		/// <summary>Clipping rectangles on the root context</summary>
-		IRegion clipping;
-		/// <summary>Main Cairo context</summary>
-		//Context ctx;
 		#endregion
 
 		#region Default values and Style loading
@@ -816,10 +802,10 @@ namespace Crow
 							string resId = $"#{pic.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
 							using (Stream s = new FileStream (pic, FileMode.Open, FileAccess.Read)) {
 								if (resId.EndsWith (".svg", StringComparison.OrdinalIgnoreCase)) {
-									ISvgHandle hSVG = Device.LoadSvg (s);
+									ISvgHandle hSVG = Backend.LoadSvg (s);
 									sharedPictures[resId] = new sharedPicture (hSVG, hSVG.Dimensions);
 								} else {
-									byte[] image = Device.LoadBitmap (s, out Size dimensions);
+									byte[] image = Backend.LoadBitmap (s, out Size dimensions);
 									sharedPictures[resId] = new sharedPicture (image, dimensions);
 								}
 							}
@@ -1151,11 +1137,9 @@ namespace Crow
 				}
 
 				if (!clipping.IsEmpty || shouldDrawTextCursor) {
-					if (ctx == null) {
-						using (ctx =  Device.CreateContext (surf))
-							processDrawing (ctx);
-					}else
-						processDrawing (ctx);
+					ctx = Backend.PrepareUIFrame (ctx, clipping);
+					processDrawing (ctx);
+					Backend.FlushUIFrame (ctx);
 				}
 			} finally {
 
@@ -1217,40 +1201,7 @@ namespace Crow
 			PerformanceMeasure.End (PerformanceMeasure.Kind.Clipping);
 			DbgLogger.EndEvent (DbgEvtType.ClippingRegistration, true);
 		}
-		void clear(IContext ctx) {
-			for (int i = 0; i < clipping.NumRectangles; i++)
-				ctx.Rectangle (clipping.GetRectangle (i));
 
-			ctx.ClipPreserve ();
-			ctx.Operator = Operator.Clear;
-			ctx.Fill ();
-			ctx.Operator = Operator.Over;
-		}
-		bool solidBackground = false;
-		public bool SolidBackground {
-			get => solidBackground;
-			set {
-				if (Environment.OSVersion.Platform == PlatformID.Unix)
-					solidBackground = value;
-				else
-					Debug.WriteLine ("SolidBackground property only available on unix.");
-			}
-		}
-		double zoomFactor = 1.0;
-		public double ZoomFactor {
-			get => zoomFactor;
-			set {
-				if (zoomFactor == value)
-					return;
-				zoomFactor = value;
-				NotifyValueChanged (zoomFactor);
-				lock (UpdateMutex) {
-					foreach (Widget g in GraphicTree)
-						g.RegisterForLayouting (LayoutingType.All);
-					registerRefreshClientRectangle ();
-				}
-			}
-		}
 
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
@@ -1258,18 +1209,8 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
 
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
+
 			if (!clipping.IsEmpty) {
-				ctx.Scale (zoomFactor,zoomFactor);
-
-#if VKVG
-				clear (ctx);
-#else
-				ctx.PushGroup ();
-
-				if (SolidBackground)
-					clear (ctx);
-#endif
-
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 					Widget p = GraphicTree[i];
 					if (!p.IsVisible)
@@ -1281,7 +1222,6 @@ namespace Crow
 					p.Paint (ctx);
 					ctx.Restore ();
 				}
-
 
 				if (lastDragImageBounds != DragImageBounds) {
 					DirtyRect += lastDragImageBounds;
@@ -1304,28 +1244,13 @@ namespace Crow
 
 #endif
 
-#if VKVG
-				ctx.Flush();
-#else
-				ctx.PopGroupToSource ();
-
-				if (!SolidBackground)
-					clear (ctx);
-
-				ctx.Paint ();
-
-				surf.Flush ();
-#endif
-
 				clipping.Reset ();
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 				IsDirty = true;
 			}
 
-#if !VKVG
 			drawTextCursor (ctx);
-#endif
 
 			debugHighlightFocus (ctx);
 
@@ -1354,7 +1279,7 @@ namespace Crow
 			/*if (DragAndDropInProgress) {
 
 			}*/
-			surf.Flush ();
+			MainSurface.Flush ();
 		}
 
 		#region Blinking text cursor
@@ -1372,7 +1297,7 @@ namespace Crow
 						if (textCursor != null && c != textCursor.Value)
 							RegisterClip (textCursor.Value);
 						textCursor = c;
-						surf.Flush ();
+						MainSurface.Flush ();
 					} else if (textCursor != null)
 						RegisterClip (textCursor.Value);
 				}
@@ -1386,7 +1311,7 @@ namespace Crow
 				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {
 						textCursor = c;
-						surf.Flush ();
+						MainSurface.Flush ();
 						blinkingCursor.Restart ();
 					}
 				}
@@ -1506,7 +1431,7 @@ namespace Crow
 		public virtual void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
-				surf.Resize (clientRectangle.Width, clientRectangle.Height);
+				MainSurface.Resize (clientRectangle.Width, clientRectangle.Height);
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 
@@ -1514,7 +1439,7 @@ namespace Crow
 			}
 		}
 
-		internal void registerRefreshClientRectangle () => RegisterClip (clientRectangle);
+		protected void registerRefreshClientRectangle () => RegisterClip (clientRectangle);
 
 		#region Mouse and Keyboard Handling
 		MouseCursor cursor = MouseCursor.top_left_arrow;
@@ -1646,7 +1571,7 @@ namespace Crow
 		/// Ask OS to force the mouse position to the actual coordinate of Interface.MousePosition
 		/// </summary>
 		public virtual void ForceMousePosition () {
-			Glfw3.SetCursorPosition (hWin, MousePosition.X * ZoomFactor, MousePosition.Y * ZoomFactor);
+			Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
 		}
 
 		/// <summary>Processes mouse move events from the root container, this function
@@ -2123,7 +2048,7 @@ namespace Crow
 			set { throw new NotImplementedException (); }
 		}
 
-		public Rectangle ClientRectangle => clientRectangle.Scaled (1.0/zoomFactor);
+		public Rectangle ClientRectangle => clientRectangle;
 		public Rectangle GetClientRectangleForChild (ILayoutable child) => ClientRectangle;
 		public Interface HostContainer => this;
 

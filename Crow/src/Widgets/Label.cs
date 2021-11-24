@@ -514,7 +514,7 @@ namespace Crow
 			int hoverLine = _multiline ?
 				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
 			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
-			using (IContext gr = IFace.Device.CreateContext (IFace.surf)) {
+			using (IContext gr = IFace.Backend.CreateContext (IFace.MainSurface)) {
 				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 				gr.SetFontSize (Font.Size);
 				updateLocation (gr, ClientRectangle.Width, ref hoverLoc);
@@ -650,7 +650,7 @@ namespace Crow
 				getLines ();
 
 			if (!textMeasureIsUpToDate) {
-				using (IContext gr = IFace.Device.CreateContext (IFace.surf)) {
+				using (IContext gr = IFace.Backend.CreateContext (IFace.MainSurface)) {
 					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 					gr.SetFontSize (Font.Size);
 					measureTextBounds (gr);

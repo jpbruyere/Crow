@@ -251,7 +251,7 @@ namespace Crow
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			if (!Clipping.IsEmpty) {
-				using (IContext gr = IFace.Device.CreateContext (bmp)) {
+				using (IContext gr = IFace.Backend.CreateContext (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
 						gr.Rectangle(Clipping.GetRectangle(i));
 					gr.ClipPreserve();

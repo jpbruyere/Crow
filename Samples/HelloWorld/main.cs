@@ -1,13 +1,15 @@
 ﻿using System;
 using Crow;
+using Glfw;
 using Samples;
 
 namespace HelloWorld
 {
-	class Program {
+	class Program : Interface {
+		Program() : base (800, 600, true, true) {}
 		static void Main (string[] args) {
-			using (Interface app = new Interface ()) {
-				app.Initialized += (sender, e) => app.LoadIMLFragment (@"<Label Text='Hello World'/>");
+			using (Program app = new Program ()) {
+				app.Initialized += (sender, e) => app.LoadIMLFragment (@"<Window Caption='Hello World'/>");
 				app.Run ();
 			}
 		}

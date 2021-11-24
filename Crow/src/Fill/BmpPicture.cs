@@ -40,7 +40,7 @@ namespace Crow
 				return;
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path)) {
-				image = iFace.Device.LoadBitmap (stream, out Size dimensions);
+				image = iFace.Backend.LoadBitmap (stream, out Size dimensions);
 				Dimensions = dimensions;
 				iFace.sharedPictures[Path] = new sharedPicture (image, Dimensions);
 			}
@@ -89,13 +89,13 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			using (ISurface tmp = iFace.Device.CreateSurface (bounds.Width, bounds.Height)) {
-				using (IContext gr = iFace.Device.CreateContext (tmp)) {
+			using (ISurface tmp = iFace.Backend.CreateSurface (bounds.Width, bounds.Height)) {
+				using (IContext gr = iFace.Backend.CreateContext (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
 
-					using (ISurface imgSurf = iFace.Device.CreateSurface (bounds.Width, bounds.Height)) {
+					using (ISurface imgSurf = iFace.Backend.CreateSurface (bounds.Width, bounds.Height)) {
 						gr.SetSource (imgSurf, 0,0);
 						gr.Paint ();
 					}
@@ -138,7 +138,7 @@ namespace Crow
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 
-			using (ISurface imgSurf = iFace.Device.CreateSurface (image, Dimensions.Width, Dimensions.Height)) {
+			using (ISurface imgSurf = iFace.Backend.CreateSurface (image, Dimensions.Width, Dimensions.Height)) {
 				gr.SetSource (imgSurf, 0,0);
 				gr.Paint ();
 			}

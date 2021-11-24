@@ -54,7 +54,7 @@ namespace Crow.CairoBackend {
 		{}
 		public override void Flush ()
 		{
-			base.Flush ();
+			//base.Flush ();
 			SwapBuffers ();
 		}
 		public override int Width => NativeMethods.cairo_gl_surface_get_width (handle);

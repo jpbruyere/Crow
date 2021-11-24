@@ -38,13 +38,13 @@ namespace Crow
 				return;
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path))
-				hSVG = iFace.Device.LoadSvg (stream);
+				hSVG = iFace.Backend.LoadSvg (stream);
 			Dimensions = hSVG.Dimensions;
 			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);
 		}
 
 		public void LoadSvgFragment (Interface iface, string fragment) {
-			hSVG = iface.Device.LoadSvg (fragment);
+			hSVG = iface.Backend.LoadSvg (fragment);
 			Dimensions = hSVG.Dimensions;
 		}
 
@@ -70,8 +70,8 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			using (ISurface tmp = iFace.Device.CreateSurface (bounds.Width, bounds.Height)) {
-				using (IContext gr = iFace.Device.CreateContext (tmp)) {
+			using (ISurface tmp = iFace.Backend.CreateSurface (bounds.Width, bounds.Height)) {
+				using (IContext gr = iFace.Backend.CreateContext (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
