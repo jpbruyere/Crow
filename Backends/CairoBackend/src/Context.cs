@@ -138,6 +138,11 @@ namespace Crow.CairoBackend
 				return NativeMethods.cairo_status (handle);
 			}
 		}
+		public string StatusString {
+			get {
+				return System.Runtime.InteropServices.Marshal.PtrToStringAuto(NativeMethods.cairo_status_to_string (Status));
+			}
+		}
 
 		public IntPtr Handle => handle;
 

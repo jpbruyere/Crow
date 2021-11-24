@@ -112,7 +112,7 @@ namespace Crow.CairoBackend
 		public virtual ISurface CreateSurface(byte[] data, int width, int height)
 			=> new ImageSurface (data, Format.ARGB32, width, height, 4 * width);
 
-		public ISurface CreateSurface (IntPtr nativeWindoPointer, int width, int height) {
+		public virtual ISurface CreateSurface (IntPtr nativeWindoPointer, int width, int height) {
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.Unix:
 				IntPtr disp = Glfw3.GetX11Display ();

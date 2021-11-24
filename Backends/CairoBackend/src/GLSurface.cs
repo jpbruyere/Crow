@@ -52,6 +52,13 @@ namespace Crow.CairoBackend {
 		public GLSurface (WGLDevice device, IntPtr hdc, int width, int height)
 			: base (NativeMethods.cairo_gl_surface_create_for_dc (device.Handle, hdc, width, height), true)
 		{}
+		public override void Flush ()
+		{
+			base.Flush ();
+			SwapBuffers ();
+		}
+		public override int Width => NativeMethods.cairo_gl_surface_get_width (handle);
+		public override int Height => NativeMethods.cairo_gl_surface_get_height (handle);
 
 		public void SwapBuffers(){
 			NativeMethods.cairo_gl_surface_swapbuffers (this.Handle);

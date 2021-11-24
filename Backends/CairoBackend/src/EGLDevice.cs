@@ -28,14 +28,22 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+using Drawing2D;
 
 namespace Crow.CairoBackend
 {
 	public class EGLDevice : GLDevice
 	{
-		public EGLDevice (IntPtr dpy, IntPtr gl_ctx) : base (NativeMethods.cairo_egl_device_create (dpy, gl_ctx), true)
+		public EGLDevice (IntPtr dpy, IntPtr gl_ctx, bool threadAwayre = false) : base (NativeMethods.cairo_egl_device_create (dpy, gl_ctx), true)
 		{
+			SetThreadAware(threadAwayre);
 		}
+		public override ISurface CreateSurface(int width, int height)
+			=> new ImageSurface (Format.ARGB32, width, height);
+		public override ISurface CreateSurface (IntPtr nativeWindoPointer, int width, int height) {
+			return new GLSurface (this, Glfw.Glfw3.GetEGLSurface (nativeWindoPointer), width, height);
+		}
+
 	}
 }
 

@@ -111,12 +111,9 @@ namespace Crow.CairoBackend {
 		}
 
 
-		public Surface CreateSimilar (
-			Content content, int width, int height)
-		{
+		public ISurface CreateSimilar (int width, int height) {
 			IntPtr p = NativeMethods.cairo_surface_create_similar (
-				this.Handle, content, width, height);
-
+				this.Handle, Content.ColorAlpha, width, height);
 			return Surface.Lookup(p, true);
 		}
 
@@ -152,7 +149,7 @@ namespace Crow.CairoBackend {
 			return Status;
 		}
 
-		public void Flush ()
+		public virtual void Flush ()
 		{
 			NativeMethods.cairo_surface_flush (handle);
 		}
@@ -166,8 +163,8 @@ namespace Crow.CairoBackend {
 		{
 			NativeMethods.cairo_surface_mark_dirty_rectangle (Handle, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 		}
-		public virtual int Width => -1;
-		public virtual int Height => -1;
+		public virtual int Width => NativeMethods.cairo_image_surface_get_width (handle);
+		public virtual int Height => NativeMethods.cairo_image_surface_get_height (handle);
 
 		public IntPtr Handle {
 			get {
@@ -232,11 +229,6 @@ namespace Crow.CairoBackend {
 		}
 
 		public void Clear()
-		{
-			throw new NotImplementedException();
-		}
-
-		public ISurface CreateSimilar(int width, int height)
 		{
 			throw new NotImplementedException();
 		}
