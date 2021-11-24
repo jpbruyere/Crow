@@ -37,7 +37,7 @@ namespace Crow.CairoBackend {
 		public GLSurface (IntPtr ptr, bool own) : base (ptr, own)
 		{}
 
-		public GLSurface (Device device, Content content, uint tex, int width, int height)
+		public GLSurface (CairoDevice device, Content content, uint tex, int width, int height)
 			: base (NativeMethods.cairo_gl_surface_create_for_texture (device.Handle, (uint)content, tex, width, height), true)
 		{}
 

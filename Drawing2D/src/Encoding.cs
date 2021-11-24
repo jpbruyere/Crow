@@ -2,14 +2,12 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Crow.Text
+namespace Drawing2D
 {
-    public class Encoding
+	public static class Extensions
     {
-        public static int ToUtf8 (ReadOnlySpan<char> source, Span<byte> buff, int tabWidth = 4) {
+        public static int ToUtf8 (this ReadOnlySpan<char> source, Span<byte> buff, int tabWidth = 4) {
             int c = 0;
             int encodedBytes = 0;
             int encodedChar = 0;

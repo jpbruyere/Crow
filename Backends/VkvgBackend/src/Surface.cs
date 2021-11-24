@@ -1,20 +1,22 @@
-﻿// Copyright (c) 2018-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2018-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
+using Drawing2D;
 
-namespace Crow.Drawing
+namespace Crow.VkvgBackend
 {
-	public class Surface: IDisposable
-	{		
+	public class Surface: ISurface
+	{
 		IntPtr handle = IntPtr.Zero;
 		Device vkvgDev;
 
+		#region CTOR
 		public Surface (Device device, int width, int height)
 		{
 			vkvgDev = device;
-			if (width <= 0 || height <= 0)				
+			if (width <= 0 || height <= 0)
 				handle = NativeMethods.vkvg_surface_create (device.Handle, 1, 1);
 			else
 				handle = NativeMethods.vkvg_surface_create (device.Handle, (uint)width, (uint)height);
@@ -38,6 +40,7 @@ namespace Crow.Drawing
 		{
 			handle = NativeMethods.vkvg_surface_create (devHandle, (uint)width, (uint)heigth);
 		}
+		#endregion
 		~Surface ()
 		{
 			Dispose (false);
@@ -51,12 +54,12 @@ namespace Crow.Drawing
 		public void AddReference () => NativeMethods.vkvg_surface_reference (handle);
 		public uint References () => NativeMethods.vkvg_surface_get_reference_count (handle);
 
-//		public Surface CreateSimilar (uint width, uint height) {
-//			return new Surface (handle, width, height);
-//		}
-//		public Surface CreateSimilar (int width, int height) {
-//			return new Surface (handle, (uint)width, (uint)height);
-//		}
+		public ISurface CreateSimilar(int width, int height) => new Surface (vkvgDev, width, height);
+
+		public void Resize(int width, int height)
+		{
+			throw new NotImplementedException();
+		}
 
 		public void Flush () {
 			//throw new NotImplementedException ();

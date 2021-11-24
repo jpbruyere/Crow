@@ -45,7 +45,7 @@ namespace Crow.CairoBackend {
 			IntPtr ptr = NativeMethods.cairo_xcb_surface_create_for_bitmap (connection, bitmap, screen, width, height);
 			return new XcbSurface (ptr, true);
 		}
-		public override void SetSize (int width, int height)
+		public override void Resize (int width, int height)
 		{
 			NativeMethods.cairo_xcb_surface_set_size (Handle, width, height);
 		}

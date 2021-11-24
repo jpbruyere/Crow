@@ -3,7 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-namespace Crow.Drawing {
+namespace Crow.VkvgBackend {
 	public struct Matrix {
 		float xx; float yx;
 		float xy; float yy;

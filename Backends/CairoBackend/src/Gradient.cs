@@ -28,11 +28,11 @@
 //
 
 using System;
-using Color = Drawing2D.Color;
+using Drawing2D;
 
 namespace Crow.CairoBackend {
 
-	public class Gradient : Pattern
+	public class Gradient : Pattern, IGradient
 	{
 		protected Gradient (IntPtr handle, bool owned) : base (handle, owned)
 		{
@@ -41,20 +41,20 @@ namespace Crow.CairoBackend {
 		public int ColorStopCount {
 			get {
 				int cnt;
-				NativeMethods.cairo_pattern_get_color_stop_count (Handle, out cnt);
+				NativeMethods.cairo_pattern_get_color_stop_count (handle, out cnt);
 				return cnt;
 			}
 		}
-
-		public Status AddColorStop (double offset, Color c)
-		{
-			NativeMethods.cairo_pattern_add_color_stop_rgba (Handle, offset, c.R / 255.0, c.G / 255.0, c.B / 255.0, c.A / 255.0);
-			return Status;
-		}
+		#region IGradient implementation
+		public void AddColorStop (double offset, Color c)
+			=> NativeMethods.cairo_pattern_add_color_stop_rgba (handle, offset, c.R / 255.0, c.G / 255.0, c.B / 255.0, c.A / 255.0);
+		public void AddColorStop(float offset, float r, float g, float b, float a = 1)
+			=> NativeMethods.cairo_pattern_add_color_stop_rgba (handle, offset, r, g, b, a);
+		#endregion
 
 		public Status AddColorStopRgb (double offset, Color c)
 		{
-			NativeMethods.cairo_pattern_add_color_stop_rgb (Handle, offset, c.R / 255.0, c.G / 255.0 / 255.0, c.B / 255.0);
+			NativeMethods.cairo_pattern_add_color_stop_rgb (handle, offset, c.R / 255.0, c.G / 255.0 / 255.0, c.B / 255.0);
 			return Status;
 		}
 	}

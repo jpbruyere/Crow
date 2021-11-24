@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backends", "Backends", "{45
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CairoBackend", "Backends\CairoBackend\CairoBackend.csproj", "{E06441A9-0CFD-45BB-9478-99D28CEB327F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VkvgBackend", "Backends\VkvgBackend\VkvgBackend.csproj", "{34976828-80CF-4AC5-8C81-F66F635DC5FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{E06441A9-0CFD-45BB-9478-99D28CEB327F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E06441A9-0CFD-45BB-9478-99D28CEB327F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E06441A9-0CFD-45BB-9478-99D28CEB327F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34976828-80CF-4AC5-8C81-F66F635DC5FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34976828-80CF-4AC5-8C81-F66F635DC5FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34976828-80CF-4AC5-8C81-F66F635DC5FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34976828-80CF-4AC5-8C81-F66F635DC5FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +68,7 @@ Global
 		{56329D48-D382-4850-93DE-59C453894E8A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{E06441A9-0CFD-45BB-9478-99D28CEB327F} = {451F5727-2A2E-4361-A41B-089429ADE8F9}
+		{34976828-80CF-4AC5-8C81-F66F635DC5FC} = {451F5727-2A2E-4361-A41B-089429ADE8F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00D4E149-7131-49F4-BAAD-559AA961A78E}

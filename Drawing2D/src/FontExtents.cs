@@ -41,38 +41,38 @@ namespace Drawing2D
 	[StructLayout (LayoutKind.Sequential)]
 	public struct FontExtents : IEquatable<FontExtents>
 	{
-		float ascent;
-		float descent;
-		float height;
-		float maxXAdvance;
-		float maxYAdvance;
+		double ascent;
+		double descent;
+		double height;
+		double maxXAdvance;
+		double maxYAdvance;
 
-		public float Ascent {
+		public double Ascent {
 			get => ascent;
 			set { ascent = value; }
 		}
 
-		public float Descent {
+		public double Descent {
 			get => descent;
 			set { descent = value; }
 		}
 
-		public float Height {
+		public double Height {
 			get => height;
 			set { height = value; }
 		}
 
-		public float MaxXAdvance {
+		public double MaxXAdvance {
 			get => maxXAdvance;
 			set { maxXAdvance = value; }
 		}
 
-		public float MaxYAdvance {
+		public double MaxYAdvance {
 			get => maxYAdvance;
 			set { maxYAdvance = value; }
 		}
 
-		public FontExtents (float ascent, float descent, float height, float maxXAdvance, float maxYAdvance)
+		public FontExtents (double ascent, double descent, double height, double maxXAdvance, double maxYAdvance)
 		{
 			this.ascent = ascent;
 			this.descent = descent;

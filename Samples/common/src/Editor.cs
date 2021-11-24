@@ -411,7 +411,7 @@ namespace Crow
 							if (bytes.Length < size)
 								bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
-							int encodedBytes = Crow.Text.Encoding.ToUtf8 (buff, bytes);
+							int encodedBytes = buff.ToUtf8 (bytes);
 
 							if (encodedBytes > 0) {
 								bytes[encodedBytes++] = 0;
@@ -456,7 +456,7 @@ namespace Crow
 								if (bytes.Length < size)
 									bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
-								int encodedBytes = Crow.Text.Encoding.ToUtf8 (buff, bytes);
+								int encodedBytes = buff.ToUtf8 (bytes);
 
 								gr.SetSource (SelectionBackground);
 								gr.Rectangle (selRect);

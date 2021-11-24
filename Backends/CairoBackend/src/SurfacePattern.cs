@@ -45,13 +45,13 @@ namespace Crow.CairoBackend {
 
 		//no idea why this is here, the base one is identical, but we can't remove it now
 		public new Extend Extend {
-			set { NativeMethods.cairo_pattern_set_extend (Handle, value); }
-			get { return NativeMethods.cairo_pattern_get_extend (Handle); }
+			set { NativeMethods.cairo_pattern_set_extend (handle, value); }
+			get { return NativeMethods.cairo_pattern_get_extend (handle); }
 		}
 
 		public Filter Filter {
-			set { NativeMethods.cairo_pattern_set_filter (Handle, value); }
-			get { return NativeMethods.cairo_pattern_get_filter (Handle); }
+			set { NativeMethods.cairo_pattern_set_filter (handle, value); }
+			get { return NativeMethods.cairo_pattern_get_filter (handle); }
 		}
 	}
 }

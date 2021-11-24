@@ -15,7 +15,7 @@ namespace Crow
 	/// </summary>
 	public class SvgPicture : Picture
 	{
-		SvgHandle hSVG;
+		ISvgHandle hSVG;
 
 		#region CTOR
 		/// <summary>
@@ -33,37 +33,19 @@ namespace Crow
 		{
 			if (iFace.sharedPictures.ContainsKey (Path)) {
 				sharedPicture sp = iFace.sharedPictures [Path];
-				hSVG = (SvgHandle)sp.Data;
+				hSVG = (ISvgHandle)sp.Data;
 				Dimensions = sp.Dims;
 				return;
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path))
-				load (iFace, stream);
+				hSVG = iFace.Device.LoadSvg (stream);
+			Dimensions = hSVG.Dimensions;
 			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);
 		}
-		void load (Interface iface, Stream stream) {
-			using (BinaryReader sr = new BinaryReader (stream)) {
-#if VKVG
-				hSVG = new SvgHandle (iface.vkvgDevice, sr.ReadBytes ((int)stream.Length));
-#else
-				hSVG = new SvgHandle (sr.ReadBytes ((int)stream.Length));
-#endif
-				Dimensions = hSVG.Dimensions;
-			}
-		}
-		internal static sharedPicture CreateSharedPicture (Interface iface, Stream stream) {
-			SvgPicture pic = new SvgPicture ();
-			pic.load (iface, stream);
-			return new sharedPicture (pic.hSVG, pic.Dimensions);
-		}
 
-		public void LoadSvgFragment (Interface iface, string fragment) {			
-#if VKVG
-			hSVG = new SvgHandle (iface.vkvgDevice, System.Text.Encoding.Unicode.GetBytes(fragment));
-#else
-			hSVG = new SvgHandle (System.Text.Encoding.Unicode.GetBytes(fragment));
-#endif
-			Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+		public void LoadSvgFragment (Interface iface, string fragment) {
+			hSVG = iface.Device.LoadSvg (fragment);
+			Dimensions = hSVG.Dimensions;
 		}
 
 		#region implemented abstract members of Fill
@@ -88,12 +70,8 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-#if VKVG
-			using (Surface tmp = new Surface (iFace.vkvgDevice, bounds.Width, bounds.Height)) {
-#else
-			using (Surface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
-#endif
-				using (IContext gr = new Context (tmp)) {
+			using (ISurface tmp = iFace.Device.CreateSurface (bounds.Width, bounds.Height)) {
+				using (IContext gr = iFace.Device.CreateContext (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
@@ -130,7 +108,7 @@ namespace Crow
 				else
 					widthRatio = heightRatio;
 			}
-				
+
 			gr.Save ();
 
 			gr.Translate (rect.Left,rect.Top);
@@ -141,10 +119,10 @@ namespace Crow
 				hSVG.Render (gr);
 			else {
 				string[] parts = subPart.Split (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string p in parts)                
+                foreach (string p in parts)
 					hSVG.Render (gr, "#" + subPart);
 			}
-			
+
 			gr.Restore ();
 		}
 	}

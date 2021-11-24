@@ -4,8 +4,9 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Drawing2D;
 
-namespace Crow.Drawing
+namespace Crow.VkvgBackend
 {
 	internal static class NativeMethods
 	{
@@ -142,6 +143,8 @@ namespace Crow.Drawing
 
 		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void vkvg_set_dash (IntPtr ctx, float[] dashes, uint dashCount, float offset);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void vkvg_path_extents (IntPtr ctx, out float x1, out float y1, out float x2, out float y2);
 
 		//void vkvg_set_dash (VkvgContext ctx, const float* dashes, uint32_t num_dashes, float offset);
 		//void vkvg_get_dash (VkvgContext ctx, const float* dashes, uint32_t* num_dashes, float* offset

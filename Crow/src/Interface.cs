@@ -197,11 +197,6 @@ namespace Crow
 
 			PerformanceMeasure.InitMeasures ();
 
-#if VKVG
-			//force single threaded interface for vkvg until multithreading in vkvg is ok
-			startUIThread = false;
-#endif
-
 			if (startUIThread) {
 				Thread t = new Thread (InterfaceThread) {
 					IsBackground = true
@@ -253,13 +248,11 @@ namespace Crow
 		/// Create the VulkanContext with swapchain support. Override it to use another vulkan backend.
 		/// </summary>
 #endif
+		static string backendDeviceTypeString = "Crow.CairoBackend.Device";
 		protected void initBackend (bool offscreen = false) {
-#if VKVG
-			if (offscreen)
-				vkCtx = new OffscreenVulkanContext (this);
-			else
-				vkCtx = new VulkanContext (this, hWin, (uint)clientRectangle.Width, (uint)clientRectangle.Height);
-#endif
+
+			dev = new Crow.CairoBackend.Device ();
+			clipping = dev.CreateRegion ();
 		}
 		/// <summary>
 		/// Create the main rendering surface. The default is a GLFW window with a cairo surface bound to it.
@@ -279,12 +272,9 @@ namespace Crow
 
 			registerGlfwCallbacks ();
 
-#if VKVG
 			initBackend ();
-			vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
-#else
 
-#endif
+			CreateMainSurface (ref clientRectangle);
 		}
 		/// <summary>
 		/// ??
@@ -292,11 +282,7 @@ namespace Crow
 		/// <param name="r"></param>
 		public void CreateMainSurface (ref Rectangle r) {
 			surf?.Dispose();
-#if (VKVG)
-			vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
-#else
-			surf = new ImageSurface (Format.ARGB32, r.Width, r.Height);
-#endif
+			surf = Device.CreateSurface (hWin, r.Width, r.Height);
 		}
 		public IntPtr SurfacePointer {
 			get {
@@ -556,9 +542,7 @@ namespace Crow
 				if (disposing)
 				{
 					disposeContextMenus ();
-#if VKVG
-					vkCtx.Dispose ();
-#endif
+					dev.Dispose ();
 				}
 
 				currentCursor?.Dispose ();
@@ -735,7 +719,7 @@ namespace Crow
 		/// <summary>Client rectangle in the host context</summary>
 		protected Rectangle clientRectangle;
 		/// <summary>Clipping rectangles on the root context</summary>
-		Region clipping = new Region();
+		IRegion clipping;
 		/// <summary>Main Cairo context</summary>
 		//Context ctx;
 		#endregion
@@ -831,10 +815,13 @@ namespace Crow
 						foreach (string pic in Directory.GetFiles (path, "*.*", SearchOption.AllDirectories)) {
 							string resId = $"#{pic.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
 							using (Stream s = new FileStream (pic, FileMode.Open, FileAccess.Read)) {
-								if (resId.EndsWith (".svg", StringComparison.OrdinalIgnoreCase))
-									sharedPictures[resId] = SvgPicture.CreateSharedPicture (this, s);
-								else
-									sharedPictures[resId] = BmpPicture.CreateSharedPicture (s);
+								if (resId.EndsWith (".svg", StringComparison.OrdinalIgnoreCase)) {
+									ISvgHandle hSVG = Device.LoadSvg (s);
+									sharedPictures[resId] = new sharedPicture (hSVG, hSVG.Dimensions);
+								} else {
+									byte[] image = Device.LoadBitmap (s, out Size dimensions);
+									sharedPictures[resId] = new sharedPicture (image, dimensions);
+								}
 							}
 						}
 					}
@@ -1165,18 +1152,11 @@ namespace Crow
 
 				if (!clipping.IsEmpty || shouldDrawTextCursor) {
 					if (ctx == null) {
-						using (ctx = new Context (surf))
+						using (ctx =  Device.CreateContext (surf))
 							processDrawing (ctx);
 					}else
 						processDrawing (ctx);
 				}
-
-#if VKVG
-				if (IsDirty) {
-					if (!vkCtx.render ())
-						ProcessResize (new Rectangle (0,0,(int)vkCtx.width, (int)vkCtx.height));
-				}
-#endif
 			} finally {
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Update);
@@ -1187,13 +1167,6 @@ namespace Crow
 
 			PerformanceMeasure.Notify ();
 		}
-#if VKVG
-		void resizeVulkanContext () {
-
-
-
-		}
-#endif
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
@@ -1533,32 +1506,7 @@ namespace Crow
 		public virtual void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
-
-#if VKVG
-				vkCtx.CreateSurface (clientRectangle.Width, clientRectangle.Height, ref surf);
-#else
-				switch (Environment.OSVersion.Platform) {
-				case PlatformID.MacOSX:
-					break;
-				case PlatformID.Unix:
-					surf.SetSize (clientRectangle.Width, clientRectangle.Height);
-					break;
-				case PlatformID.Win32NT:
-				case PlatformID.Win32S:
-				case PlatformID.Win32Windows:
-					if (ownWindow) {
-						surf.Dispose ();
-						IntPtr hWin32 = Glfw3.GetWin32Window (hWin);
-						IntPtr hdc = Glfw3.GetWin32DC (hWin32);
-						surf = new Win32Surface (hdc);
-					}else
-						surf.SetSize (clientRectangle.Width, clientRectangle.Height);
-					break;
-				case PlatformID.Xbox:
-				case PlatformID.WinCE:
-					throw new PlatformNotSupportedException ("Unable to create cairo surface.");
-				}
-#endif
+				surf.Resize (clientRectangle.Width, clientRectangle.Height);
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 

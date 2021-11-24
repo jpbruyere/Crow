@@ -203,7 +203,7 @@ namespace Crow
 				return;
 
 			Rectangle cr = ClientRectangle;
-			double widthRatio = 1f, heightRatio = 1f;
+			double widthRatio = 1, heightRatio = 1;
 
 			double w = (double)(contentSize.Width == 0 ? size.Width : contentSize.Width);
 			double h = (double)(contentSize.Height == 0 ? size.Height : contentSize.Height);
@@ -220,8 +220,7 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			Matrix m = gr.Matrix;
-			//gr.Save ();
+			gr.SaveTransformations ();
 
 			gr.Translate (cr.Left, cr.Top);
 			gr.Scale (widthRatio, heightRatio);
@@ -233,8 +232,7 @@ namespace Crow
 			using (PathParser parser = new PathParser (path))
 				parser.Draw (gr);
 
-			//gr.Restore ();
-			gr.Matrix = m;
+			gr.RestoreTransformations ();
 		}
 
 

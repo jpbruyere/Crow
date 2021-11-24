@@ -1,9 +1,12 @@
-﻿// Copyright (c) 2018-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2018-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-namespace Crow.Drawing {
+using Drawing2D;
+
+namespace Crow.VkvgBackend
+{
 	public class TextRun : IDisposable {
 
 		IntPtr handle = IntPtr.Zero;
@@ -28,11 +31,10 @@ namespace Crow.Drawing {
 
 		public IntPtr Handle { get { return handle; } }
 
-		public TextExtents Extents {
+		public Drawing2D.TextExtents Extents {
 			get {
-				TextExtents extents;
-				NativeMethods.vkvg_text_run_get_extents (handle, out extents);
-				return extents;
+				NativeMethods.vkvg_text_run_get_extents (handle, out TextExtents e);
+				return new Drawing2D.TextExtents (e.XBearing, e.YBearing, e.Width, e.Height, e.XAdvance, e.YAdvance);
 			}
 		}
 

@@ -4,21 +4,16 @@
 
 using System.Collections.Generic;
 using System;
+using Drawing2D;
+using System.Diagnostics.CodeAnalysis;
 
-
-namespace Crow {
-	public enum RegionOverlap {
-		In,
-		Out,
-		Part,
-	}
-	public class Region : IDisposable
+namespace Crow.VkvgBackend {
+	public class Region : IRegion
 	{
+		Rectangle _bounds;
+		bool boundsUpToDate = true;
 		public List<Rectangle> list = new List<Rectangle>();
 		public int count => list.Count;
-		public int NumRectangles => list.Count;
-		public bool IsEmpty => list.Count == 0;
-		public Rectangle GetRectangle(int i) => list[i];
 
 		public void AddRectangle(Rectangle r)
 		{
@@ -29,12 +24,6 @@ namespace Crow {
 				boundsUpToDate = false;
 			}
 		}
-		public void Reset()
-		{
-			list = new List<Rectangle>();
-			_bounds = default;
-			boundsUpToDate = true;
-		}
 		public bool DoesNotContains(Rectangle r)
 		{
 			foreach (Rectangle rInList in list)
@@ -42,13 +31,6 @@ namespace Crow {
 					return false;
 			return true;
 		}
-		public bool OverlapOut (Rectangle r) {
-			foreach (Rectangle rInList in list)
-				if (rInList.Intersect(r))
-					return false;
-			return true;
-		}
-
 		public bool intersect(Rectangle r)
 		{
 			foreach (Rectangle rInList in list)
@@ -56,7 +38,7 @@ namespace Crow {
 					return true;
 			return false;
 		}
-		public void stroke(Context ctx, Color c)
+		public void stroke(IContext ctx, Color c)
 		{
 			foreach (Rectangle r in list)
 				ctx.Rectangle(r);
@@ -66,7 +48,7 @@ namespace Crow {
 			ctx.LineWidth = 2;
 			ctx.Stroke ();
 		}
-		public void clearAndClip(Context ctx)
+		public void clearAndClip(IContext ctx)
 		{
 			if (list.Count == 0)
 				return;
@@ -79,20 +61,13 @@ namespace Crow {
 			ctx.Operator = Operator.Over;
 		}
 
-		public void clip(Context ctx)
+		public void clip(IContext ctx)
 		{
 			foreach (Rectangle r in list)
 				ctx.Rectangle(r);
 
 			ctx.Clip();
 		}
-		public void UnionRectangle (Rectangle r) {
-			/*if (r == default)
-				System.Diagnostics.Debugger.Break ();*/
-			AddRectangle (r);
-		}
-		Rectangle _bounds;
-		bool boundsUpToDate = true;
 		public Rectangle Bounds {
 			get {
 				if (!boundsUpToDate) {
@@ -108,7 +83,7 @@ namespace Crow {
 				return _bounds;
 			}
 		}
-		public void clear(Context ctx)
+		public void clear(IContext ctx)
 		{
 			foreach (Rectangle r in list)
 				ctx.Rectangle(r);
@@ -116,6 +91,37 @@ namespace Crow {
 			ctx.Fill();
 			ctx.Operator = Operator.Over;
 		}
+
+		#region  IRegion implemenatation
+		public bool IsEmpty => list.Count == 0;
+		public int NumRectangles => list.Count;
+		public Rectangle GetRectangle(int i) => list[i];
+		public void UnionRectangle (Rectangle r) {
+			/*if (r == default)
+				System.Diagnostics.Debugger.Break ();*/
+			AddRectangle (r);
+		}
+		public bool OverlapOut (Rectangle r) {
+			foreach (Rectangle rInList in list)
+				if (rInList.Intersect(r))
+					return false;
+			return true;
+		}
+		public RegionOverlap Contains(Rectangle rectangle)
+		{
+			throw new NotImplementedException();
+		}
+		public void Reset()
+		{
+			list = new List<Rectangle>();
+			_bounds = default;
+			boundsUpToDate = true;
+		}
+
+		public bool Equals([AllowNull] IRegion other)
+			=> other is Region r ? Bounds.Equals (r.Bounds) : false;
+		#endregion
+
 		public override string ToString ()
 		{
 			string tmp = "";
@@ -129,5 +135,6 @@ namespace Crow {
 		{
 
 		}
+
 	}
 }

@@ -57,22 +57,9 @@
 		<ProjectReference Include="..\CrowDbgShared\CrowDbgShared.csproj" />
 	</ItemGroup>-->
 
-	<PropertyGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
-		<DefineConstants>$(DefineConstants);VKVG</DefineConstants>
-	</PropertyGroup>
-
-	<ItemGroup Condition=" '$(CrowVkvgBackend)' == 'true'">
-		<Compile Include="src\GraphicBackends\vkvg\**\*.*" />
-		<PackageReference Include="vke" Version="0.2.0-beta" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(CrowVkvgBackend)' != 'true'">
-		<Compile Include="src\GraphicBackends\Mono.Cairo\**\*.*" Exclude="src\GraphicBackends\Mono.Cairo\NativeMethods-internal.cs" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<Content Include="..\Images\crow.png" Pack="true" PackagePath="" />
-		<Compile Include="src\**\*.cs" Exclude="src\GraphicBackends\**\*.*" />
+		<Compile Include="src\**\*.cs" />
 		<EmbeddedResource Include="Templates\*.*">
 			<LogicalName>Crow.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>
@@ -87,5 +74,11 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Drawing2D\Drawing2D.csproj" />
+	  <ProjectReference Include="..\Backends\CairoBackend\CairoBackend.csproj" />
 	</ItemGroup>
+
+	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
+		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
+	</PropertyGroup>
+
 </Project>

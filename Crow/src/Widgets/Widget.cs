@@ -198,7 +198,7 @@ namespace Crow
 		/// are repeated at each cached levels of the tree with correspondig coordinate system. This is done
 		/// in a dedicated step of the update between layouting and drawing.
 		/// </summary>
-		public Region Clipping;
+		public IRegion Clipping;
 
 		#region IValueChange implementation
 		/// <summary>
@@ -233,7 +233,6 @@ namespace Crow
 		/// action.
 		/// </summary>
 		protected Widget () {
-			Clipping = new Region ();
 #if DEBUG_STATS
 			TotalWidgetCreated++;
 #endif
@@ -1169,6 +1168,7 @@ namespace Crow
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOInitialization, this);
 
+			Clipping = IFace.Device.CreateRegion ();
 			Type thisType = this.GetType ();
 
 			if (!string.IsNullOrEmpty (style)) {
@@ -1927,10 +1927,6 @@ namespace Crow
 		}
 		#endregion
 
-		protected void setFontForContext (IContext gr) {
-
-		}
-
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
 		protected virtual void onDraw(IContext gr)
@@ -1958,14 +1954,8 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
-#if (VKVG)
-			DbgLogger.StartEvent (DbgEvtType.GOCreateSurface, this);
-			bmp = new Surface (IFace.vkvgDevice, Slot.Width, Slot.Height);
-			DbgLogger.EndEvent (DbgEvtType.GOCreateSurface);
-			//bmp.Clear();
-#else
-			bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
-#endif
+			bmp = IFace.Device.CreateSurface (Slot.Width, Slot.Height);
+
 			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
 			DbgLogger.StartEvent (DbgEvtType.GOCreateContext, this);

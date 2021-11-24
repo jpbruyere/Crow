@@ -14,5 +14,8 @@
     <ProjectReference Include="..\..\Drawing2D\Drawing2D.csproj" />
   </ItemGroup>
 
+	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
+		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
+	</PropertyGroup>
 
 </Project>

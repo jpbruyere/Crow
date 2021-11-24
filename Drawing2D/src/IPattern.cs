@@ -3,10 +3,12 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
+
 namespace Drawing2D
 {
 	public interface IPattern : IDisposable
 	{
+		IntPtr Handle { get; }
 		Extend Extend { get; set; }
 		Filter Filter { get; set; }
 	}

@@ -40,51 +40,11 @@ namespace Crow
 				return;
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path)) {
-				load (stream);
-				//loadBitmap (new System.Drawing.Bitmap (stream));
+				image = iFace.Device.LoadBitmap (stream, out Size dimensions);
+				Dimensions = dimensions;
 				iFace.sharedPictures[Path] = new sharedPicture (image, Dimensions);
 			}
 		}
-		void load (Stream stream) {
-#if STB_SHARP
-			StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
-			image = new byte[stbi.Data.Length];
-	#if VKVG
-			Array.Copy (stbi.Data, image, stbi.Data.Length);
-	#else
-			//rgba to argb for cairo.
-			for (int i = 0; i < stbi.Data.Length; i += 4) {
-				image[i] = stbi.Data[i + 2];
-				image[i + 1] = stbi.Data[i + 1];
-				image[i + 2] = stbi.Data[i];
-				image[i + 3] = stbi.Data[i + 3];
-			}
-	#endif
-			Dimensions = new Size (stbi.Width, stbi.Height);
-#else
-			using (StbImage stbi = new StbImage (stream)) {
-				image = new byte [stbi.Size];
-	#if VKVG
-				Marshal.Copy (stbi.Handle, image, 0, stbi.Size);
-	#else
-				for (int i = 0; i < stbi.Size; i+=4) {
-					//rgba to argb for cairo. ???? looks like bgra to me.
-					image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
-					image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
-					image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
-					image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
-				}
-	#endif
-				Dimensions = new Size (stbi.Width, stbi.Height);
-			}
-#endif
-		}
-		internal static sharedPicture CreateSharedPicture (Stream stream) {
-			BmpPicture pic = new BmpPicture ();
-			pic.load (stream);
-			return new sharedPicture (pic.image, pic.Dimensions);
-		}
-
 
 		//load image via System.Drawing.Bitmap, cairo load png only
 		/*void loadBitmap (System.Drawing.Bitmap bitmap)
@@ -157,12 +117,12 @@ namespace Crow
 			if (image == null)
 				load (iFace);
 
-			float widthRatio = 1f;
-			float heightRatio = 1f;
+			double widthRatio = 1;
+			double heightRatio = 1;
 
 			if (Scaled){
-				widthRatio = (float)rect.Width / Dimensions.Width;
-				heightRatio = (float)rect.Height / Dimensions.Height;
+				widthRatio = (double)rect.Width / Dimensions.Width;
+				heightRatio = (double)rect.Height / Dimensions.Height;
 			}
 
 			if (KeepProportions) {
@@ -172,26 +132,18 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			//gr.Save ();
-
-			Matrix m = gr.Matrix;
+			gr.SaveTransformations ();
 
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 
-#if VKVG
-			using (Surface imgSurf = new Surface (iFace.vkvgDevice, image, Dimensions.Width, Dimensions.Height))
-#else
-			using (Surface imgSurf = new ImageSurface (image, Format.Argb32, Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width))
-#endif
-			{
+			using (ISurface imgSurf = iFace.Device.CreateSurface (image, Dimensions.Width, Dimensions.Height)) {
 				gr.SetSource (imgSurf, 0,0);
 				gr.Paint ();
 			}
 
-			gr.Matrix = m;
-			//gr.Restore ();
+			gr.RestoreTransformations ();
 		}
 	}
 }

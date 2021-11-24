@@ -48,7 +48,7 @@ namespace Crow
 
 		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
-		{			
+		{
 			LayoutType = _layoutType;
 			Layoutable = _graphicObject;
 			Layoutable.RegisteredLayoutings |= LayoutType;
@@ -75,7 +75,7 @@ namespace Crow
 
 				if (!go.layoutMutex.TryEnterWriteLock (1)) {
 					go.IFace.LayoutingQueue.Enqueue (this);
-#if DEBUG_LOG					
+#if DEBUG_LOG
 					result = Result.Requeued;
 #endif
 					return;
@@ -92,12 +92,12 @@ namespace Crow
 					Slot = Layoutable.getSlot ();
 #endif
 					LayoutingTries++;
-					
+
 					if (Layoutable.UpdateLayout (LayoutType)) {
 						Layoutable.RequiredLayoutings &= (~LayoutType);
-						if (Layoutable.RequiredLayoutings == LayoutingType.None && go.IsDirty)							
+						if (Layoutable.RequiredLayoutings == LayoutingType.None && go.IsDirty)
 							go.IFace.EnqueueForRepaint (this);
-#if DEBUG_LOG					
+#if DEBUG_LOG
 						result = Result.Success;
 #endif
 					} else {
@@ -122,7 +122,7 @@ namespace Crow
 						}
 #endif
 					}
-#if DEBUG_LOG				
+#if DEBUG_LOG
 					NewSlot = Layoutable.getSlot();
 #endif
 				} finally {

@@ -31,7 +31,7 @@ using System;
 
 namespace Crow.CairoBackend
 {
-	public class DRMDevice : Device
+	public class DRMDevice : CairoDevice
 	{
 		public DRMDevice () : base (NativeMethods.cairo_drm_device_default (), true)
 		{
@@ -44,10 +44,10 @@ namespace Crow.CairoBackend
 		}
 
 		public int FileDescriptor {
-			get { return NativeMethods.cairo_drm_device_get_fd (Handle); }
+			get { return NativeMethods.cairo_drm_device_get_fd (handle); }
 		}
 
-		public void DeviceThrottle () { NativeMethods.cairo_drm_device_throttle (Handle);}
+		public void DeviceThrottle () { NativeMethods.cairo_drm_device_throttle (handle);}
 	}
 }
 

@@ -28,7 +28,8 @@
 //
 
 using System;
-using Color = Drawing2D.Color;
+using Drawing2D;
+
 namespace Crow.CairoBackend {
 
 	public class SolidPattern : Pattern
@@ -63,7 +64,7 @@ namespace Crow.CairoBackend {
 		public Color Color {
 			get {
 				double red, green, blue, alpha;
-				NativeMethods.cairo_pattern_get_rgba  (Handle, out red, out green, out blue, out alpha);
+				NativeMethods.cairo_pattern_get_rgba  (handle, out red, out green, out blue, out alpha);
 				return new Color (red, green, blue, alpha);
 			}
 		}

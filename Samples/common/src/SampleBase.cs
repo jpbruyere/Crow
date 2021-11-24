@@ -12,6 +12,7 @@ using System.Threading;
 
 
 using System.Diagnostics;
+using Drawing2D;
 
 namespace Samples
 {

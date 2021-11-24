@@ -146,11 +146,8 @@ namespace Crow
 			r.Height -= 4;
 			r.Y += 2;
 
-			Gradient.Type gt = Gradient.Type.Horizontal;
-			if (Orientation == Orientation.Vertical)
-				gt = Gradient.Type.Vertical;
-
-			Gradient grad = new Gradient (gt);
+			Gradient grad = new Gradient (
+				Orientation == Orientation.Vertical ? GradientType.Vertical : GradientType.Horizontal);
 			Color c = currentColor;
 
 			switch (component) {
@@ -192,8 +189,6 @@ namespace Crow
 			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill ();
-
-			
 
 			r = ClientRectangle;
 

@@ -55,13 +55,13 @@ namespace Crow
 				gr.Fill ();
 			}
 
-			Crow.Gradient grad = new Gradient (Gradient.Type.Horizontal);
+			Crow.Gradient grad = new Gradient (GradientType.Horizontal);
 			grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 1, 1, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (1, new Color (1, 1, 1, 0)));
 			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
-			grad = new Gradient (Gradient.Type.Vertical);
+			grad = new Gradient (GradientType.Vertical);
 			grad.Stops.Add (new Gradient.ColorStop (0, new Color (0, 0, 0, 0)));
 			grad.Stops.Add (new Gradient.ColorStop (1, new Color (0, 0, 0, 1)));
 			grad.SetAsSource (IFace, gr, r);

@@ -439,7 +439,7 @@ namespace Crow
 							if (bytes.Length < size)
 								bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
-							encodedBytes = Crow.Text.Encoding.ToUtf8 (_text.GetLine (lines[i]), bytes);
+							encodedBytes = _text.GetLine (lines[i]).ToUtf8 (bytes);
 							bytes[encodedBytes++] = 0;
 
 							if (lines[i].LengthInPixel < 0) {
@@ -592,7 +592,7 @@ namespace Crow
 				Span<byte> bytes = stackalloc byte[5];//utf8 single char buffer + '\0'
 
 				for (int i = 0; i < ls.Length; i++) {
-					int encodedBytes = Crow.Text.Encoding.ToUtf8 (curLine.Slice (i, 1), bytes);
+					int encodedBytes = curLine.Slice (i, 1).ToUtf8 (bytes);
 					bytes[encodedBytes] = 0;
 
 					gr.TextExtents (bytes, out te);

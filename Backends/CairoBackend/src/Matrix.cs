@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
 namespace Crow.CairoBackend {
 
 	[StructLayout(LayoutKind.Sequential)]
-	public class Matrix //: ICloneable
+	public struct Matrix //: ICloneable
 	{
 		public double Xx;
 		public double Yx;
@@ -52,12 +52,6 @@ namespace Crow.CairoBackend {
 			this.Xx = xx; this.Yx = yx; this.Xy = xy;
 			this.Yy = yy; this.X0 = x0; this.Y0 = y0;
 		}
-
-		public Matrix ()
-		{
-			this.InitIdentity ();
-		}
-
 		public bool IsIdentity ()
 		{
 			return (this == new Matrix ());

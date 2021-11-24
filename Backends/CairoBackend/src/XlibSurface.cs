@@ -60,7 +60,7 @@ namespace Crow.CairoBackend {
 			NativeMethods.cairo_xlib_surface_set_drawable (Handle, drawable, width, height);
 		}
 
-		public override void SetSize (int width, int height)
+		public override void Resize (int width, int height)
 		{
 			NativeMethods.cairo_xlib_surface_set_size (Handle, width, height);
 		}

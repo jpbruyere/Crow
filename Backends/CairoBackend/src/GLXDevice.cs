@@ -31,18 +31,18 @@ using System;
 
 namespace Crow.CairoBackend
 {
-	public class GLXDevice : Device
+	public class GLXDevice : CairoDevice
 	{
 		public GLXDevice (IntPtr dpy, IntPtr gl_ctx) : base (NativeMethods.cairo_glx_device_create (dpy, gl_ctx), true)
 		{
 		}
 
 		public IntPtr Display {
-			get { return NativeMethods.cairo_glx_device_get_display (Handle); }
+			get { return NativeMethods.cairo_glx_device_get_display (handle); }
 		}
 
 		public IntPtr Context {
-			get { return NativeMethods.cairo_glx_device_get_context (Handle); }
+			get { return NativeMethods.cairo_glx_device_get_context (handle); }
 		}
 	}
 }

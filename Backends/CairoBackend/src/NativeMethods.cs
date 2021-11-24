@@ -233,7 +233,7 @@ namespace Crow.CairoBackend
 		internal static extern double cairo_get_line_width (IntPtr cr);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_get_matrix (IntPtr cr, Matrix matrix);
+		internal static extern void cairo_get_matrix (IntPtr cr, out Matrix matrix);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern double cairo_get_miter_limit (IntPtr cr);
@@ -723,7 +723,7 @@ namespace Crow.CairoBackend
 		internal static extern void cairo_set_line_width (IntPtr cr, double width);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_set_matrix (IntPtr cr, Matrix matrix);
+		internal static extern void cairo_set_matrix (IntPtr cr, ref Matrix matrix);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_set_miter_limit (IntPtr cr, double limit);

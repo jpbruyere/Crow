@@ -31,7 +31,7 @@ using System;
 
 namespace Crow.CairoBackend
 {
-	public class EGLDevice : Device
+	public class EGLDevice : GLDevice
 	{
 		public EGLDevice (IntPtr dpy, IntPtr gl_ctx) : base (NativeMethods.cairo_egl_device_create (dpy, gl_ctx), true)
 		{

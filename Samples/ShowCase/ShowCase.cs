@@ -36,7 +36,7 @@ namespace ShowCase
 
 			using (Showcase app = new Showcase ()) {
 				app.WindowTitle = "C.R.O.W Showcase";
-				app.SetWindowIcon ("#Crow.Icons.crow.png");
+				//app.SetWindowIcon ("#Crow.Icons.crow.png");
 				//app.Theme = @"C:\Users\Jean-Philippe\source\Crow\Themes\TestTheme";
 				CurrentProgramInstance = app;
 				//Interface.UPDATE_INTERVAL = 50;

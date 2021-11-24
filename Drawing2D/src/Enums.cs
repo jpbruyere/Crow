@@ -72,6 +72,13 @@ namespace Drawing2D
 		Mesh,
 		RasterSource,
 	}
+	public enum GradientType
+	{
+		Vertical,
+		Horizontal,
+		Oblic,
+		Radial
+	}
 
 	public enum Operator
 	{

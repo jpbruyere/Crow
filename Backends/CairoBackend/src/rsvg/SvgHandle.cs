@@ -6,7 +6,7 @@ using Drawing2D;
 namespace Crow.CairoBackend {
 
 
-	public sealed class SvgHandle : IDisposable {
+	public sealed class SvgHandle : ISvgHandle {
 		const string lib = "rsvg-2.40";
 
 		public IntPtr Raw;
@@ -58,10 +58,10 @@ namespace Crow.CairoBackend {
 		public void SetDpiXY (double dpi_x, double dpi_y) => rsvg_handle_set_dpi_x_y (Raw, dpi_x, dpi_y);
 
 
-		public void Render(Context cr) =>
+		public void Render(IContext cr) =>
 			rsvg_handle_render_cairo (Raw, cr == null ? IntPtr.Zero : cr.Handle);
 
-		public void Render (Context cr, string id) =>
+		public void Render (IContext cr, string id) =>
 			rsvg_handle_render_cairo_sub (Raw, cr == null ? IntPtr.Zero : cr.Handle, id);
 
 		[StructLayout(LayoutKind.Sequential)]

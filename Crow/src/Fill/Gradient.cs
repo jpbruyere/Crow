@@ -12,13 +12,6 @@ namespace Crow
 {
 	public class Gradient : Fill
 	{
-		public enum Type
-		{
-			Vertical,
-			Horizontal,
-			Oblic,
-			Radial
-		}
 		public class ColorStop
 		{
 			public double Offset;
@@ -44,7 +37,7 @@ namespace Crow
 				return new ColorStop (-1, Color.FromIml (parts [0]));
 			}
 		}
-		public Type GradientType = Type.Vertical;
+		public GradientType Type = GradientType.Vertical;
 //		public double x0;
 //		public double y0;
 //		public double x1;
@@ -52,30 +45,16 @@ namespace Crow
 //		public double Radius1;
 //		public double Radius2;
 		public List<ColorStop> Stops = new List<ColorStop>();
-		public Gradient(Type _type)
+		public Gradient(GradientType _type)
 		{
-			GradientType = _type;
+			Type = _type;
 		}
 
 		#region implemented abstract members of Fill
 
 		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle))
 		{
-			Crow.Drawing.Gradient grad = null;
-			switch (GradientType) {
-			case Type.Vertical:
-				grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
-				break;
-			case Type.Horizontal:
-				grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
-				break;
-			case Type.Oblic:
-				grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-				break;
-			case Type.Radial:
-				throw new NotImplementedException ();
-			}
-
+			IGradient grad = iFace.Device.CreateGradient (Type, bounds);
 			foreach (ColorStop cs in Stops) {
 				if (cs == null)
 					continue;
@@ -98,13 +77,13 @@ namespace Crow
 
 			switch (stops[0].Trim()) {
 			case "vgradient":
-				tmp = new Gradient (Type.Vertical);
+				tmp = new Gradient (GradientType.Vertical);
 				break;
 			case "hgradient":
-				tmp = new Gradient (Type.Horizontal);
+				tmp = new Gradient (GradientType.Horizontal);
 				break;
 			case "ogradient":
-				tmp = new Gradient (Type.Oblic);
+				tmp = new Gradient (GradientType.Oblic);
 				break;
 			default:
 				throw new Exception ("Unknown gradient type: " + stops [0]);

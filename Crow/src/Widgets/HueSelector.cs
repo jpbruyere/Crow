@@ -57,11 +57,8 @@ namespace Crow
 			r.Height -= 4;
 			r.Y += 2;
 
-			Gradient.Type gt = Gradient.Type.Horizontal;
-			if (Orientation == Orientation.Vertical)
-				gt = Gradient.Type.Vertical;
-
-			Gradient grad = new Gradient (gt);
+			Gradient grad = new Gradient (
+				Orientation == Orientation.Vertical ? GradientType.Vertical : GradientType.Horizontal);
 
 			grad.Stops.Add (new Gradient.ColorStop (0,     new Color (1, 0, 0, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (0.167, new Color (1, 1, 0, 1)));

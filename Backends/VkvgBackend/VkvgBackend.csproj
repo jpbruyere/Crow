@@ -1,16 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-		<TargetFramework>netcoreapp3.0</TargetFramework>
-		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
-	<ItemGroup>
-		<Compile Include="src\**\*.cs" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\**\*.cs" Exclude="src\VulkanContext.cs" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\..\Drawing2D\Drawing2D.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="vke" Version="0.2.0-beta" />
+    <ProjectReference Include="..\..\Drawing2D\Drawing2D.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
+    <DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
+  </PropertyGroup>
 
 </Project>

@@ -7,8 +7,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
-
-
+using Drawing2D;
 
 namespace Crow
 {
@@ -188,6 +187,6 @@ namespace Crow
 				gr.Operator = Operator.Over;
 			}
 		}
-		#endregion		
+		#endregion
 	}
 }

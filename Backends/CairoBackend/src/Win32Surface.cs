@@ -32,6 +32,7 @@ namespace Crow.CairoBackend {
 
 	public class Win32Surface : Surface
 	{
+		IntPtr hdc;
 		internal Win32Surface (IntPtr handle, bool owns) : base (handle, owns)
 		{
 		}
@@ -39,6 +40,16 @@ namespace Crow.CairoBackend {
 		public Win32Surface (IntPtr hdc)
 			: base (NativeMethods.cairo_win32_surface_create (hdc), true)
 		{
+			this.hdc = hdc;
+		}
+		public override void Resize(int width, int height)
+		{
+			if (hdc == IntPtr.Zero)
+				base.Resize (width, height);
+			else {
+				NativeMethods.cairo_surface_destroy (handle);
+				handle = NativeMethods.cairo_win32_surface_create (hdc);
+			}
 		}
 	}
 }

@@ -31,14 +31,14 @@ using System;
 
 namespace Crow.CairoBackend
 {
-	public class WGLDevice : Device
+	public class WGLDevice : GLDevice
 	{
 		public WGLDevice (IntPtr hglrc) : base (NativeMethods.cairo_wgl_device_create (hglrc), true)
 		{
 		}
 
 		public IntPtr Context {
-			get { return NativeMethods.cairo_wgl_device_get_context (Handle); }
+			get { return NativeMethods.cairo_wgl_device_get_context (handle); }
 		}
 	}
 }

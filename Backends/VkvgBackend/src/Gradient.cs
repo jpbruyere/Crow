@@ -3,12 +3,14 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-namespace Crow.Drawing
+using Drawing2D;
+
+namespace Crow.VkvgBackend
 {
-	public class Gradient : Pattern
-	{		
+	public class Gradient : Pattern, IGradient
+	{
 		protected Gradient(IntPtr handle) : base (handle) {	}
-		public void AddColorStop (double offset, Crow.Color c)
+		public void AddColorStop (double offset, Color c)
 			=> NativeMethods.vkvg_pattern_add_color_stop(handle, (float)offset, c.R / 255f, c.G / 255f, c.B / 255f, c.A / 255f);
 		public void AddColorStop(float offset, float r, float g, float b, float a = 1f)
 			=> NativeMethods.vkvg_pattern_add_color_stop(handle, offset, r, g, b, a);

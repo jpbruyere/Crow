@@ -34,14 +34,13 @@
 //
 
 using System;
-using System.Collections;
 using Drawing2D;
 
 namespace Crow.CairoBackend {
 
 	public class Surface : ISurface
 	{
-		IntPtr handle = IntPtr.Zero;
+		protected IntPtr handle = IntPtr.Zero;
 
 		[Obsolete]
 		protected Surface()
@@ -144,7 +143,7 @@ namespace Crow.CairoBackend {
 			NativeMethods.cairo_surface_destroy (handle);
 			handle = IntPtr.Zero;
 		}
-		public virtual void SetSize (int width, int height) {
+		public virtual void Resize (int width, int height) {
 		}
 
 		public Status Finish ()

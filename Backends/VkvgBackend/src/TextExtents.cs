@@ -5,51 +5,44 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Drawing2D
+namespace Crow.VkvgBackend
 {
 	[StructLayout (LayoutKind.Sequential)]
-	public struct TextExtents : IEquatable<TextExtents>
+	internal struct TextExtents : IEquatable<TextExtents>
 	{
-		double xBearing;
-		double yBearing;
-		double width;
-		double height;
-		double xAdvance;
-		double yAdvance;
-		public TextExtents (double xBearing, double yBearing, double width, double height, double xAdvance, double yAdvance) {
-			this.xBearing = xBearing;
-			this.yBearing = yBearing;
-			this.width = width;
-			this.height = height;
-			this.xAdvance = xAdvance;
-			this.yAdvance = yAdvance;
-		}
-		public double XBearing {
+		float xBearing;
+		float yBearing;
+		float width;
+		float height;
+		float xAdvance;
+		float yAdvance;
+
+		public float XBearing {
 			get => xBearing;
 			set { xBearing = value; }
 		}
 
-		public double YBearing {
+		public float YBearing {
 			get => yBearing;
 			set { yBearing = value; }
 		}
 
-		public double Width {
+		public float Width {
 			get => width;
 			set { width = value; }
 		}
 
-		public double Height {
+		public float Height {
 			get => height;
 			set { height = value; }
 		}
 
-		public double XAdvance {
+		public float XAdvance {
 			get => xAdvance;
 			set { xAdvance = value; }
 		}
 
-		public double YAdvance {
+		public float YAdvance {
 			get => yAdvance;
 			set { yAdvance = value; }
 		}

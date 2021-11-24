@@ -3,11 +3,14 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-namespace Crow.Drawing
+using Drawing2D;
+
+namespace Crow.VkvgBackend
 {
-	public class Pattern : IDisposable
+	public class Pattern : IPattern
 	{
 		protected IntPtr handle = IntPtr.Zero;
+		public IntPtr Handle => handle;
 
 		#region CTORS & DTOR
 		protected Pattern(IntPtr handle)
@@ -39,17 +42,16 @@ namespace Crow.Drawing
 		}
 		public uint References() => NativeMethods.vkvg_pattern_get_reference_count(handle);
 
-		public IntPtr Handle => handle;
 
 		public Extend Extend
 		{
+			get => NativeMethods.vkvg_pattern_get_extend(handle);
 			set { NativeMethods.vkvg_pattern_set_extend(handle, value); }
-			get { return NativeMethods.vkvg_pattern_get_extend(handle); }
 		}
 		public Filter Filter
 		{
+			get => NativeMethods.vkvg_pattern_get_filter(handle);
 			set { NativeMethods.vkvg_pattern_set_filter(handle, value); }
-			get { return NativeMethods.vkvg_pattern_get_filter(handle); }
 		}
 
 		#region IDisposable implementation
