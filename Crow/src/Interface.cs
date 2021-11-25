@@ -402,7 +402,7 @@ namespace Crow
 		}
 
 		protected virtual void initBackend () {
-			backend = new Crow.CairoBackend.ImageBackend (hWin, clientRectangle.Width, clientRectangle.Height);
+			backend = new Crow.Backends.DefaultBackend (hWin, clientRectangle.Width, clientRectangle.Height);
 			clipping = Backend.CreateRegion ();
 		}
 		/// <summary>
@@ -412,8 +412,9 @@ namespace Crow
 		{
 			Glfw3.Init ();
 
-			Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
-			Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 3);
+			//Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
+			Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
+			//Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 3);
 			//Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 0);
 			Glfw3.WindowHint (WindowAttribute.ContextCreationApi, Constants.EglContextApi);
 
@@ -1431,7 +1432,7 @@ namespace Crow
 		public virtual void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
-				MainSurface.Resize (clientRectangle.Width, clientRectangle.Height);
+				backend.ResizeMainSurface (clientRectangle.Width, clientRectangle.Height);
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 

@@ -161,9 +161,9 @@ namespace PerfTests
 		protected override void initBackend()
 		{
 			if (screenOutput)
-				backend = new Crow.CairoBackend.ImageBackend (WindowHandle, clientRectangle.Width, clientRectangle.Height);
+				backend = new Crow.Backends.DefaultBackend (WindowHandle, clientRectangle.Width, clientRectangle.Height);
 			else
-				backend = new Crow.CairoBackend.ImageBackend (clientRectangle.Width, clientRectangle.Height);
+				backend = new Crow.Backends.DefaultBackend (clientRectangle.Width, clientRectangle.Height);
 
 			clipping = Backend.CreateRegion ();
 		}

@@ -28,7 +28,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
-using Drawing2D;
 
 namespace Crow.CairoBackend
 {
@@ -39,9 +38,7 @@ namespace Crow.CairoBackend
 		{
 			SetThreadAware(threadAwayre);
 		}
-		/*public override ISurface CreateSurface(int width, int height)
-			=> new ImageSurface (Format.ARGB32, width, height);
-		public override ISurface CreateSurface (IntPtr nativeWindoPointer, int width, int height) {
+		/*public override ISurface CreateSurface (IntPtr nativeWindoPointer, int width, int height) {
 			return new GLSurface (this, Glfw.Glfw3.GetEGLSurface (nativeWindoPointer), width, height);
 		}*/
 

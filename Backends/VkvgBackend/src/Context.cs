@@ -14,7 +14,7 @@ namespace Crow.VkvgBackend
 
 		IntPtr handle = IntPtr.Zero;
 
-		public Context(Surface surf)
+		public Context (ISurface surf)
 		{
 			handle = NativeMethods.vkvg_create(surf.Handle);
 			this.FillRule = FillRule.NonZero;
@@ -310,7 +310,7 @@ namespace Crow.VkvgBackend
 
 		public void SelectFontFace(string family, FontSlant slant, FontWeight weight)
 		{
-			throw new NotImplementedException();
+			NativeMethods.vkvg_select_font_face (handle, family);
 		}
 
 		internal static byte[] TerminateUtf8(string s)

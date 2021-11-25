@@ -36,9 +36,9 @@ namespace Crow.VkvgBackend
 			AddReference ();
 		}
 
-		Surface (IntPtr devHandle, int width, int heigth)
+		Surface (IntPtr devHandle, int width, int height)
 		{
-			handle = NativeMethods.vkvg_surface_create (devHandle, (uint)width, (uint)heigth);
+			handle = NativeMethods.vkvg_surface_create (devHandle, (uint)width, (uint)height);
 		}
 		#endregion
 		~Surface ()
@@ -58,7 +58,8 @@ namespace Crow.VkvgBackend
 
 		public void Resize(int width, int height)
 		{
-			throw new NotImplementedException();
+			NativeMethods.vkvg_surface_destroy (handle);
+			handle = NativeMethods.vkvg_surface_create (vkvgDev.Handle, (uint)width, (uint)height);
 		}
 
 		public void Flush () {

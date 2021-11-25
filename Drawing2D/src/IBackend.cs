@@ -22,6 +22,7 @@ namespace Drawing2D
 		ISvgHandle LoadSvg (string svgFragment);
 		IContext PrepareUIFrame (IContext existingContext, IRegion clipping);
 		void FlushUIFrame (IContext ctx);
+		void ResizeMainSurface (int width, int height);
 		/*IRegion CreateRegion ();
 		ISurface CreateSurface (int width, int height);
 		ISurface CreateSurface (byte[] data, int width, int height);

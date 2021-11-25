@@ -156,8 +156,10 @@ namespace Crow.CairoBackend
 				ctx.Dispose ();
 			clipping = null;
 		}
-
-
+		public void ResizeMainSurface (int width, int height)
+		{
+			surf.Resize (width, height);
+		}
 		#region IDispose implementation
 		bool isDisposed;
 		public void Dispose ()
