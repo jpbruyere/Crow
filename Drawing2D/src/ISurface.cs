@@ -14,10 +14,10 @@ namespace Drawing2D
 
 		void Flush ();
 
-		void WriteToPng (string path);
+		/*void WriteToPng (string path);
 		void WriteTo (IntPtr bitmap);
 		void Clear ();
-		ISurface CreateSimilar (int width, int height);
+		ISurface CreateSimilar (int width, int height);*/
 		void Resize (int width, int height);
 	}
 }

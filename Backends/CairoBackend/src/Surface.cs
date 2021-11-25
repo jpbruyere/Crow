@@ -42,7 +42,6 @@ namespace Crow.CairoBackend {
 	{
 		protected IntPtr handle = IntPtr.Zero;
 
-		[Obsolete]
 		protected Surface()
 		{
 		}
@@ -141,6 +140,7 @@ namespace Crow.CairoBackend {
 			handle = IntPtr.Zero;
 		}
 		public virtual void Resize (int width, int height) {
+			
 		}
 
 		public Status Finish ()

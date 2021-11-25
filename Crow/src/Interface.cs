@@ -412,11 +412,12 @@ namespace Crow
 		{
 			Glfw3.Init ();
 
-			//Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
+			
 			Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
-			//Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 3);
-			//Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 0);
-			Glfw3.WindowHint (WindowAttribute.ContextCreationApi, Constants.EglContextApi);
+			/*Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
+			Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 3);
+			Glfw3.WindowHint (WindowAttribute.ContextVersionMinor, 2);
+			Glfw3.WindowHint (WindowAttribute.ContextCreationApi, Constants.EglContextApi);*/
 
 			Glfw3.WindowHint (WindowAttribute.Resizable, 1);
 			Glfw3.WindowHint (WindowAttribute.Decorated, 1);

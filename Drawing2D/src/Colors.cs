@@ -233,12 +233,12 @@ namespace Drawing2D
 		#region Operators
 		/*public static implicit operator string(Color c) => c.ToString();
 
-		public static implicit operator UInt32 (Color c) => c.value;*/
+		*/
 
 		/*public static implicit operator Color(string s)
 		{
 		}*/
-
+		public static implicit operator UInt32 (Color c) => c.value;
 		public static implicit operator Color (Colors c) => new Color ((UInt32)c);
 		public static implicit operator Colors (Color c) => (Colors)c.value;
 		public static bool operator ==(Color a, Color b) => a.Equals (b);

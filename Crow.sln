@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CairoBackend", "Backends\Ca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VkvgBackend", "Backends\VkvgBackend\VkvgBackend.csproj", "{34976828-80CF-4AC5-8C81-F66F635DC5FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiaBackend", "Backends\SkiaBackend\SkiaBackend.csproj", "{ADAABC24-0152-41E2-BBEC-3AC9ACEE1175}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{34976828-80CF-4AC5-8C81-F66F635DC5FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34976828-80CF-4AC5-8C81-F66F635DC5FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34976828-80CF-4AC5-8C81-F66F635DC5FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADAABC24-0152-41E2-BBEC-3AC9ACEE1175}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADAABC24-0152-41E2-BBEC-3AC9ACEE1175}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADAABC24-0152-41E2-BBEC-3AC9ACEE1175}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADAABC24-0152-41E2-BBEC-3AC9ACEE1175}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +75,7 @@ Global
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{E06441A9-0CFD-45BB-9478-99D28CEB327F} = {451F5727-2A2E-4361-A41B-089429ADE8F9}
 		{34976828-80CF-4AC5-8C81-F66F635DC5FC} = {451F5727-2A2E-4361-A41B-089429ADE8F9}
+		{ADAABC24-0152-41E2-BBEC-3AC9ACEE1175} = {451F5727-2A2E-4361-A41B-089429ADE8F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00D4E149-7131-49F4-BAAD-559AA961A78E}

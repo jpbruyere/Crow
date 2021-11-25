@@ -29,9 +29,35 @@
 //
 
 using System;
+using OpenGL;
+using static OpenGL.Gl;
 
 namespace Crow.CairoBackend {
 
+	public class GLTextureSurface : Surface
+	{
+		uint texId;
+		internal GLTextureSurface (CairoDevice device, int width, int height)
+			: base ()
+		{
+			texId = GenTexture ();
+			BindTexture (TextureTarget.Texture2d, texId);
+			TexImage2D (TextureTarget.Texture2d, 0, InternalFormat.Rgb, width, height,
+				0, PixelFormat.Rgb, PixelType.UnsignedByte, 0);
+			TexParameteri(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, NEAREST);
+			TexParameteri(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, NEAREST);
+
+			handle = NativeMethods.cairo_gl_surface_create_for_texture (device.Handle,
+				(uint)Content.ColorAlpha, texId, width, height);
+		}
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing && handle != IntPtr.Zero)
+				OpenGL.Gl.DeleteTextures (texId);
+			base.Dispose (disposing);
+		}
+
+	}
 	public class GLSurface : Surface
 	{
 		public GLSurface (IntPtr ptr, bool own) : base (ptr, own)
@@ -59,6 +85,8 @@ namespace Crow.CairoBackend {
 		}
 		public override int Width => NativeMethods.cairo_gl_surface_get_width (handle);
 		public override int Height => NativeMethods.cairo_gl_surface_get_height (handle);
+		public override void Resize(int width, int height)
+			=> NativeMethods.cairo_gl_surface_set_size(handle, width, height);
 
 		public void SwapBuffers(){
 			NativeMethods.cairo_gl_surface_swapbuffers (this.Handle);
