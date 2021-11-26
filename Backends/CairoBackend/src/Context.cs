@@ -43,7 +43,7 @@ namespace Crow.CairoBackend
 {
 	public class Context : IContext
 	{
-		IntPtr handle = IntPtr.Zero;
+		internal IntPtr handle = IntPtr.Zero;
 
 		static int native_glyph_size, c_compiler_long_size;
 
@@ -75,12 +75,12 @@ namespace Crow.CairoBackend
 			}
 		}
 
-		public Context (ISurface surface) : this (NativeMethods.cairo_create (surface.Handle), true)
+		internal Context (Surface surface) : this (NativeMethods.cairo_create (surface.handle), true)
 		{
 		}
 
 
-		public Context (IntPtr handle, bool owner)
+		internal Context (IntPtr handle, bool owner)
 		{
 			this.handle = handle;
 			if (!owner)
@@ -90,7 +90,7 @@ namespace Crow.CairoBackend
 		}
 
 		[Obsolete]
-		public Context (IntPtr state) : this (state, true)
+		internal Context (IntPtr state) : this (state, true)
 		{
 		}
 
@@ -144,8 +144,6 @@ namespace Crow.CairoBackend
 			}
 		}
 
-		public IntPtr Handle => handle;
-
 		public Operator Operator {
 			set => NativeMethods.cairo_set_operator (handle, value);
 			get => NativeMethods.cairo_get_operator (handle);
@@ -163,71 +161,29 @@ namespace Crow.CairoBackend
 			get => NativeMethods.cairo_get_line_width (handle);
 		}
 		public LineCap LineCap {
-			set {
-				NativeMethods.cairo_set_line_cap (handle, value);
-			}
-
-			get {
-				return NativeMethods.cairo_get_line_cap (handle);
-			}
+			set => NativeMethods.cairo_set_line_cap (handle, value);
+			get => NativeMethods.cairo_get_line_cap (handle);
 		}
-
 		public LineJoin LineJoin {
-			set {
-				NativeMethods.cairo_set_line_join (handle, value);
-			}
-
-			get {
-				return NativeMethods.cairo_get_line_join (handle);
-			}
+			set => NativeMethods.cairo_set_line_join (handle, value);
+			get => NativeMethods.cairo_get_line_join (handle);
+		}
+		public double MiterLimit {
+			set => NativeMethods.cairo_set_miter_limit (handle, value);
+			get => NativeMethods.cairo_get_miter_limit (handle);
 		}
 
 		public void SetDash (double [] dashes, double offset = 0)
-		{
-			NativeMethods.cairo_set_dash (handle, dashes, dashes.Length, offset);
-		}
-
-		[Obsolete("Use GetSource/SetSource")]
-		public Pattern Pattern {
-			set {
-				SetSource (value);
-			}
-			get {
-				return GetSource ();
-			}
-		}
-
-		//This is obsolete because it wasn't obvious it needed to be disposed
-		[Obsolete("Use GetSource/SetSource")]
-		public Pattern Source {
-			set {
-				SetSource (value);
-			}
-			get {
-				return GetSource ();
-			}
-		}
+			=> NativeMethods.cairo_set_dash (handle, dashes, dashes.Length, offset);
 
 		public void SetSource (Pattern source)
-		{
-			NativeMethods.cairo_set_source (handle, source.handle);
-		}
-
+			=> NativeMethods.cairo_set_source (handle, source.handle);
 		public Pattern GetSource ()
 		{
 			var ptr = NativeMethods.cairo_get_source (handle);
 			return Pattern.Lookup (ptr, false);
 		}
 
-		public double MiterLimit {
-			set {
-				NativeMethods.cairo_set_miter_limit (handle, value);
-			}
-
-			get {
-				return NativeMethods.cairo_get_miter_limit (handle);
-			}
-		}
 
 		public PointD CurrentPoint {
 			get {
@@ -237,17 +193,13 @@ namespace Crow.CairoBackend
 			}
 		}
 
-		public bool HasCurrentPoint {
-			get {
-				return NativeMethods.cairo_has_current_point (handle);
-			}
-		}
+		public bool HasCurrentPoint => NativeMethods.cairo_has_current_point (handle);
 		public Surface GetTarget () =>  Surface.Lookup (NativeMethods.cairo_get_target (handle), false);
 		public void SetTarget (Surface target)
 		{
 			if (handle != IntPtr.Zero)
 				NativeMethods.cairo_destroy (handle);
-			handle = NativeMethods.cairo_create (target.Handle);
+			handle = NativeMethods.cairo_create (target.handle);
 		}
 		public ScaledFont GetScaledFont ()
 			=> new ScaledFont (NativeMethods.cairo_get_scaled_font (handle), false);
@@ -269,17 +221,17 @@ namespace Crow.CairoBackend
 		//[Obsolete ("Use SetSource method (with double parameters)")]
 		public void SetSource (Surface source, int x = 0, int y = 0)
 		{
-			NativeMethods.cairo_set_source_surface (handle, source.Handle, x, y);
+			NativeMethods.cairo_set_source_surface (handle, source.handle, x, y);
 		}
 
 		public void SetSource (Surface source, double x, double y)
 		{
-			NativeMethods.cairo_set_source_surface (handle, source.Handle, x, y);
+			NativeMethods.cairo_set_source_surface (handle, source.handle, x, y);
 		}
 
 		public void SetSource (Surface source)
 		{
-			NativeMethods.cairo_set_source_surface (handle, source.Handle, 0, 0);
+			NativeMethods.cairo_set_source_surface (handle, source.handle, 0, 0);
 		}
 
 		#region Path methods
@@ -327,7 +279,7 @@ namespace Crow.CairoBackend
 		public void PaintWithAlpha (double alpha) => NativeMethods.cairo_paint_with_alpha (handle, alpha);
 		public void Mask (Pattern pattern) => NativeMethods.cairo_mask (handle, pattern.handle);
 		public void MaskSurface (Surface surface, double surface_x, double surface_y)
-			=> NativeMethods.cairo_mask_surface (handle, surface.Handle, surface_x, surface_y);
+			=> NativeMethods.cairo_mask_surface (handle, surface.handle, surface_x, surface_y);
 		public void Stroke () => NativeMethods.cairo_stroke (handle);
 		public void StrokePreserve () => NativeMethods.cairo_stroke_preserve (handle);
 		public Rectangle StrokeExtents ()
@@ -564,21 +516,11 @@ namespace Crow.CairoBackend
 		}
 
 		public void ShowText(string str)
-		{
-			NativeMethods.cairo_show_text (handle, TerminateUtf8 (str));
-		}
-
-
+			=> NativeMethods.cairo_show_text (handle, TerminateUtf8 (str));
 		public void TextPath(string str)
-		{
-			NativeMethods.cairo_text_path (handle, TerminateUtf8(str));
-		}
-
+			=> NativeMethods.cairo_text_path (handle, TerminateUtf8(str));
 		public void TextPath(byte[] utf8)
-		{
-			NativeMethods.cairo_text_path (handle, TerminateUtf8(utf8));
-		}
-
+			=> NativeMethods.cairo_text_path (handle, TerminateUtf8(utf8));
 		public TextExtents TextExtents(string s)
 		{
 			TextExtents extents;
@@ -625,7 +567,7 @@ namespace Crow.CairoBackend
 
 		public void Flush()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public void Clear()
@@ -711,17 +653,15 @@ namespace Crow.CairoBackend
 		{
 			throw new NotImplementedException();
 		}
-		public void RenderSvg(IntPtr svgNativeHandle, string subId = null)
-		{
-			throw new NotImplementedException();
-		}
+		public void RenderSvg(ISvgHandle svg, string subId = null)
+			=> svg.Render (this, subId);
 		Matrix savedMat;
 		public void SaveTransformations()
 			=> NativeMethods.cairo_get_matrix (handle, out savedMat);
 		public void RestoreTransformations()
 			=> NativeMethods.cairo_set_matrix (handle, ref savedMat);
-		public void SetSource(IPattern pat) => NativeMethods.cairo_set_source (handle, pat.Handle);
+		public void SetSource(IPattern pat) => NativeMethods.cairo_set_source (handle, (pat as Pattern).handle);
 		public void SetSource(ISurface surf, double x = 0, double y = 0)
-			=> NativeMethods.cairo_set_source_surface (handle, surf.Handle, x, y);
+			=> NativeMethods.cairo_set_source_surface (handle, (surf as Surface).handle, x, y);
 	}
 }

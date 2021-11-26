@@ -13,7 +13,7 @@ namespace Crow.SkiaBackend
 	public class Context : IContext
 	{
 		VkSurface surf;
-		SKCanvas canvas;
+		internal SKCanvas canvas;
 		SKPaint paint;
 		SKPath path;
 		FillRule fillRule = FillRule.NonZero;
@@ -70,8 +70,10 @@ namespace Crow.SkiaBackend
 			SKBlendMode.Darken,
 			SKBlendMode.Lighten
 		};
+
 		internal Context (VkSurface surf)
 		{
+			this.surf = surf;
 			canvas = surf.Canvas;
 			paint = new SKPaint ();
 		}
@@ -79,8 +81,6 @@ namespace Crow.SkiaBackend
 		{
 			Dispose(false);
 		}
-
-		public IntPtr Handle => throw new NotImplementedException();
 
 		public double LineWidth {
 			get => (float)paint.StrokeWidth;
@@ -108,7 +108,7 @@ namespace Crow.SkiaBackend
 				if (font == null)
 					createDefaultFont ();
 				paint.GetFontMetrics (out SKFontMetrics m);
-				return new FontExtents (m.Ascent, m.Descent, m.CapHeight, m.XMax, m.XHeight);
+				return new FontExtents (-m.Ascent, m.Descent, m.Descent - m.Ascent, m.MaxCharacterWidth, m.XHeight);
 			}
 		}
 		public Antialias Antialias {
@@ -254,10 +254,8 @@ namespace Crow.SkiaBackend
 			MoveTo (dx + x, dx + y);
 		}
 
-		public void RenderSvg(IntPtr svgNativeHandle, string subId = null)
-		{
-			//throw new NotImplementedException();
-		}
+		public void RenderSvg(ISvgHandle svgHandle, string subId = null)
+			=> svgHandle.Render (this, subId);
 
 		public void ResetClip()
 		{
@@ -292,7 +290,6 @@ namespace Crow.SkiaBackend
 				SKFontStyleWidth.Normal, (SKFontStyleSlant)slant));
 			updatePaintFont ();
 		}
-
 		public void SetDash(double[] dashes, double offset = 0)
 		{
 			if (dashes == null || dashes.Length == 1) {
@@ -301,7 +298,6 @@ namespace Crow.SkiaBackend
 			}
 			paint.PathEffect = SKPathEffect.CreateDash (dashes.Cast<float>().ToArray(), (float)offset);
 		}
-
 		public void SetFontSize(double scale)
 		{
 			if (font == null)
@@ -309,50 +305,29 @@ namespace Crow.SkiaBackend
 			font.Size = (float)scale;
 			updatePaintFont ();
 		}
-
 		public void SetSource(IPattern pat)
 		{
-			throw new NotImplementedException();
+			if (pat is Gradient gr)
+				paint.Shader = gr.shader;
 		}
-
 		public void SetSource(Color color)
 		{
+			paint.Shader = null;
 			paint.Color = (UInt32)color;
 		}
-
 		public void SetSource(double r, double g, double b, double a = 1)
 		{
-			paint.Color = (UInt32)new Color (r, g, b, a);
+			paint.Shader = null;
+			paint.Color = (UInt32)new Color (a, r, g, b);
 		}
-
+		VkSurface sourceSurface;
 		public void SetSource(ISurface surf, double x = 0, double y = 0)
 		{
-			if (!(surf is Surface s))
-				return;
-			canvas.DrawSurface (s.SkSurf, (float)x, (float)y);
-		}
-
-		public void ShowText(string text)
-		{
-			ShowText (text.AsSpan ());
-		}
-
-		public void ShowText(ReadOnlySpan<char> s, int tabSize = 4)
-		{
-			int size = s.Length * 4 + 1;
-			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
-			int encodedBytes = s.ToUtf8 (bytes, tabSize);
-			bytes[encodedBytes] = 0;
-			ShowText (bytes.Slice (0, encodedBytes + 1));
-		}
-
-		public void ShowText(Span<byte> bytes)
-		{
-			SKPoint origin = (path == null) ? SKPoint.Empty : path.LastPoint;
-			if (font == null)
-				createDefaultFont ();
-			SKTextBlob tb = SKTextBlob.Create (bytes, SKTextEncoding.Utf8, font, origin);
-			canvas.DrawText (tb, origin.X, origin.Y, paint);
+			VkSurface s = surf as VkSurface;
+			s.Flush();
+			paint.Shader = SKShader.CreateImage(s.SkSurf.Snapshot(),
+				SKShaderTileMode.Clamp, SKShaderTileMode.Clamp, SKMatrix.CreateTranslation ((float)x, (float)y));
+			//canvas.DrawSurface (s.SkSurf, (float)x, (float)y);
 		}
 
 		public void Stroke()
@@ -361,12 +336,6 @@ namespace Crow.SkiaBackend
 			path?.Dispose ();
 			path = null;
 		}
-
-		public Rectangle StrokeExtents()
-		{
-			throw new NotImplementedException();
-		}
-
 		public void StrokePreserve()
 		{
 			if (path == null)
@@ -374,13 +343,16 @@ namespace Crow.SkiaBackend
 			paint.IsStroke = true;
 			canvas.DrawPath (path, paint);
 		}
+		public Rectangle StrokeExtents()
+		{
+			throw new NotImplementedException();
+		}
 
 		public TextExtents TextExtents(ReadOnlySpan<char> s, int tabSize = 4)
 		{
 			TextExtents (s, tabSize, out Drawing2D.TextExtents e);
 			return e;
 		}
-
 		public void TextExtents(ReadOnlySpan<char> s, int tabSize, out TextExtents extents)
 		{
 			if (s.Length == 0) {
@@ -393,22 +365,39 @@ namespace Crow.SkiaBackend
 			bytes[encodedBytes] = 0;
 			TextExtents (bytes.Slice (0, encodedBytes + 1), out extents);
 		}
-
 		public void TextExtents(Span<byte> bytes, out TextExtents extents)
 		{
 			if (font == null)
 				createDefaultFont ();
 			paint.GetFontMetrics (out SKFontMetrics metrics);
 			SKRect bounds = default;
-			paint.MeasureText (bytes, ref bounds);
+			paint.MeasureText (bytes.Slice (0, bytes.Length - 1), ref bounds);
 			extents = new TextExtents (0,0,bounds.Width, bounds.Height, bounds.Width, bounds.Height);
 		}
-
-		public void Translate(double dx, double dy)
+		public void ShowText(string text)
 		{
-			canvas.Translate ((float)dx, (float)dy);
+			ShowText (text.AsSpan ());
+		}
+		public void ShowText(ReadOnlySpan<char> s, int tabSize = 4)
+		{
+			int size = s.Length * 4 + 1;
+			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+			int encodedBytes = s.ToUtf8 (bytes, tabSize);
+			bytes[encodedBytes] = 0;
+			ShowText (bytes.Slice (0, encodedBytes + 1));
+		}
+		public void ShowText(Span<byte> bytes)
+		{
+			SKPoint origin = (path == null) ? SKPoint.Empty : path.LastPoint;
+			if (font == null)
+				createDefaultFont ();
+			SKTextBlob tb = SKTextBlob.Create (bytes.Slice (0, bytes.Length - 1), SKTextEncoding.Utf8, font);
+
+			canvas.DrawText (tb, origin.X, origin.Y, paint);
 		}
 
+
+		public void Translate(double dx, double dy) => canvas.Translate ((float)dx, (float)dy);
 		public void Translate(PointD p) => Translate (p.X, p.Y);
 
 

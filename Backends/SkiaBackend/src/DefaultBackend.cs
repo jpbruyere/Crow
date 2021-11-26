@@ -9,8 +9,8 @@ namespace Crow.Backends
 {
 	public class DefaultBackend : VulkanBackend
 	{
-		public DefaultBackend (IntPtr nativeWindoPointer, int width, int height)
-		: base (nativeWindoPointer, width, height) {}
+		public DefaultBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height)
+		: base (ref nativeWindoPointer, out ownGlfwWinHandle, width, height) {}
 		public DefaultBackend (int width, int height)
 		: base (width, height) {}
 	}

@@ -9,7 +9,7 @@ namespace Crow.VkvgBackend
 {
 	public class Surface: ISurface
 	{
-		IntPtr handle = IntPtr.Zero;
+		internal IntPtr handle = IntPtr.Zero;
 		Device vkvgDev;
 
 		#region CTOR
@@ -45,8 +45,6 @@ namespace Crow.VkvgBackend
 		{
 			Dispose (false);
 		}
-
-		public IntPtr Handle => handle;
 		public IntPtr VkImage => NativeMethods.vkvg_surface_get_vk_image (handle);
 		public int Width => NativeMethods.vkvg_surface_get_width (handle);
 		public int Height => NativeMethods.vkvg_surface_get_height (handle);

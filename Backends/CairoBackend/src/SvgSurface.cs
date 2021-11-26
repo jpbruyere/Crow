@@ -43,7 +43,7 @@ namespace Crow.CairoBackend {
 
 		public void RestrictToVersion (SvgVersion version)
 		{
-			NativeMethods.cairo_svg_surface_restrict_to_version (Handle, version);
+			NativeMethods.cairo_svg_surface_restrict_to_version (handle, version);
 		}
 	}
 }

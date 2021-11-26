@@ -59,10 +59,10 @@ namespace Crow.CairoBackend {
 
 
 		public void Render(IContext cr) =>
-			rsvg_handle_render_cairo (Raw, cr == null ? IntPtr.Zero : cr.Handle);
+			rsvg_handle_render_cairo (Raw, cr == null ? IntPtr.Zero : (cr as Context).handle);
 
 		public void Render (IContext cr, string id) =>
-			rsvg_handle_render_cairo_sub (Raw, cr == null ? IntPtr.Zero : cr.Handle, id);
+			rsvg_handle_render_cairo_sub (Raw, cr == null ? IntPtr.Zero : (cr as Context).handle, id);
 
 		[StructLayout(LayoutKind.Sequential)]
 		struct DimensionData {

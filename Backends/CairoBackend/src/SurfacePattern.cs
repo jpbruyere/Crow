@@ -39,7 +39,7 @@ namespace Crow.CairoBackend {
 		}
 
 		public SurfacePattern (Surface surface)
-			: base (NativeMethods.cairo_pattern_create_for_surface (surface.Handle), true)
+			: base (NativeMethods.cairo_pattern_create_for_surface (surface.handle), true)
 		{
 		}
 

@@ -9,8 +9,6 @@ namespace Drawing2D
 	public interface IContext : IDisposable
 	{
 
-		IntPtr Handle { get; }
-
 		double LineWidth { get; set; }
 		LineJoin LineJoin { get; set; }
 		LineCap LineCap { get; set; }
@@ -76,7 +74,7 @@ namespace Drawing2D
 		void SetSource (Color color);
 		void SetSource(double r, double g, double b, double a = 1.0);
 		void SetSource(ISurface surf, double x = 0f, double y = 0f);
-		void RenderSvg(IntPtr svgNativeHandle, string subId = null);
+		void RenderSvg(ISvgHandle svgHandle, string subId = null);
 
 		void PushGroup ();
 		void PopGroupToSource ();

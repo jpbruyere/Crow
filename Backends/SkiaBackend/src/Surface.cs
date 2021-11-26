@@ -39,7 +39,7 @@ namespace Crow.SkiaBackend
 				}
 			};
 			rt = new GRBackendRenderTarget (width, height, (int)samples, imgInfo);
-			skSurf = SKSurface.Create (gr, rt, SKColorType.Rgba8888);
+			skSurf = SKSurface.Create (gr, rt, GRSurfaceOrigin.TopLeft, SKColorType.Rgba8888, SKColorSpace.CreateSrgb());
 		}
 		~VkSurface ()
 		{

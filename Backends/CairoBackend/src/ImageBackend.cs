@@ -11,7 +11,23 @@ namespace Crow.CairoBackend
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
-		public ImageBackend (IntPtr nativeWindoPointer, int width, int height) : base () {
+		public ImageBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height) : base () {
+			if (nativeWindoPointer == IntPtr.Zero) {
+				Glfw3.Init ();
+				Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
+				Glfw3.WindowHint (WindowAttribute.Resizable, 1);
+				Glfw3.WindowHint (WindowAttribute.Decorated, 1);
+
+				hWin = Glfw3.CreateWindow (width, height, "win name", MonitorHandle.Zero, IntPtr.Zero);
+				if (hWin == IntPtr.Zero)
+					throw new Exception ("[GLFW3] Unable to create Window");
+
+				nativeWindoPointer = hWin;
+				ownGlfwWinHandle = true;
+			} else {
+				hWin = nativeWindoPointer;
+				ownGlfwWinHandle = false;
+			}
 
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.Unix:

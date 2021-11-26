@@ -8,7 +8,6 @@ namespace Drawing2D
 {
 	public interface ISurface: IDisposable
 	{
-		IntPtr Handle { get; }
 		int Width { get; }
 		int Height { get; }
 

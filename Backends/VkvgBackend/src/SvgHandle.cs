@@ -9,8 +9,9 @@ namespace Crow.VkvgBackend
 {
 	public sealed class SvgHandle : ISvgHandle {
 
-		IntPtr handle;
+		internal IntPtr handle;
 
+		#region CTOR
 		public  SvgHandle (Device dev, Span<byte> bytes)
 		{
 			/*int size = svgFragment.Length * 4 + 1;
@@ -23,13 +24,12 @@ namespace Crow.VkvgBackend
 		{
 			handle = NativeMethods.nsvg_load_file (dev.Handle, file_name);
 		}
+		#endregion
 
 		public void Render(IContext cr) =>
-			cr.RenderSvg (handle);
-
+			NativeMethods.vkvg_render_svg((cr as Context).handle, handle, null);
 		public void Render (IContext cr, string id) =>
-			cr.RenderSvg (handle, id);
-
+			NativeMethods.vkvg_render_svg((cr as Context).handle, handle, id);
 		public Size Dimensions {
 			get {
 				NativeMethods.nsvg_get_size (handle, out int w, out int h);

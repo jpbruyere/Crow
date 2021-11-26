@@ -11,20 +11,17 @@ namespace Crow.VkvgBackend
 {
 	public class Context : IContext
 	{
+		internal IntPtr handle = IntPtr.Zero;
 
-		IntPtr handle = IntPtr.Zero;
-
-		public Context (ISurface surf)
+		internal Context (Surface surf)
 		{
-			handle = NativeMethods.vkvg_create(surf.Handle);
+			handle = NativeMethods.vkvg_create(surf.handle);
 			this.FillRule = FillRule.NonZero;
 		}
 		~Context()
 		{
 			Dispose(false);
 		}
-
-		public IntPtr Handle => handle;
 
 		public double LineWidth
 		{
@@ -64,16 +61,6 @@ namespace Crow.VkvgBackend
 			set;
 			get;
 		}
-		public void Arc(double xc, double yc, double radius, double a1, double a2)
-			=> NativeMethods.vkvg_arc(handle, (float)xc, (float)yc, (float)radius, (float)a1, (float)a2);
-		public void Arc (PointD center, double radius, double angle1, double angle2)
-			=> NativeMethods.vkvg_arc (handle, (float)center.X, (float)center.Y, (float)radius, (float)angle1, (float)angle2);
-		public void ArcNegative (PointD center, double radius, double angle1, double angle2)
-			=> NativeMethods.vkvg_arc_negative (handle, (float)center.X, (float)center.Y, (float)radius, (float)angle1, (float)angle2);
-		public void ArcNegative(double xc, double yc, double radius, double a1, double a2)
-		{
-			NativeMethods.vkvg_arc_negative(handle, (float)xc, (float)yc, (float)radius, (float)a1, (float)a2);
-		}
 
 		public void Clear() => NativeMethods.vkvg_clear(handle);
 
@@ -90,10 +77,16 @@ namespace Crow.VkvgBackend
 		public void SetFontSize (double size) => NativeMethods.vkvg_set_font_size(handle, (uint)size);
 
 		public void ClosePath() => NativeMethods.vkvg_close_path (handle);
-
-		public void CurveTo(double x1, double y1, double x2, double y2, double x3, double y3)
-			=> NativeMethods.vkvg_curve_to (handle, (float)x1, (float)y1, (float)x2, (float)y2, (float)x3, (float)y3);
-
+		public void NewPath() => NativeMethods.vkvg_new_path(handle);
+		public void NewSubPath() => NativeMethods.vkvg_new_sub_path(handle);
+		public void Arc(double xc, double yc, double radius, double a1, double a2)
+			=> NativeMethods.vkvg_arc(handle, (float)xc, (float)yc, (float)radius, (float)a1, (float)a2);
+		public void Arc (PointD center, double radius, double angle1, double angle2)
+			=> NativeMethods.vkvg_arc (handle, (float)center.X, (float)center.Y, (float)radius, (float)angle1, (float)angle2);
+		public void ArcNegative (PointD center, double radius, double angle1, double angle2)
+			=> NativeMethods.vkvg_arc_negative (handle, (float)center.X, (float)center.Y, (float)radius, (float)angle1, (float)angle2);
+		public void ArcNegative(double xc, double yc, double radius, double a1, double a2)
+			=> NativeMethods.vkvg_arc_negative(handle, (float)xc, (float)yc, (float)radius, (float)a1, (float)a2);
 		/*public IntPtr Handle => handle;
 
 		public void AddReference()
@@ -146,166 +139,74 @@ namespace Crow.VkvgBackend
 			throw new NotImplementedException();
 		}
 */
-		public void MoveTo(float x, float y)
-		{
-			NativeMethods.vkvg_move_to(handle, x, y);
-		}
-		public void RelMoveTo(float x, float y)
-		{
-			NativeMethods.vkvg_rel_move_to(handle, x, y);
-		}
-		public void LineTo(float x, float y)
-		{
-			NativeMethods.vkvg_line_to(handle, x, y);
-		}
-		public void LineTo(Point p)
-		{
-			NativeMethods.vkvg_line_to(handle, p.X, p.Y);
-		}
-		public void LineTo(PointD p)
-		{
-			NativeMethods.vkvg_line_to(handle, (float)p.X, (float)p.Y);
-		}
-		public void RelLineTo(float x, float y)
-		{
-			NativeMethods.vkvg_rel_line_to(handle, x, y);
-		}
-		public void CurveTo(float x1, float y1, float x2, float y2, float x3, float y3)
-		{
-			NativeMethods.vkvg_curve_to(handle, x1, y1, x2, y2, x3, y3);
-		}
-		public void RelCurveTo(float x1, float y1, float x2, float y2, float x3, float y3)
-		{
-			NativeMethods.vkvg_rel_curve_to(handle, x1, y1, x2, y2, x3, y3);
-		}
-
-		public void MoveTo(double x, double y)
-		{
-			NativeMethods.vkvg_move_to(handle, (float)x, (float)y);
-		}
-		public void RelMoveTo(double x, double y)
-		{
-			NativeMethods.vkvg_rel_move_to(handle, (float)x, (float)y);
-		}
-		public void LineTo(double x, double y)
-		{
-			NativeMethods.vkvg_line_to(handle, (float)x, (float)y);
-		}
-		public void RelLineTo(double x, double y)
-		{
-			NativeMethods.vkvg_rel_line_to(handle, (float)x, (float)y);
-		}
+		//public void MoveTo(float x, float y) => NativeMethods.vkvg_move_to(handle, x, y);
+		public void MoveTo(double x, double y) => NativeMethods.vkvg_move_to(handle, (float)x, (float)y);
+		public void MoveTo(Point p) => NativeMethods.vkvg_move_to(handle, p.X, p.Y);
+		public void MoveTo(PointD p) => NativeMethods.vkvg_move_to(handle, (float)p.X, (float)p.Y);
+		//public void RelMoveTo(float x, float y) => NativeMethods.vkvg_rel_move_to(handle, x, y);
+		//public void LineTo(float x, float y) =>	NativeMethods.vkvg_line_to(handle, x, y);
+		public void LineTo(Point p) => NativeMethods.vkvg_line_to(handle, p.X, p.Y);
+		public void LineTo(PointD p) => NativeMethods.vkvg_line_to(handle, (float)p.X, (float)p.Y);
+		public void LineTo(double x, double y) => NativeMethods.vkvg_line_to(handle, (float)x, (float)y);
+		//public void RelLineTo(float x, float y) => NativeMethods.vkvg_rel_line_to(handle, x, y);
+		/*public void CurveTo(float x1, float y1, float x2, float y2, float x3, float y3)
+			=> NativeMethods.vkvg_curve_to(handle, x1, y1, x2, y2, x3, y3);*/
+		public void CurveTo(double x1, double y1, double x2, double y2, double x3, double y3)
+			=> NativeMethods.vkvg_curve_to (handle, (float)x1, (float)y1, (float)x2, (float)y2, (float)x3, (float)y3);
+		public void RelMoveTo(double x, double y) => NativeMethods.vkvg_rel_move_to(handle, (float)x, (float)y);
+		public void RelLineTo(double x, double y) => NativeMethods.vkvg_rel_line_to(handle, (float)x, (float)y);
 		public void RelCurveTo(double x1, double y1, double x2, double y2, double x3, double y3)
-		{
-			NativeMethods.vkvg_rel_curve_to(handle, (float)x1, (float)y1, (float)x2, (float)y2, (float)x3, (float)y3);
-		}
+			=> NativeMethods.vkvg_rel_curve_to(handle, (float)x1, (float)y1, (float)x2, (float)y2, (float)x3, (float)y3);
+		//public void RelCurveTo(float x1, float y1, float x2, float y2, float x3, float y3)
+		//	=> NativeMethods.vkvg_rel_curve_to(handle, x1, y1, x2, y2, x3, y3);
+		public void Rectangle(double x, double y, double width, double height)
+			=> NativeMethods.vkvg_rectangle (handle, (float)x, (float)y, (float)width, (float)height);
+		public void Rectangle(Rectangle r)
+			=> NativeMethods.vkvg_rectangle (handle, (float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
 
-		public void SetSource(Pattern pat)
-		{
-			NativeMethods.vkvg_set_source(handle, pat.Handle);
-		}
+
 		public void SetSource(IPattern pat) {
 			if (pat is Pattern p)
-				NativeMethods.vkvg_set_source (handle, p.Handle);
+				NativeMethods.vkvg_set_source (handle, p.handle);
 		}
 		public void SetSource (Color color)
 		{
-			NativeMethods.vkvg_set_source_rgba (handle, (float)(color.R / 255.0), (float)(color.G / 255.0), (float)(color.B / 255.0), (float)(color.A / 255.0));
+			NativeMethods.vkvg_set_source_rgba (handle,
+				(float)(color.R / 255.0), (float)(color.G / 255.0), (float)(color.B / 255.0), (float)(color.A / 255.0));
 		}
 		public void SetSource(ISurface surf, double x = 0, double y = 0)
-		{
-			NativeMethods.vkvg_set_source_surface(handle, surf.Handle, (float)x, (float)y);
-		}
+			=> NativeMethods.vkvg_set_source_surface(handle, (surf as Surface).handle, (float)x, (float)y);
 		public void SetSource(double r, double g, double b, double a = 1.0)
-		{
-			NativeMethods.vkvg_set_source_rgba(handle, (float)r, (float)g, (float)b, (float)a);
-		}
-		public void RenderSvg(IntPtr nsvgImage, string subId = null)
-		{
-			NativeMethods.vkvg_render_svg(handle, nsvgImage, subId);
-		}
-
+		=> NativeMethods.vkvg_set_source_rgba(handle, (float)r, (float)g, (float)b, (float)a);
+		public void RenderSvg(ISvgHandle nsvgImage, string subId = null)
+			=> nsvgImage.Render (this, subId);
 		Matrix savedMat = Matrix.Identity;
-		public void SaveTransformations()
-		{
-			NativeMethods.vkvg_get_matrix (handle, out savedMat);
-		}
+		public void SaveTransformations() => NativeMethods.vkvg_get_matrix (handle, out savedMat);
+		public void RestoreTransformations() => NativeMethods.vkvg_set_matrix (handle, ref savedMat);
 
-		public void RestoreTransformations()
-		{
-			NativeMethods.vkvg_set_matrix (handle, ref savedMat);
-		}
 
-		Rectangle IContext.StrokeExtents()
+		public void Scale(double sx, double sy) => NativeMethods.vkvg_scale(handle, (float)sx, (float)sy);
+		public void Translate(double dx, double dy) => NativeMethods.vkvg_translate(handle, (float)dx, (float)dy);
+		public void Translate(PointD p) => NativeMethods.vkvg_translate(handle, (float)p.X, (float)p.Y);
+		public void Rotate(double alpha) => NativeMethods.vkvg_rotate(handle, (float)alpha);
+
+		public void Fill() => NativeMethods.vkvg_fill(handle);
+		public void FillPreserve() => NativeMethods.vkvg_fill_preserve(handle);
+		public void Stroke() => NativeMethods.vkvg_stroke(handle);
+		public void StrokePreserve() => NativeMethods.vkvg_stroke_preserve(handle);
+		public Rectangle StrokeExtents()
 		{
 			throw new NotImplementedException();
 		}
-
-		public void Scale(double sx, double sy)
-		{
-			NativeMethods.vkvg_scale(handle, (float)sx, (float)sy);
-		}
-		public void Translate(double dx, double dy)
-		{
-			NativeMethods.vkvg_translate(handle, (float)dx, (float)dy);
-		}
-		public void Translate(PointD p)
-		{
-			NativeMethods.vkvg_translate(handle, (float)p.X, (float)p.Y);
-		}
-		public void Rotate(double alpha)
-		{
-			NativeMethods.vkvg_rotate(handle, (float)alpha);
-		}
-
-		public void Fill()
-		{
-			NativeMethods.vkvg_fill(handle);
-		}
-		public void FillPreserve()
-		{
-			NativeMethods.vkvg_fill_preserve(handle);
-		}
-		public void Stroke()
-		{
-			NativeMethods.vkvg_stroke(handle);
-		}
-		public void StrokePreserve()
-		{
-			NativeMethods.vkvg_stroke_preserve(handle);
-		}
-		public void NewPath()
-		{
-			NativeMethods.vkvg_new_path(handle);
-		}
-		public void NewSubPath()
-		{
-			NativeMethods.vkvg_new_sub_path(handle);
-		}
-		public void MoveTo(PointD p)
-		{
-			NativeMethods.vkvg_move_to(handle, (float)p.X, (float)p.Y);
-		}
-		public void MoveTo(Point p)
-		{
-			NativeMethods.vkvg_move_to(handle, p.X, p.Y);
-		}
-
-
 		public void PopGroupToSource()
 		{
 			throw new NotImplementedException();
 		}
-
 		public void PushGroup()
 		{
 			throw new NotImplementedException();
 		}
 
-		public void Rectangle(double x, double y, double width, double height)
-			=> NativeMethods.vkvg_rectangle (handle, (float)x, (float)y, (float)width, (float)height);
-		public void Rectangle(Rectangle r)
-			=> NativeMethods.vkvg_rectangle (handle, (float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
 
 
 		public void SelectFontFace(string family, FontSlant slant, FontWeight weight)
@@ -362,15 +263,9 @@ namespace Crow.VkvgBackend
 		}
 
 		public void ShowText(TextRun textRun)
-		{
-			NativeMethods.vkvg_show_text_run(handle, textRun.Handle);
-		}
+			=> NativeMethods.vkvg_show_text_run(handle, textRun.Handle);
 
 
-		public Rectangle StrokeExtents()
-		{
-			throw new NotImplementedException();
-		}
 
 
 		#region IDisposable implementation

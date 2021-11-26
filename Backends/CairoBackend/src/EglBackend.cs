@@ -6,15 +6,33 @@ using Glfw;
 namespace Crow.CairoBackend
 {
 	public class EglBackend : CairoBackendBase {
-		IntPtr hWin;
 		EGLDevice device;
 		/// <summary>
 		/// Create a new generic backend bound to the application surface
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
-		public EglBackend (IntPtr nativeWindoPointer, int width, int height) : base () {
-			hWin = nativeWindoPointer;
+		public EglBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height) : base () {
+			if (nativeWindoPointer == IntPtr.Zero) {
+				Glfw3.Init ();
+				Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
+				Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 3);
+				Glfw3.WindowHint (WindowAttribute.ContextVersionMinor, 2);
+				Glfw3.WindowHint (WindowAttribute.ContextCreationApi, Constants.EglContextApi);
+				Glfw3.WindowHint (WindowAttribute.Resizable, 1);
+				Glfw3.WindowHint (WindowAttribute.Decorated, 1);
+
+				hWin = Glfw3.CreateWindow (width, height, "win name", MonitorHandle.Zero, IntPtr.Zero);
+				if (hWin == IntPtr.Zero)
+					throw new Exception ("[GLFW3] Unable to create Window");
+
+				nativeWindoPointer = hWin;
+				ownGlfwWinHandle = true;
+			} else {
+				hWin = nativeWindoPointer;
+				ownGlfwWinHandle = false;
+			}
+
 			Glfw3.MakeContextCurrent (hWin);
 			Glfw3.SwapInterval (0);
 

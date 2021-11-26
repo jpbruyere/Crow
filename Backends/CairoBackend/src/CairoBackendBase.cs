@@ -6,7 +6,8 @@ using Glfw;
 namespace Crow.CairoBackend
 {
 	public abstract class CairoBackendBase : IBackend {
-		protected ISurface surf;
+		protected IntPtr hWin;
+		protected Surface surf;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		FontOptions FontRenderingOptions;
 		/// <summary> Global font rendering settings for Cairo </summary>
@@ -29,7 +30,7 @@ namespace Crow.CairoBackend
 		public IRegion CreateRegion () => new Region ();
 		public IContext CreateContext (ISurface surf)
 		{
-			Context gr = new Context (surf);
+			Context gr = new Context (surf as Surface);
 			gr.FontOptions = FontRenderingOptions;
 			gr.Antialias = Antialias;
 			return gr;
@@ -102,7 +103,7 @@ namespace Crow.CairoBackend
 			IContext ctx = existingContext;
 			if (ctx == null) {
 				disposeContextOnFlush = true;
-				ctx = new Context (MainSurface);
+				ctx = new Context (surf);
 			} else
 				disposeContextOnFlush = false;
 			return ctx;

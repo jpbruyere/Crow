@@ -70,12 +70,12 @@ namespace Crow.CairoBackend {
 		{
 		}
 
-		public override int Width => NativeMethods.cairo_image_surface_get_width (Handle);
-		public override int Height => NativeMethods.cairo_image_surface_get_height (Handle);
+		public override int Width => NativeMethods.cairo_image_surface_get_width (handle);
+		public override int Height => NativeMethods.cairo_image_surface_get_height (handle);
 
 		public byte[] Data {
 			get {
-				IntPtr ptr = NativeMethods.cairo_image_surface_get_data (Handle);
+				IntPtr ptr = NativeMethods.cairo_image_surface_get_data (handle);
 				int length = Height * Stride;
 				byte[] data = new byte[length];
 				Marshal.Copy (ptr, data, 0, length);
@@ -85,16 +85,16 @@ namespace Crow.CairoBackend {
 
 		public IntPtr DataPtr {
 			get {
-				return NativeMethods.cairo_image_surface_get_data (Handle);
+				return NativeMethods.cairo_image_surface_get_data (handle);
 			}
 		}
 
 		public Format Format {
-			get { return NativeMethods.cairo_image_surface_get_format (Handle); }
+			get { return NativeMethods.cairo_image_surface_get_format (handle); }
 		}
 
 		public int Stride {
-			get { return NativeMethods.cairo_image_surface_get_stride (Handle); }
+			get { return NativeMethods.cairo_image_surface_get_stride (handle); }
 		}
 	}
 }

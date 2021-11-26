@@ -141,10 +141,7 @@ namespace PerfTests
 				writer.WriteLine ("Path;MinEllapsed;MaxEllapsed;MeanEllapsed;MedianEllapsed;sigmaEllapsed;MinMem;MaxMem;MeanMem;MedianMem;sigmaMem;MinAlloc;MaxAlloc;MeanAlloc;MedianAlloc;sigmaAlloc");
 			}
 
-			if (screenOutput)
-				initSurface ();
-			else
-				initBackend ();
+			initBackend ();
 
 			initDictionaries ();
 			loadStyling ();
@@ -161,7 +158,7 @@ namespace PerfTests
 		protected override void initBackend()
 		{
 			if (screenOutput)
-				backend = new Crow.Backends.DefaultBackend (WindowHandle, clientRectangle.Width, clientRectangle.Height);
+				backend = new Crow.Backends.DefaultBackend (ref hWin, out ownWindow, clientRectangle.Width, clientRectangle.Height);
 			else
 				backend = new Crow.Backends.DefaultBackend (clientRectangle.Width, clientRectangle.Height);
 

@@ -47,7 +47,7 @@ namespace Crow.CairoBackend {
 		}
 		public override void Resize (int width, int height)
 		{
-			NativeMethods.cairo_xcb_surface_set_size (Handle, width, height);
+			NativeMethods.cairo_xcb_surface_set_size (handle, width, height);
 		}
 	}
 }

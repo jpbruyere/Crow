@@ -63,9 +63,24 @@ namespace Crow.Backends
 
 			surf = new VkvgBackend.Surface (vkvgDev, (int)width, (int)height);
 		}
-		public DefaultBackend (IntPtr nativeWindoPointer, int width, int height)
+		public DefaultBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height)
 		{
-			hWin = nativeWindoPointer;
+			if (nativeWindoPointer == IntPtr.Zero) {
+				Glfw3.Init ();
+				Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
+				Glfw3.WindowHint (WindowAttribute.Resizable, 1);
+				Glfw3.WindowHint (WindowAttribute.Decorated, 1);
+
+				hWin = Glfw3.CreateWindow (width, height, "win name", MonitorHandle.Zero, IntPtr.Zero);
+				if (hWin == IntPtr.Zero)
+					throw new Exception ("[GLFW3] Unable to create Window");
+
+				nativeWindoPointer = hWin;
+				ownGlfwWinHandle = true;
+			} else {
+				hWin = nativeWindoPointer;
+				ownGlfwWinHandle = false;
+			}
 
 			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
 			SwapChain.PREFERED_FORMAT = VkFormat.B8g8r8a8Unorm;
@@ -113,6 +128,7 @@ namespace Crow.Backends
 
 			vkvgDev = new Crow.VkvgBackend.Device (
 				instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, samples);
+			vkvgDev.SetDpy (72,72);
 
 			createMainSurface ((uint)width, (uint)height);
 		}
@@ -128,7 +144,7 @@ namespace Crow.Backends
 		public IRegion CreateRegion () => new Crow.VkvgBackend.Region ();
 		public IContext CreateContext (ISurface surf)
 		{
-			Crow.VkvgBackend.Context gr = new Crow.VkvgBackend.Context (surf);
+			Crow.VkvgBackend.Context gr = new VkvgBackend.Context (surf as VkvgBackend.Surface);
 			return gr;
 		}
 		//IPattern CreatePattern (PatternType patternType);
@@ -188,7 +204,7 @@ namespace Crow.Backends
 			IContext ctx = existingContext;
 			if (ctx == null) {
 				disposeContextOnFlush = true;
-				ctx = new VkvgBackend.Context (MainSurface);
+				ctx = new VkvgBackend.Context (surf);
 			} else
 				disposeContextOnFlush = false;
 

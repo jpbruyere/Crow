@@ -89,7 +89,7 @@ namespace Crow.CairoBackend {
 			=> NativeMethods.cairo_gl_surface_set_size(handle, width, height);
 
 		public void SwapBuffers(){
-			NativeMethods.cairo_gl_surface_swapbuffers (this.Handle);
+			NativeMethods.cairo_gl_surface_swapbuffers (this.handle);
 		}
 	}
 }

@@ -43,22 +43,22 @@ namespace Crow.CairoBackend {
 
 		public void BeginPageSetup ()
 		{
-			NativeMethods.cairo_ps_surface_dsc_begin_page_setup (Handle);
+			NativeMethods.cairo_ps_surface_dsc_begin_page_setup (handle);
 		}
 
 		public void BeginSetup ()
 		{
-			NativeMethods.cairo_ps_surface_dsc_begin_setup (Handle);
+			NativeMethods.cairo_ps_surface_dsc_begin_setup (handle);
 		}
 
 		public void DscComment (string comment)
 		{
-			NativeMethods.cairo_ps_surface_dsc_comment (Handle, comment);
+			NativeMethods.cairo_ps_surface_dsc_comment (handle, comment);
 		}
 
 		public void SetSize (double width, double height)
 		{
-			NativeMethods.cairo_ps_surface_set_size (Handle, width, height);
+			NativeMethods.cairo_ps_surface_set_size (handle, width, height);
 		}
 	}
 }

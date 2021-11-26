@@ -9,8 +9,7 @@ namespace Crow.VkvgBackend
 {
 	public class Pattern : IPattern
 	{
-		protected IntPtr handle = IntPtr.Zero;
-		public IntPtr Handle => handle;
+		internal IntPtr handle = IntPtr.Zero;
 
 		#region CTORS & DTOR
 		protected Pattern(IntPtr handle)
@@ -27,7 +26,7 @@ namespace Crow.VkvgBackend
 		}
 		public Pattern(Surface surf)
 		{
-			handle = NativeMethods.vkvg_pattern_create_for_surface(surf.Handle);
+			handle = NativeMethods.vkvg_pattern_create_for_surface(surf.handle);
 		}
 
 		~Pattern()
@@ -41,7 +40,6 @@ namespace Crow.VkvgBackend
 			NativeMethods.vkvg_pattern_reference(handle);
 		}
 		public uint References() => NativeMethods.vkvg_pattern_get_reference_count(handle);
-
 
 		public Extend Extend
 		{

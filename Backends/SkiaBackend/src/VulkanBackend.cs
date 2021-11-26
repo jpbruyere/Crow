@@ -51,7 +51,7 @@ namespace Crow.SkiaBackend
 					Vk.vkGetDeviceProcAddr (device, n);
 			}
 		}
-
+		#region  CTOR
 		/// <summary>
 		/// Create a new offscreen backend, used in perfTests
 		/// </summary>
@@ -77,12 +77,28 @@ namespace Crow.SkiaBackend
 			dev.Activate (enabledFeatures);
 
 		}
-		public VulkanBackend (IntPtr nativeWindoPointer, int width, int height) : base ()
+		public VulkanBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height)
+		: base ()
 		{
-			hWin = nativeWindoPointer;
+			if (nativeWindoPointer == IntPtr.Zero) {
+				Glfw3.Init ();
+				Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
+				Glfw3.WindowHint (WindowAttribute.Resizable, 1);
+				Glfw3.WindowHint (WindowAttribute.Decorated, 1);
+
+				hWin = Glfw3.CreateWindow (width, height, "win name", MonitorHandle.Zero, IntPtr.Zero);
+				if (hWin == IntPtr.Zero)
+					throw new Exception ("[GLFW3] Unable to create Window");
+
+				nativeWindoPointer = hWin;
+				ownGlfwWinHandle = true;
+			} else {
+				hWin = nativeWindoPointer;
+				ownGlfwWinHandle = false;
+			}
 
 			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
-			SwapChain.PREFERED_FORMAT = VkFormat.B8g8r8a8Unorm;
+			SwapChain.PREFERED_FORMAT = VkFormat.B8g8r8a8Srgb;
 
 			List<string> instExts = new List<string> (Glfw3.GetRequiredInstanceExtensions ());
 #if DEBUG
@@ -100,6 +116,7 @@ namespace Crow.SkiaBackend
 					phy = phys[0];
 
 			VkPhysicalDeviceFeatures enabledFeatures = default;
+
 			dev = new vke.Device (phy);
 			graphicQueue = new PresentQueue (dev, VkQueueFlags.Graphics, hSurf);
 
@@ -137,19 +154,27 @@ namespace Crow.SkiaBackend
 		{
 			Dispose (false);
 		}
+		#endregion
 
 		public IContext CreateContext(ISurface surf) => new Context (surf as VkSurface);
 		public IGradient CreateGradient(GradientType gradientType, Rectangle bounds)
 		{
-			throw new NotImplementedException();
+			switch (gradientType) {
+			case GradientType.Vertical:
+				return new LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
+			case GradientType.Horizontal:
+				return new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
+			case GradientType.Oblic:
+				return new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+			case GradientType.Radial:
+				throw new NotImplementedException ();
+			}
+			return null;
 		}
 
 		public IRegion CreateRegion () => new Crow.SkiaBackend.Region ();
 		public ISurface CreateSurface(int width, int height)
-		{
-			return new VkSurface (dev, graphicQueue, gr, (int)width, (int)height, samples);
-		}
-
+			=> new VkSurface (dev, graphicQueue, gr, (int)width, (int)height, samples);
 		public ISurface CreateSurface(byte[] data, int width, int height)
 		{
 			throw new NotImplementedException();
@@ -161,9 +186,7 @@ namespace Crow.SkiaBackend
 		}
 
 		public ISvgHandle LoadSvg(Stream stream)
-		{
-			throw new NotImplementedException();
-		}
+			=> new SvgHandle (stream);
 
 		public ISvgHandle LoadSvg(string svgFragment)
 		{
@@ -197,6 +220,9 @@ namespace Crow.SkiaBackend
 		}
 		public void FlushUIFrame(IContext ctx)
 		{
+			//surf.Canvas.Flush ();
+			surf.Flush();
+
 			if (disposeContextOnFlush)
 				ctx.Dispose ();
 			clipping = null;

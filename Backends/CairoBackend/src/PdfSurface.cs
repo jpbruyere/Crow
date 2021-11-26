@@ -43,7 +43,7 @@ namespace Crow.CairoBackend {
 
 		public void SetSize (double width, double height)
 		{
-			NativeMethods.cairo_pdf_surface_set_size (Handle, width, height);
+			NativeMethods.cairo_pdf_surface_set_size (handle, width, height);
 		}
 	}
 }

@@ -57,21 +57,21 @@ namespace Crow.CairoBackend {
 
 		public void SetDrawable (IntPtr drawable, int width, int height)
 		{
-			NativeMethods.cairo_xlib_surface_set_drawable (Handle, drawable, width, height);
+			NativeMethods.cairo_xlib_surface_set_drawable (handle, drawable, width, height);
 		}
 
 		public override void Resize (int width, int height)
 		{
-			NativeMethods.cairo_xlib_surface_set_size (Handle, width, height);
+			NativeMethods.cairo_xlib_surface_set_size (handle, width, height);
 		}
 
-		public int Depth => NativeMethods.cairo_xlib_surface_get_depth (Handle);
-		public IntPtr Display => NativeMethods.cairo_xlib_surface_get_display (Handle);
-		public IntPtr Drawable => NativeMethods.cairo_xlib_surface_get_drawable (Handle);
-		public override int Width => NativeMethods.cairo_xlib_surface_get_width (Handle);
-		public override int Height => NativeMethods.cairo_xlib_surface_get_height (Handle);
+		public int Depth => NativeMethods.cairo_xlib_surface_get_depth (handle);
+		public IntPtr Display => NativeMethods.cairo_xlib_surface_get_display (handle);
+		public IntPtr Drawable => NativeMethods.cairo_xlib_surface_get_drawable (handle);
+		public override int Width => NativeMethods.cairo_xlib_surface_get_width (handle);
+		public override int Height => NativeMethods.cairo_xlib_surface_get_height (handle);
 
-		public IntPtr Screen => NativeMethods.cairo_xlib_surface_get_screen (Handle);
-		public IntPtr Visual=> NativeMethods.cairo_xlib_surface_get_visual (Handle);
+		public IntPtr Screen => NativeMethods.cairo_xlib_surface_get_screen (handle);
+		public IntPtr Visual=> NativeMethods.cairo_xlib_surface_get_visual (handle);
 	}
 }

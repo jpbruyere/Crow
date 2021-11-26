@@ -1979,9 +1979,8 @@ namespace Crow
 			}
 			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
-#if VKVG
 			ctx.Flush ();
-#endif
+
 			DbgLogger.EndEvent(DbgEvtType.GOPaintCache);
 		}
 		protected virtual void UpdateCache(IContext ctx){

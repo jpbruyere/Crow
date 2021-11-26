@@ -236,8 +236,7 @@ namespace Crow
 			clientRectangle = new Rectangle (0, 0, width, height);
 			SingleThreaded = singleThreaded;
 
-			if (createSurface)
-				initSurface ();
+			initBackend ();
 
 			PerformanceMeasure.InitMeasures ();
 
@@ -308,13 +307,16 @@ namespace Crow
 			manage VkWindow instance. */
 		static Dictionary<IntPtr, Interface> windows = new Dictionary<IntPtr, Interface> ();
 		/** GLFW window native pointer and current native handle for mouse cursor */
-		IntPtr hWin;
+		protected IntPtr hWin;
+		/// <summary>
+		/// True if GLFW window has been created by the backend and should be disposed with the `Interface`, false otherwise.
+		/// </summary>
+		protected bool ownWindow;
 		protected IBackend backend;//backend device
 		/// <summary>Clipping rectangles on the root context</summary>
 		protected IRegion clipping;
 		static string backendDeviceTypeString = "Crow.CairoBackend.Device";
 		Cursor currentCursor;
-		bool ownWindow;
 		/// <summary>
 		/// If `true`, UI updates will be handle in the `Run()` method, so in the main thread of the application along with GLFW events polling.
 		/// If `false`, A dedicated thread will be started for the UI updates.
@@ -330,7 +332,7 @@ namespace Crow
 		public IntPtr SurfacePointer {
 			get {
 				lock(UpdateMutex)
-					return MainSurface.Handle;
+					return IntPtr.Zero;// MainSurface.Handle;
 			}
 		}
 
@@ -402,34 +404,9 @@ namespace Crow
 		}
 
 		protected virtual void initBackend () {
-			backend = new Crow.Backends.DefaultBackend (hWin, clientRectangle.Width, clientRectangle.Height);
+			backend = new Crow.Backends.DefaultBackend (ref hWin, out ownWindow, clientRectangle.Width, clientRectangle.Height);
 			clipping = Backend.CreateRegion ();
-		}
-		/// <summary>
-		/// Create the main rendering surface. The default is a GLFW window with a cairo surface bound to it.
-		/// </summary>
-		protected void initSurface ()
-		{
-			Glfw3.Init ();
-
-			
-			Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
-			/*Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
-			Glfw3.WindowHint (WindowAttribute.ContextVersionMajor, 3);
-			Glfw3.WindowHint (WindowAttribute.ContextVersionMinor, 2);
-			Glfw3.WindowHint (WindowAttribute.ContextCreationApi, Constants.EglContextApi);*/
-
-			Glfw3.WindowHint (WindowAttribute.Resizable, 1);
-			Glfw3.WindowHint (WindowAttribute.Decorated, 1);
-
-			hWin = Glfw3.CreateWindow (clientRectangle.Width, clientRectangle.Height, "win name", MonitorHandle.Zero, IntPtr.Zero);
-			if (hWin == IntPtr.Zero)
-				throw new Exception ("[GLFW3] Unable to create Window");
-			ownWindow = true;
-
 			registerGlfwCallbacks ();
-
-			initBackend ();
 		}
 		/// <summary>
 		/// search for graphic object type in crow assembly, if not found,

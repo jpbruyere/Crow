@@ -35,7 +35,6 @@ namespace Crow.CairoBackend
 	public class Pattern : IPattern
 	{
 		internal IntPtr handle;
-		public IntPtr Handle => handle;
 		public static Pattern Lookup (IntPtr pattern, bool owner)
 		{
 			if (pattern == IntPtr.Zero)
@@ -67,7 +66,7 @@ namespace Crow.CairoBackend
 
 		[Obsolete ("Use the SurfacePattern constructor")]
 		public Pattern (Surface surface)
-			: this ( NativeMethods.cairo_pattern_create_for_surface (surface.Handle), true)
+			: this ( NativeMethods.cairo_pattern_create_for_surface (surface.handle), true)
 		{
 		}
 

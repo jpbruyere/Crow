@@ -8,7 +8,6 @@ namespace Drawing2D
 {
 	public interface IPattern : IDisposable
 	{
-		IntPtr Handle { get; }
 		Extend Extend { get; set; }
 		Filter Filter { get; set; }
 	}

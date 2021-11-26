@@ -40,7 +40,7 @@ namespace Crow.CairoBackend {
 
 	public class Surface : ISurface
 	{
-		protected IntPtr handle = IntPtr.Zero;
+		internal IntPtr handle = IntPtr.Zero;
 
 		protected Surface()
 		{
@@ -112,7 +112,7 @@ namespace Crow.CairoBackend {
 
 		public ISurface CreateSimilar (int width, int height) {
 			IntPtr p = NativeMethods.cairo_surface_create_similar (
-				this.Handle, Content.ColorAlpha, width, height);
+				this.handle, Content.ColorAlpha, width, height);
 			return Surface.Lookup(p, true);
 		}
 
@@ -156,22 +156,15 @@ namespace Crow.CairoBackend {
 
 		public void MarkDirty ()
 		{
-			NativeMethods.cairo_surface_mark_dirty (Handle);
+			NativeMethods.cairo_surface_mark_dirty (handle);
 		}
 
 		public void MarkDirty (Rectangle rectangle)
 		{
-			NativeMethods.cairo_surface_mark_dirty_rectangle (Handle, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+			NativeMethods.cairo_surface_mark_dirty_rectangle (handle, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 		}
 		public virtual int Width => NativeMethods.cairo_image_surface_get_width (handle);
 		public virtual int Height => NativeMethods.cairo_image_surface_get_height (handle);
-
-		public IntPtr Handle {
-			get {
-				return handle;
-			}
-		}
-
 		public PointD DeviceOffset {
 			get {
 				double x, y;
