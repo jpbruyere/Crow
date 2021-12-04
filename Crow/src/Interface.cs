@@ -217,7 +217,7 @@ namespace Crow
 		/// <param name="height">the height of the window</param>
 		/// <param name="glfwWindowHandle">A valid GLFW window handle</param>
 		/// <returns></returns>
-		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, true, false)
+		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, true)
 		{
 			hWin = glfwWindowHandle;
 			PerformanceMeasure.InitMeasures ();
@@ -229,23 +229,13 @@ namespace Crow
 		/// <param name="height">the height of the native window</param>
 		/// <param name="singleThreaded">If 'false' start the ui update (InterfaceThread method) in a dedicated thread</param>
 		/// <param name="createSurface">If 'yes', create the main rendering surface on the native window</param>
-		public Interface (int width = 800, int height = 600, bool singleThreaded = false, bool createSurface = true)
+		public Interface (int width = 800, int height = 600, bool singleThreaded = false)
 		{
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 			//CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
 			SingleThreaded = singleThreaded;
-
-			initBackend ();
-
 			PerformanceMeasure.InitMeasures ();
-
-			if (!SingleThreaded) {
-				Thread t = new Thread (InterfaceThread) {
-					IsBackground = true
-				};
-				t.Start ();
-			}
 		}
 		#endregion
 
@@ -606,6 +596,15 @@ namespace Crow
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
 		/// </summary>
 		public virtual void Run () {
+			initBackend ();
+
+			if (!SingleThreaded) {
+				Thread t = new Thread (InterfaceThread) {
+					IsBackground = true
+				};
+				t.Start ();
+			}
+
 			Init ();
 
 			if (SingleThreaded) {

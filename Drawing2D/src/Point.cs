@@ -8,6 +8,9 @@ namespace Drawing2D
 {
 	public struct Point : IEquatable<Point>, IEquatable<int>
     {
+		public static readonly Point UnitX = new Point (1,0);
+		public static readonly Point UnitY = new Point (0,1);
+
 		public int X, Y;
 
 		#region CTOR

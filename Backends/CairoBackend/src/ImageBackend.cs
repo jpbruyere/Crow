@@ -56,6 +56,10 @@ namespace Crow.CairoBackend
 		public ImageBackend (int width, int height) : base () {
 			surf = new ImageSurface (Format.ARGB32, width, height);
 		}
+		public ImageBackend (IntPtr surfaceBitmapData, int width, int height, int stride) : base () {
+			surf = new ImageSurface (surfaceBitmapData, Format.ARGB32, width, height, stride);
+		}
+
 		public override ISurface CreateSurface(int width, int height)
 			=> new ImageSurface (Format.ARGB32, width, height);
 		public override ISurface CreateSurface(byte[] data, int width, int height)

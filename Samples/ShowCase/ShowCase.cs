@@ -35,7 +35,6 @@ namespace ShowCase
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 
 			using (Showcase app = new Showcase ()) {
-				app.WindowTitle = "C.R.O.W Showcase";
 				//app.SetWindowIcon ("#Crow.Icons.crow.png");
 				//app.Theme = @"C:\Users\Jean-Philippe\source\Crow\Themes\TestTheme";
 				CurrentProgramInstance = app;
@@ -126,6 +125,8 @@ namespace ShowCase
 
 		protected override void OnInitialized () {
 			base.OnInitialized ();
+
+			WindowTitle = "C.R.O.W Showcase";
 
 			Load ("#ShowCase.showcase.crow").DataSource = this;
 			crowContainer = FindByName ("CrowContainer") as Container;

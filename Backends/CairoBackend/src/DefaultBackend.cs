@@ -3,7 +3,7 @@ using Crow.CairoBackend;
 
 namespace Crow.Backends
 {
-	public class DefaultBackend : EglBackend {
+	public class DefaultBackend : ImageBackend {
 		/// <summary>
 		/// Create a new generic backend bound to the application surface
 		/// </summary>

@@ -64,7 +64,7 @@ namespace PerfTests
 		}
 
 		public TestInterface (string[] args, int width = 800, int height = 600)
-			: base (width, height, true, false)
+			: base (width, height, true)
 		{
 			string outDir = null;
 

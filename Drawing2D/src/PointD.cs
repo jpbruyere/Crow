@@ -6,6 +6,8 @@ using System;
 
 namespace Drawing2D {
 	public struct PointD : IEquatable<PointD>, IEquatable<double> {
+		public static readonly PointD UnitX = new PointD (1,0);
+		public static readonly PointD UnitY = new PointD (0,1);
 		public double X;
 		public double Y;
 		public PointD (double x, double y)

@@ -114,7 +114,7 @@ namespace Crow.CairoBackend
 				ctx.Dispose ();
 			clipping = null;
 		}
-		public void ResizeMainSurface (int width, int height)
+		public virtual void ResizeMainSurface (int width, int height)
 		{
 			surf.Resize (width, height);
 		}

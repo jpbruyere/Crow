@@ -23,9 +23,6 @@
 		<!-- Used only by CrowIDE and CrowEdit-->
 		<CrowDesignModeEnabled>false</CrowDesignModeEnabled>
 
-		<!-- Experimental vkvg backend, testing only-->
-		<CrowVkvgBackend>false</CrowVkvgBackend>
-
 		<GlfwSharpVersion>0.2.14</GlfwSharpVersion>
 	</PropertyGroup>
 </Project>
