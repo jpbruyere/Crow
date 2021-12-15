@@ -41,11 +41,17 @@ The `ShowCase` sample will allow you to quickly test **IML** with live result.
 
 <p align="center">
   <a href="https://github.com/jpbruyere/Crow/blob/master/Images/showCase2.png">
-	<kbd><img src="https://github.com/jpbruyere/Crow/blob/master/Images/showCase2.png" height="200"></kbd>
+	<kbd><img src="https://github.com/jpbruyere/Crow/blob/master/Images/showCase2.png" height="360"></kbd>
   </a>
 </p>
 
 Visit the [wiki](https://github.com/jpbruyere/Crow/wiki) and the [samples](https://github.com/jpbruyere/Crow/wiki/Tutorials) for documentation.
+
+<p align="center">
+  <a href="https://github.com/jpbruyere/Crow/blob/master/Images/allwidgets2.png">
+	<kbd><img src="https://github.com/jpbruyere/Crow/blob/master/Images/allwidgets2.png" height="360" ></kbd>
+  </a>
+</p>
 
 _Due to the early state of this project and the frequent changes, some part of the docs may be outdated. It is in **beta** development state, api could change, but most of it is quiet stabilized._
 
