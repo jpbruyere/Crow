@@ -78,6 +78,8 @@ namespace Crow.CairoBackend
 			ctx.PopGroupToSource ();
 			ctx.Paint ();
 
+			surf.Flush ();
+
 			base.FlushUIFrame (ctx);
 		}
 	}
