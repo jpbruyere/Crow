@@ -1,0 +1,29 @@
+<Project>
+	<PropertyGroup>
+		<OutputPath>$(SolutionDir)build\backends\$(Configuration)\</OutputPath>
+		<License>MIT</License>
+		<Authors>Jean-Philippe Bruyère</Authors>
+		<LangVersion>7.3</LangVersion>
+
+		<CrowVersion>0.9.9</CrowVersion>
+		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
+
+		<!-- If you dont have a native libstb on your system, enable the managed version of stb here
+				TODO: this could be detected on startup or install automatically-->
+		<CrowStbSharp>true</CrowStbSharp>
+
+		<!-- Compile with logging enabled, this will slow down apps, use this only
+			 for debugging purpose-->
+		<CrowDebugLogEnabled>false</CrowDebugLogEnabled>
+
+		<!-- Collect several statistics on widgets-->
+		<CrowDebugStatsEnabled>false</CrowDebugStatsEnabled>
+
+		<!-- Used only by CrowIDE and CrowEdit-->
+		<CrowDesignModeEnabled>false</CrowDesignModeEnabled>
+
+		<GlfwSharpVersion>0.2.14</GlfwSharpVersion>
+
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
+</Project>

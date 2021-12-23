@@ -5,14 +5,19 @@ using Glfw;
 
 namespace Crow.CairoBackend
 {
-	public abstract class CairoBackendBase : IBackend {
-		protected IntPtr hWin;
+	public abstract class CairoBackendBase : CrowBackend {
+		/// <summary>
+		/// Main rendering surface, usualy an accelerated window surface
+		/// </summary>
 		protected Surface surf;
+		protected IRegion clipping;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		FontOptions FontRenderingOptions;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		Antialias Antialias = Antialias.Subpixel;
-		protected CairoBackendBase ()
+		bool disposeContextOnFlush;
+		protected CairoBackendBase (int width, int height, IntPtr nativeWindow)
+		: base (width, height, nativeWindow)
 		{
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
@@ -24,11 +29,11 @@ namespace Crow.CairoBackend
 		{
 			Dispose (false);
 		}
-		public abstract ISurface CreateSurface(int width, int height);
-		public abstract ISurface CreateSurface(byte[] data, int width, int height);
-		public ISurface MainSurface => surf;
-		public IRegion CreateRegion () => new Region ();
-		public IContext CreateContext (ISurface surf)
+		public override abstract ISurface CreateSurface(int width, int height);
+		public override abstract ISurface CreateSurface(byte[] data, int width, int height);
+		public override ISurface MainSurface => surf;
+		public override IRegion CreateRegion () => new Region ();
+		public override IContext CreateContext (ISurface surf)
 		{
 			Context gr = new Context (surf as Surface);
 			gr.FontOptions = FontRenderingOptions;
@@ -36,7 +41,7 @@ namespace Crow.CairoBackend
 			return gr;
 		}
 		//IPattern CreatePattern (PatternType patternType);
-		public IGradient CreateGradient (GradientType gradientType, Rectangle bounds)
+		public override IGradient CreateGradient (GradientType gradientType, Rectangle bounds)
 		{
 			switch (gradientType) {
 			case GradientType.Vertical:
@@ -50,7 +55,7 @@ namespace Crow.CairoBackend
 			}
 			return null;
 		}
-		public byte[] LoadBitmap (Stream stream, out Size dimensions)
+		public override byte[] LoadBitmap (Stream stream, out Size dimensions)
 		{
 			byte[] image;
 #if STB_SHARP
@@ -79,15 +84,13 @@ namespace Crow.CairoBackend
 #endif
 			return image;
 		}
-		public ISvgHandle LoadSvg(Stream stream)
+		public override ISvgHandle LoadSvg(Stream stream)
 		{
 			using (BinaryReader sr = new BinaryReader (stream))
 				return new SvgHandle (sr.ReadBytes ((int)stream.Length));
 		}
-		public ISvgHandle LoadSvg(string svgFragment) =>
+		public override ISvgHandle LoadSvg(string svgFragment) =>
 			new SvgHandle (System.Text.Encoding.Unicode.GetBytes (svgFragment));
-		bool disposeContextOnFlush;
-		protected IRegion clipping;
 		protected void clear(IContext ctx) {
 			for (int i = 0; i < clipping.NumRectangles; i++)
 				ctx.Rectangle (clipping.GetRectangle (i));
@@ -97,7 +100,7 @@ namespace Crow.CairoBackend
 			ctx.Fill ();
 			ctx.Operator = Operator.Over;
 		}
-		public virtual IContext PrepareUIFrame(IContext existingContext, IRegion clipping)
+		public override IContext PrepareUIFrame(IContext existingContext, IRegion clipping)
 		{
 			this.clipping = clipping;
 			IContext ctx = existingContext;
@@ -108,20 +111,19 @@ namespace Crow.CairoBackend
 				disposeContextOnFlush = false;
 			return ctx;
 		}
-		public virtual void FlushUIFrame(IContext ctx)
+		public override void FlushUIFrame(IContext ctx)
 		{
 			if (disposeContextOnFlush)
 				ctx.Dispose ();
 			clipping = null;
 		}
-		public virtual void ResizeMainSurface (int width, int height)
+		public override void ResizeMainSurface (int width, int height)
 		{
 			surf.Resize (width, height);
 		}
 
 		#region IDispose implementation
-		bool isDisposed;
-		public void Dispose ()
+		public override void Dispose ()
 		{
 			Dispose (true);
 			GC.SuppressFinalize (this);

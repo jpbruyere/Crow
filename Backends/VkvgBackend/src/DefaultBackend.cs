@@ -16,20 +16,19 @@ using Device = vke.Device;
 
 namespace Crow.Backends
 {
-	public class DefaultBackend : IBackend
+	public class DefaultBackend : CrowBackend
 	{
 		protected Instance instance;
 		protected PhysicalDevice phy;
 		protected vke.Device dev;
 		protected Queue graphicQueue;	//for vkvg, we must have at least a graphic queue
-		protected IntPtr hWin;			//GLFW window native pointer.
 		protected VkSurfaceKHR hSurf;	//Vulkan Surface
 		protected SwapChain swapChain;
 		protected CommandPool cmdPool;
 		protected PrimaryCommandBuffer[] cmds;
 		protected VkSemaphore[] drawComplete;
 		protected Fence drawFence;
-		VkvgBackend.Surface surf;
+		Crow.VkvgBackend.Surface surf;
 		Crow.VkvgBackend.Device vkvgDev;
 		SampleCount samples = SampleCount.Sample_1;
 		bool vsync = false;
@@ -39,8 +38,10 @@ namespace Crow.Backends
 			return phy != null;
 		}
 		public DefaultBackend (int width, int height)
+		: base (width, height, IntPtr.Zero)
 		{
 #if DEBUG
+			//Instance.RENDER_DOC_CAPTURE = true;
 			instance = new Instance (Ext.I.VK_EXT_debug_utils);
 #else
 			instance = new Instance ();
@@ -61,9 +62,10 @@ namespace Crow.Backends
 			vkvgDev = new Crow.VkvgBackend.Device (
 				instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, samples);
 
-			surf = new VkvgBackend.Surface (vkvgDev, (int)width, (int)height);
+			surf = new Crow.VkvgBackend.Surface (vkvgDev, (int)width, (int)height);
 		}
-		public DefaultBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height)
+		public DefaultBackend (int width, int height, IntPtr nativeWindoPointer)
+		: base (width, height, nativeWindoPointer)
 		{
 			if (nativeWindoPointer == IntPtr.Zero) {
 				Glfw3.Init ();
@@ -75,11 +77,6 @@ namespace Crow.Backends
 				if (hWin == IntPtr.Zero)
 					throw new Exception ("[GLFW3] Unable to create Window");
 
-				nativeWindoPointer = hWin;
-				ownGlfwWinHandle = true;
-			} else {
-				hWin = nativeWindoPointer;
-				ownGlfwWinHandle = false;
 			}
 
 			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
@@ -87,6 +84,7 @@ namespace Crow.Backends
 
 			List<string> instExts = new List<string> (Glfw3.GetRequiredInstanceExtensions ());
 #if DEBUG
+			//Instance.RENDER_DOC_CAPTURE = true;
 			instExts.Add (Ext.I.VK_EXT_debug_utils);
 #endif
 			instance = new Instance (instExts.ToArray());
@@ -136,25 +134,25 @@ namespace Crow.Backends
 		{
 			Dispose (false);
 		}
-		public virtual ISurface CreateSurface(int width, int height)
+		public override ISurface CreateSurface(int width, int height)
 			=> new Crow.VkvgBackend.Surface (vkvgDev, width, height);
-		public virtual ISurface CreateSurface(byte[] data, int width, int height)
+		public override ISurface CreateSurface(byte[] data, int width, int height)
 			=> new Crow.VkvgBackend.Surface (vkvgDev, data, width, height);
-		public ISurface MainSurface => surf;
-		public IRegion CreateRegion () => new Crow.VkvgBackend.Region ();
-		public IContext CreateContext (ISurface surf)
+		public override ISurface MainSurface => surf;
+		public override IRegion CreateRegion () => new Crow.VkvgBackend.Region ();
+		public override IContext CreateContext (ISurface surf)
 		{
-			Crow.VkvgBackend.Context gr = new VkvgBackend.Context (surf as VkvgBackend.Surface);
+			Crow.VkvgBackend.Context gr = new Crow.VkvgBackend.Context (surf as Crow.VkvgBackend.Surface);
 			return gr;
 		}
 		//IPattern CreatePattern (PatternType patternType);
-		public IGradient CreateGradient (GradientType gradientType, Rectangle bounds)
+		public override IGradient CreateGradient (GradientType gradientType, Rectangle bounds)
 		{
 			switch (gradientType) {
 			case GradientType.Vertical:
-				return new Crow.VkvgBackend.LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
+				return new Crow.VkvgBackend.LinearGradient (0, bounds.Top, 0, bounds.Bottom);
 			case GradientType.Horizontal:
-				return new Crow.VkvgBackend.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
+				return new Crow.VkvgBackend.LinearGradient (bounds.Left, 0, bounds.Right, 0);
 			case GradientType.Oblic:
 				return new Crow.VkvgBackend.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
 			case GradientType.Radial:
@@ -162,7 +160,7 @@ namespace Crow.Backends
 			}
 			return null;
 		}
-		public byte[] LoadBitmap (Stream stream, out Size dimensions)
+		public override byte[] LoadBitmap (Stream stream, out Size dimensions)
 		{
 			byte[] image;
 #if STB_SHARP
@@ -180,13 +178,13 @@ namespace Crow.Backends
 #endif
 			return image;
 		}
-		public ISvgHandle LoadSvg(Stream stream)
+		public override ISvgHandle LoadSvg(Stream stream)
 		{
 			using (BinaryReader sr = new BinaryReader (stream))
-				return new VkvgBackend.SvgHandle(vkvgDev, sr.ReadBytes ((int)stream.Length));
+				return new Crow.VkvgBackend.SvgHandle(vkvgDev, sr.ReadBytes ((int)stream.Length));
 		}
-		public ISvgHandle LoadSvg(string svgFragment) =>
-			new VkvgBackend.SvgHandle (vkvgDev,System.Text.Encoding.Unicode.GetBytes (svgFragment));
+		public override ISvgHandle LoadSvg(string svgFragment) =>
+			new Crow.VkvgBackend.SvgHandle (vkvgDev, System.Text.Encoding.Unicode.GetBytes (svgFragment));
 		bool disposeContextOnFlush;
 		IRegion clipping;
 		protected void clear(IContext ctx) {
@@ -198,13 +196,13 @@ namespace Crow.Backends
 			ctx.Fill ();
 			ctx.Operator = Operator.Over;
 		}
-		public IContext PrepareUIFrame(IContext existingContext, IRegion clipping)
+		public override IContext PrepareUIFrame(IContext existingContext, IRegion clipping)
 		{
 			this.clipping = clipping;
 			IContext ctx = existingContext;
 			if (ctx == null) {
 				disposeContextOnFlush = true;
-				ctx = new VkvgBackend.Context (surf);
+				ctx = new Crow.VkvgBackend.Context (surf);
 			} else
 				disposeContextOnFlush = false;
 
@@ -212,7 +210,7 @@ namespace Crow.Backends
 
 			return ctx;
 		}
-		public void FlushUIFrame(IContext ctx)
+		public override void FlushUIFrame(IContext ctx)
 		{
 			if (disposeContextOnFlush)
 				ctx.Dispose ();
@@ -234,7 +232,7 @@ namespace Crow.Backends
 
 			dev.WaitIdle();
 		}
-		public void ResizeMainSurface (int width, int height) {
+		public override void ResizeMainSurface (int width, int height) {
 			//resize is done on swapchain image aquisition failure
 		}
 		vke.Image blitSource;
@@ -243,7 +241,7 @@ namespace Crow.Backends
 
 			blitSource?.Dispose ();
 			surf?.Dispose ();
-			surf = new VkvgBackend.Surface (vkvgDev, (int)width, (int)height);
+			surf = new Crow.VkvgBackend.Surface (vkvgDev, (int)width, (int)height);
 
 			cmdPool.Reset();
 
@@ -281,8 +279,7 @@ namespace Crow.Backends
 			dev.WaitIdle ();
 		}
 		#region IDispose implementation
-		bool isDisposed;
-		public void Dispose ()
+		public override void Dispose ()
 		{
 			Dispose (true);
 			GC.SuppressFinalize (this);

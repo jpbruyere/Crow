@@ -12,7 +12,8 @@ namespace Crow.CairoBackend
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
-		public EglBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height) : base () {
+		public EglBackend (int width, int height, IntPtr nativeWindoPointer)
+		: base (width, height, nativeWindoPointer) {
 			if (nativeWindoPointer == IntPtr.Zero) {
 				Glfw3.Init ();
 				Glfw3.WindowHint (WindowAttribute.ClientApi, Constants.OpenglEsApi);
@@ -25,12 +26,6 @@ namespace Crow.CairoBackend
 				hWin = Glfw3.CreateWindow (width, height, "win name", MonitorHandle.Zero, IntPtr.Zero);
 				if (hWin == IntPtr.Zero)
 					throw new Exception ("[GLFW3] Unable to create Window");
-
-				nativeWindoPointer = hWin;
-				ownGlfwWinHandle = true;
-			} else {
-				hWin = nativeWindoPointer;
-				ownGlfwWinHandle = false;
 			}
 
 			Glfw3.MakeContextCurrent (hWin);
@@ -44,7 +39,8 @@ namespace Crow.CairoBackend
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
-		public EglBackend (int width, int height) : base () {
+		public EglBackend (int width, int height)
+		: base (width, height, IntPtr.Zero) {
 			device = new EGLDevice (Glfw3.GetEGLDisplay (), IntPtr.Zero);
 			surf = new GLTextureSurface (device, width, height);
 		}

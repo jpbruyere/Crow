@@ -7,9 +7,9 @@ using System;
 namespace Drawing2D
 {
 	public enum BackendType {
-		Native,
-		OpenGL,
-		EGL,
+		Default,
+		Gl,
+		Egl,
 		Vulkan
 	}
 	public enum Status

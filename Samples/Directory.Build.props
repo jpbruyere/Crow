@@ -21,6 +21,12 @@
 		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\Drawing2D\Drawing2D.csproj" />
+	  <!--<ProjectReference Include="..\Backends\SkiaBackend\SkiaBackend.csproj" />-->
+	  <ProjectReference Include="..\Backends\CairoBackend\CairoBackend.csproj" />
+	  <!--<ProjectReference Include="..\Backends\VkvgBackend\VkvgBackend.csproj" />-->
+	</ItemGroup>
+	<ItemGroup>
 		<None Include="$(SamplesDir)common\ui\Interfaces\**\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>

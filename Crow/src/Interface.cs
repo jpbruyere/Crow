@@ -153,12 +153,69 @@ namespace Crow
 			}
 			return IntPtr.Zero;
 		}
+		static string[] backends = {"CairoBackend", "VkvgBackend", "SkiaBackend"};
+		static Assembly resolving (System.Runtime.Loader.AssemblyLoadContext ctx, AssemblyName name) {
+			if (name.Name == "CrowBackend") {
+				string bp = Path.GetDirectoryName (Assembly.GetExecutingAssembly().Location);
+				foreach (string b in backends) {
+					string bPath = Path.Combine (bp, b + ".dll");
+					if (File.Exists (bPath))
+						return ctx.LoadFromAssemblyPath (bPath);
+				}
+			}
+			return ctx.LoadFromAssemblyName (name);
+		}
+		public static BackendType PreferedBackendType = BackendType.Default;
+		/// <summary>
+		/// If not null, backends assemblies will be search in this directory, else
+		/// backends are search where the main crow assembly is.
+		/// </summary>
+		public static string BackendsDirectory = null;
+		protected static bool tryFindBackendType (out Type backendType) {
+			backendType = default;
+			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
+			foreach (Assembly a in ldCtx.Assemblies.Where (asb => backends.Contains (asb.GetName ().Name))) {
+				IEnumerable<Type> backendTypes = a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract);
+				if (backendTypes != null) {
+					backendType = backendTypes.FirstOrDefault();
+					return true;
+				}
+			}
+			string bp =
+				(!string.IsNullOrEmpty(BackendsDirectory) && Directory.Exists(BackendsDirectory)) ?
+					BackendsDirectory :	Path.GetDirectoryName (Assembly.GetExecutingAssembly().Location);
+			foreach (string b in backends) {
+				string bPath = Path.Combine (bp, b + ".dll");
+				if (File.Exists (bPath)) {
+					Assembly a = ldCtx.LoadFromAssemblyPath (bPath);
+					IEnumerable<Type> backendTypes = a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract);
+					if (backendTypes != null) {
+						if (PreferedBackendType == BackendType.Default)
+							backendType = backendTypes.FirstOrDefault(be => be.Name == "DefaultBackend");
+						else if (PreferedBackendType == BackendType.Egl)
+							backendType = backendTypes.FirstOrDefault(be => be.Name == "EglBackend");
+						else if (PreferedBackendType == BackendType.Vulkan)
+							backendType = backendTypes.FirstOrDefault(be => be.Name == "VulkanBackend");
+						else if (PreferedBackendType == BackendType.Gl)
+							backendType = backendTypes.FirstOrDefault(be => be.Name == "GlBackend");
+
+						if (backendType == null)
+							backendType = backendTypes.FirstOrDefault();
+						return backendType != null;
+					}
+				}
+			}
+
+			return false;
+		}
 
 
 		#region CTOR
 		static Interface ()
 		{
-			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).ResolvingUnmanagedDll += resolveUnmanaged;
+			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
+			ldCtx.ResolvingUnmanagedDll += resolveUnmanaged;
+			ldCtx.Resolving += resolving;
 
 			CROW_CONFIG_ROOT =
 				System.IO.Path.Combine (
@@ -302,7 +359,7 @@ namespace Crow
 		/// True if GLFW window has been created by the backend and should be disposed with the `Interface`, false otherwise.
 		/// </summary>
 		protected bool ownWindow;
-		protected IBackend backend;//backend device
+		protected CrowBackend backend;//backend device
 		/// <summary>Clipping rectangles on the root context</summary>
 		protected IRegion clipping;
 		static string backendDeviceTypeString = "Crow.CairoBackend.Device";
@@ -316,7 +373,7 @@ namespace Crow
 		/// Native GLFW window handle bound to this interface.
 		/// </summary>
 		public IntPtr WindowHandle => hWin;
-		public IBackend Backend => backend;
+		public CrowBackend Backend => backend;
 		/// <summary>Main backend surface</summary>
 		public ISurface MainSurface => backend.MainSurface;
 		public IntPtr SurfacePointer {
@@ -394,7 +451,11 @@ namespace Crow
 		}
 
 		protected virtual void initBackend () {
-			backend = new Crow.Backends.DefaultBackend (ref hWin, out ownWindow, clientRectangle.Width, clientRectangle.Height);
+			if (!tryFindBackendType (out Type backendType))
+				throw new Exception ("No backend found.");
+			backend = (CrowBackend)Activator.CreateInstance (backendType, new object[] {clientRectangle.Width, clientRectangle.Height, hWin});
+			hWin = backend.hWin;
+			ownWindow = backend.ownGlfwWinHandle;
 			clipping = Backend.CreateRegion ();
 			registerGlfwCallbacks ();
 		}

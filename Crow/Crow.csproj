@@ -72,15 +72,10 @@
 		<Compile Remove="src\Widgets\ColorPicker2.cs" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\Drawing2D\Drawing2D.csproj" />
-	  <!--<ProjectReference Include="..\Backends\SkiaBackend\SkiaBackend.csproj" />-->
-	  <ProjectReference Include="..\Backends\CairoBackend\CairoBackend.csproj" />
-	  <!--<ProjectReference Include="..\Backends\VkvgBackend\VkvgBackend.csproj" />-->
-	</ItemGroup>
-
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
 	</PropertyGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="..\Drawing2D\Drawing2D.csproj" />
+	</ItemGroup>
 </Project>

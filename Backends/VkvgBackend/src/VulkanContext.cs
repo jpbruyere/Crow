@@ -145,10 +145,10 @@ namespace Crow.Drawing {
 			this.hWin = hWin;
 
 			SwapChain.IMAGES_USAGE = VkImageUsageFlags.ColorAttachment | VkImageUsageFlags.TransferDst;
-			SwapChain.PREFERED_FORMAT = VkFormat.B8g8r8a8Unorm;
+			SwapChain.PREFERED_FORMAT = VkFormat.B8g8r8a8Srgb;
 
 			//Instance.VALIDATION = true;
-			//Instance.RENDER_DOC_CAPTURE = true;
+			Instance.RENDER_DOC_CAPTURE = true;
 			List<string> instExts = new List<string> (Glfw3.GetRequiredInstanceExtensions ());
 #if DEBUG
 			instExts.Add (Ext.I.VK_EXT_debug_utils);
@@ -209,7 +209,7 @@ namespace Crow.Drawing {
 			//Console.WriteLine ($"build blit w:{width} h:{height}");
 			cmdPool.Reset();
 
-			blitSource = new vke.Image (dev, new VkImage((ulong)surf.VkImage.ToInt64()), Vulkan.VkFormat.B8g8r8a8Unorm,
+			blitSource = new vke.Image (dev, new VkImage((ulong)surf.VkImage.ToInt64()), Vulkan.VkFormat.B8g8r8a8Srgb,
 				Vulkan.VkImageUsageFlags.TransferSrc | Vulkan.VkImageUsageFlags.TransferDst | Vulkan.VkImageUsageFlags.ColorAttachment,
 				width, height);
 

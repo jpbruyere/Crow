@@ -5,13 +5,15 @@ using Glfw;
 
 namespace Crow.CairoBackend
 {
-	public class ImageBackend : CairoBackendBase {
+	public class DefaultBackend : CairoBackendBase {
 		/// <summary>
 		/// Create a new generic backend bound to the application surface
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
-		public ImageBackend (ref IntPtr nativeWindoPointer, out bool ownGlfwWinHandle, int width, int height) : base () {
+		/// <param name="nativeWindoPointer"></param>
+		public DefaultBackend (int width, int height, IntPtr nativeWindoPointer)
+		: base (width, height, nativeWindoPointer) {
 			if (nativeWindoPointer == IntPtr.Zero) {
 				Glfw3.Init ();
 				Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
@@ -21,18 +23,11 @@ namespace Crow.CairoBackend
 				hWin = Glfw3.CreateWindow (width, height, "win name", MonitorHandle.Zero, IntPtr.Zero);
 				if (hWin == IntPtr.Zero)
 					throw new Exception ("[GLFW3] Unable to create Window");
-
-				nativeWindoPointer = hWin;
-				ownGlfwWinHandle = true;
-			} else {
-				hWin = nativeWindoPointer;
-				ownGlfwWinHandle = false;
 			}
-
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.Unix:
 				IntPtr disp = Glfw3.GetX11Display ();
-				IntPtr nativeWin = Glfw3.GetX11Window (nativeWindoPointer);
+				IntPtr nativeWin = Glfw3.GetX11Window (hWin);
 				Int32 scr = Glfw3.GetX11DefaultScreen (disp);
 				IntPtr visual = Glfw3.GetX11DefaultVisual (disp, scr);
 				surf = new XlibSurface (disp, nativeWin, visual, width, height);
@@ -40,7 +35,7 @@ namespace Crow.CairoBackend
 			case PlatformID.Win32NT:
 			case PlatformID.Win32S:
 			case PlatformID.Win32Windows:
-				IntPtr hWin32 = Glfw3.GetWin32Window (nativeWindoPointer);
+				IntPtr hWin32 = Glfw3.GetWin32Window (hWin);
 				IntPtr hdc = Glfw3.GetWin32DC (hWin32);
 				surf = new Win32Surface (hdc);
 				break;
@@ -53,10 +48,12 @@ namespace Crow.CairoBackend
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
-		public ImageBackend (int width, int height) : base () {
+		public DefaultBackend (int width, int height)
+		: base (width, height, IntPtr.Zero) {
 			surf = new ImageSurface (Format.ARGB32, width, height);
 		}
-		public ImageBackend (IntPtr surfaceBitmapData, int width, int height, int stride) : base () {
+		public DefaultBackend (IntPtr surfaceBitmapData, int width, int height, int stride)
+		 : base (width, height, IntPtr.Zero) {
 			surf = new ImageSurface (surfaceBitmapData, Format.ARGB32, width, height, stride);
 		}
 

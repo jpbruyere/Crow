@@ -16,7 +16,7 @@ namespace Crow.VkvgBackend
 		#region CTORS & DTOR
 		public Device (IntPtr instance, IntPtr phy, IntPtr dev, uint qFamIdx, SampleCount samples = SampleCount.Sample_1, uint qIndex = 0)
 		{
-			handle = NativeMethods.vkvg_device_create_multisample (instance, phy, dev, qFamIdx, qIndex, samples, false);
+			handle = NativeMethods.vkvg_device_create_from_vk_multisample (instance, phy, dev, qFamIdx, qIndex, samples, false);
 		}
 		~Device ()
 		{

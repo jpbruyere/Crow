@@ -26,10 +26,10 @@ namespace Crow.VkvgBackend
 		}
 		#endregion
 
-		public void Render(IContext cr) =>
-			NativeMethods.vkvg_render_svg((cr as Context).handle, handle, null);
-		public void Render (IContext cr, string id) =>
-			NativeMethods.vkvg_render_svg((cr as Context).handle, handle, id);
+		public void Render(IContext cr) {}
+			//NativeMethods.vkvg_render_svg((cr as Context).handle, handle, null);
+		public void Render (IContext cr, string id) {}
+			//NativeMethods.vkvg_render_svg((cr as Context).handle, handle, id);
 		public Size Dimensions {
 			get {
 				NativeMethods.nsvg_get_size (handle, out int w, out int h);

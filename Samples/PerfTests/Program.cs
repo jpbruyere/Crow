@@ -48,8 +48,8 @@ namespace PerfTests
 			Console.WriteLine ("Usage: PerfTests.exe [options]\n");
 			Console.WriteLine ("-o,--output:\n\tWrite results to output directory, if omited, results are printed to screen.");
 			Console.WriteLine ("-i,--input:\n\tInput directory to search recursively for '.crow' file to test. If ommitted, builtin unit tests are performs");
-			Console.WriteLine ("-w,--width:\n\toutput surface width, not displayed on screen.");
-			Console.WriteLine ("-h,--height:\n\toutput surface height, not displayed on screen.");
+			Console.WriteLine ("-x,--width:\n\toutput surface width, not displayed on screen.");
+			Console.WriteLine ("-y,--height:\n\toutput surface height, not displayed on screen.");
 			Console.WriteLine ("-c,--count:\n\trepeat each test 'c' times. (default = 10, minimum = 5");
 
 			Console.WriteLine ("-b,--begin:\n\tStarting stage for measures, may be the stage name or stage index");
@@ -60,7 +60,7 @@ namespace PerfTests
 			Console.WriteLine ("-r,--reset:\n\tenable clear iterators after each test file.");
 			Console.WriteLine ("-u,--update:\n\tmeasure 'n' update cycle with elapsed ticks string notified. (default = 0)");
 			Console.WriteLine ("-s,--screen:\n\tenable output to screen.");
-			Console.WriteLine ("--help:\n\tthis help message.");
+			Console.WriteLine ("-h,--help:\n\tthis help message.");
 		}
 
 		public TestInterface (string[] args, int width = 800, int height = 600)
@@ -84,11 +84,11 @@ namespace PerfTests
 					case "--count":
 						count = Math.Max(5, int.Parse (args[i++]));
 						break;
-					case "-w":
+					case "-x":
 					case "--width":
 						clientRectangle.Width = int.Parse (args[i++]);
 						break;
-					case "-h":
+					case "-y":
 					case "--height":
 						clientRectangle.Height = int.Parse (args[i++]);
 						break;
@@ -110,6 +110,7 @@ namespace PerfTests
 					case "--screen":
 						screenOutput = true;
 						break;
+					case "-h":
 					case "--help":
 					default:
 						throw new Exception ("none");
@@ -157,11 +158,15 @@ namespace PerfTests
         }
 		protected override void initBackend()
 		{
+			if (!tryFindBackendType (out Type backendType))
+				throw new Exception ("No backend found.");
 			if (screenOutput)
-				backend = new Crow.Backends.DefaultBackend (ref hWin, out ownWindow, clientRectangle.Width, clientRectangle.Height);
+				backend = (Drawing2D.CrowBackend)Activator.CreateInstance (backendType, new object[] {clientRectangle.Width, clientRectangle.Height, hWin});
 			else
-				backend = new Crow.Backends.DefaultBackend (clientRectangle.Width, clientRectangle.Height);
+				backend = (Drawing2D.CrowBackend)Activator.CreateInstance (backendType, new object[] {clientRectangle.Width, clientRectangle.Height});
 
+			hWin = backend.hWin;
+			ownWindow = backend.ownGlfwWinHandle;
 			clipping = Backend.CreateRegion ();
 		}
 

@@ -14,11 +14,13 @@ namespace Crow.VkvgBackend
 
 		#region Device
 		[DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr vkvg_device_create(IntPtr instance, IntPtr phy, IntPtr dev, uint qFamIdx, uint qIndex);
+		internal static extern IntPtr vkvg_device_create(SampleCount samples, bool deferredResolve);
+		[DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr vkvg_device_create_from_vk(IntPtr instance, IntPtr phy, IntPtr dev, uint qFamIdx, uint qIndex);
+		[DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr vkvg_device_create_from_vk_multisample(IntPtr inst, IntPtr phy, IntPtr vkdev, uint qFamIdx, uint qIndex, SampleCount samples, bool deferredResolve);
 		[DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr vkvg_device_destroy(IntPtr device);
-		[DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr vkvg_device_create_multisample(IntPtr inst, IntPtr phy, IntPtr vkdev, uint qFamIdx, uint qIndex, SampleCount samples, bool deferredResolve);
 		[DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr vkvg_device_reference(IntPtr dev);
 		[DllImport(libvkvg, CallingConvention = CallingConvention.Cdecl)]

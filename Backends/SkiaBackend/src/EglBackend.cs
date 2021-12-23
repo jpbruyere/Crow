@@ -10,15 +10,15 @@ using SkiaSharp;
 
 namespace Crow.SkiaBackend
 {
-	public class EglBackend : IBackend
+	public class EglBackend : CrowBackend
 	{
 		[DllImport("libEGL")]
 		extern static IntPtr eglGetProcAddress(string procname);
-
 		int sampleCount = 1;
 		Surface surf;
-		public ISurface MainSurface => surf;
-		public EglBackend (IntPtr nativeWindoPointer, int width, int height) : base () {
+		public override ISurface MainSurface => surf;
+		public EglBackend (int width, int height, IntPtr nativeWindoPointer)
+		: base (width, height, nativeWindoPointer) {
 
 		}
 		/// <summary>
@@ -26,7 +26,8 @@ namespace Crow.SkiaBackend
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
-		public EglBackend (int width, int height) : base ()
+		public EglBackend (int width, int height)
+		: base (width, height, IntPtr.Zero)
 		{
 			/*GRGlGetProcedureAddressDelegate del = new GRGlGetProcedureAddressDelegate (eglGetProcAddress);
 			GRGlInterface iface = GRGlInterface.CreateGles (del);
@@ -37,62 +38,62 @@ namespace Crow.SkiaBackend
 			SKSurface.CreateAsRenderTarget (gr,)
 			surf = new Surface (width, height);*/
 		}
-		public IContext CreateContext(ISurface surf)
+		public override ISurface CreateSurface(int width, int height)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IGradient CreateGradient(GradientType gradientType, Rectangle bounds)
+		public override ISurface CreateSurface(byte[] data, int width, int height)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IRegion CreateRegion()
+		public override IRegion CreateRegion()
 		{
 			throw new NotImplementedException();
 		}
 
-		public ISurface CreateSurface(int width, int height)
+		public override IContext CreateContext(ISurface surf)
 		{
 			throw new NotImplementedException();
 		}
 
-		public ISurface CreateSurface(byte[] data, int width, int height)
+		public override IGradient CreateGradient(GradientType gradientType, Rectangle bounds)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void Dispose()
+		public override byte[] LoadBitmap(Stream stream, out Size dimensions)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void FlushUIFrame(IContext ctx)
+		public override ISvgHandle LoadSvg(Stream stream)
 		{
 			throw new NotImplementedException();
 		}
 
-		public byte[] LoadBitmap(Stream stream, out Size dimensions)
+		public override ISvgHandle LoadSvg(string svgFragment)
 		{
 			throw new NotImplementedException();
 		}
 
-		public ISvgHandle LoadSvg(Stream stream)
+		public override IContext PrepareUIFrame(IContext existingContext, IRegion clipping)
 		{
 			throw new NotImplementedException();
 		}
 
-		public ISvgHandle LoadSvg(string svgFragment)
+		public override void FlushUIFrame(IContext ctx)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IContext PrepareUIFrame(IContext existingContext, IRegion clipping)
+		public override void ResizeMainSurface(int width, int height)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void ResizeMainSurface(int width, int height)
+		public override void Dispose()
 		{
 			throw new NotImplementedException();
 		}
