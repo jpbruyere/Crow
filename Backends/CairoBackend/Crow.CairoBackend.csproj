@@ -3,28 +3,19 @@
   <PropertyGroup>
 	  <TargetFramework>netcoreapp3.1</TargetFramework>
 
-		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<AssemblyVersion>1.0.1</AssemblyVersion>
 		<PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
 
 		<Title>C.R.O.W Cairo Backend</Title>
 		<Description>C.R.O.W. is a widget toolkit and rendering engine developed in C# with templates, styles, compositing, and bindings.</Description>
-		<RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
 		<PackageTags>Crow GUI Backend cairo</PackageTags>
-		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageIcon>crow.png</PackageIcon>
-		<PackageCopyright>Copyright 2021</PackageCopyright>
 		<PackageReleaseNotes>
 		</PackageReleaseNotes>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
   <ItemGroup>
-	  <Compile Include="src\**\*.cs" Exclude="src\NativeMethods-internal.cs" />
-    <Content Include="..\..\Images\crow.png" Pack="true" PackagePath="" />
+	<Compile Include="src\**\*.cs" Exclude="src\NativeMethods-internal.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -23,7 +23,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="$(SolutionDir)Drawing2D\Drawing2D.csproj" />
 	  <!--<ProjectReference Include="$(SolutionDir)Backends\SkiaBackend\Crow.SkiaBackend.csproj" />-->
-	  <ProjectReference Include="$(SolutionDir)Backends\Crow.CairoBackend\Crow.CairoBackend.csproj" />
+	  <ProjectReference Include="$(SolutionDir)Backends\CairoBackend\Crow.CairoBackend.csproj" />
 	  <!--<ProjectReference Include="$(SolutionDir)Backends\VkvgBackend\Crow.VkvgBackend.csproj" />-->
 	</ItemGroup>
 	<ItemGroup>

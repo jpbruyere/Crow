@@ -22,5 +22,18 @@
 		<GlfwSharpVersion>0.2.14</GlfwSharpVersion>
 
 		<NoWarn>$(NoWarn);1591</NoWarn>
+
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>crow.png</PackageIcon>
+		<PackageCopyright>Copyright 2021</PackageCopyright>
+
 	</PropertyGroup>
+	<ItemGroup>
+		<Content Include="..\..\Images\crow.png" Pack="true" PackagePath="" />
+	</ItemGroup>
 </Project>
