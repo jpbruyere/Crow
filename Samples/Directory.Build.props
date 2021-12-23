@@ -21,10 +21,10 @@
 		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Drawing2D\Drawing2D.csproj" />
-	  <!--<ProjectReference Include="..\Backends\SkiaBackend\SkiaBackend.csproj" />-->
-	  <ProjectReference Include="..\Backends\CairoBackend\CairoBackend.csproj" />
-	  <!--<ProjectReference Include="..\Backends\VkvgBackend\VkvgBackend.csproj" />-->
+	  <ProjectReference Include="$(SolutionDir)Drawing2D\Drawing2D.csproj" />
+	  <!--<ProjectReference Include="$(SolutionDir)Backends\SkiaBackend\Crow.SkiaBackend.csproj" />-->
+	  <ProjectReference Include="$(SolutionDir)Backends\Crow.CairoBackend\Crow.CairoBackend.csproj" />
+	  <!--<ProjectReference Include="$(SolutionDir)Backends\VkvgBackend\Crow.VkvgBackend.csproj" />-->
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="$(SamplesDir)common\ui\Interfaces\**\*.*">

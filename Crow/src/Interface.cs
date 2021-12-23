@@ -154,17 +154,6 @@ namespace Crow
 			return IntPtr.Zero;
 		}
 		static string[] backends = {"CairoBackend", "VkvgBackend", "SkiaBackend"};
-		static Assembly resolving (System.Runtime.Loader.AssemblyLoadContext ctx, AssemblyName name) {
-			if (name.Name == "CrowBackend") {
-				string bp = Path.GetDirectoryName (Assembly.GetExecutingAssembly().Location);
-				foreach (string b in backends) {
-					string bPath = Path.Combine (bp, b + ".dll");
-					if (File.Exists (bPath))
-						return ctx.LoadFromAssemblyPath (bPath);
-				}
-			}
-			return ctx.LoadFromAssemblyName (name);
-		}
 		public static BackendType PreferedBackendType = BackendType.Default;
 		/// <summary>
 		/// If not null, backends assemblies will be search in this directory, else
@@ -173,6 +162,7 @@ namespace Crow
 		public static string BackendsDirectory = null;
 		protected static bool tryFindBackendType (out Type backendType) {
 			backendType = default;
+			//IEnumerable<AssemblyName> backendAssemblies = Assembly.GetEntryAssembly ().GetReferencedAssemblies().Where (ra=>backends.Contains (ra.Name));
 			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
 			foreach (Assembly a in ldCtx.Assemblies.Where (asb => backends.Contains (asb.GetName ().Name))) {
 				IEnumerable<Type> backendTypes = a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract);
@@ -185,7 +175,7 @@ namespace Crow
 				(!string.IsNullOrEmpty(BackendsDirectory) && Directory.Exists(BackendsDirectory)) ?
 					BackendsDirectory :	Path.GetDirectoryName (Assembly.GetExecutingAssembly().Location);
 			foreach (string b in backends) {
-				string bPath = Path.Combine (bp, b + ".dll");
+				string bPath = Path.Combine (bp,$"Crow.{b}.dll");
 				if (File.Exists (bPath)) {
 					Assembly a = ldCtx.LoadFromAssemblyPath (bPath);
 					IEnumerable<Type> backendTypes = a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract);
@@ -215,7 +205,6 @@ namespace Crow
 		{
 			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
 			ldCtx.ResolvingUnmanagedDll += resolveUnmanaged;
-			ldCtx.Resolving += resolving;
 
 			CROW_CONFIG_ROOT =
 				System.IO.Path.Combine (
