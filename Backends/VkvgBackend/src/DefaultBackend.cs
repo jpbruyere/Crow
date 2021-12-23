@@ -14,7 +14,7 @@ using Vulkan;
 using static Vulkan.Vk;
 using Device = vke.Device;
 
-namespace Crow.Backends
+namespace Crow.VkvgBackend
 {
 	public class DefaultBackend : CrowBackend
 	{
@@ -28,8 +28,8 @@ namespace Crow.Backends
 		protected PrimaryCommandBuffer[] cmds;
 		protected VkSemaphore[] drawComplete;
 		protected Fence drawFence;
-		Crow.VkvgBackend.Surface surf;
-		Crow.VkvgBackend.Device vkvgDev;
+		Surface surf;
+		Device vkvgDev;
 		SampleCount samples = SampleCount.Sample_1;
 		bool vsync = false;
 
@@ -59,10 +59,10 @@ namespace Crow.Backends
 			graphicQueue = new Queue (dev, VkQueueFlags.Graphics);
 			dev.Activate (enabledFeatures);
 
-			vkvgDev = new Crow.VkvgBackend.Device (
+			vkvgDev = new Device (
 				instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, samples);
 
-			surf = new Crow.VkvgBackend.Surface (vkvgDev, (int)width, (int)height);
+			surf = new Surface (vkvgDev, (int)width, (int)height);
 		}
 		public DefaultBackend (int width, int height, IntPtr nativeWindoPointer)
 		: base (width, height, nativeWindoPointer)
@@ -124,7 +124,7 @@ namespace Crow.Backends
 
 			cmdPool.SetName ("main CmdPool");
 
-			vkvgDev = new Crow.VkvgBackend.Device (
+			vkvgDev = new Device (
 				instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, samples);
 			vkvgDev.SetDpy (72,72);
 
@@ -135,14 +135,14 @@ namespace Crow.Backends
 			Dispose (false);
 		}
 		public override ISurface CreateSurface(int width, int height)
-			=> new Crow.VkvgBackend.Surface (vkvgDev, width, height);
+			=> new Surface (vkvgDev, width, height);
 		public override ISurface CreateSurface(byte[] data, int width, int height)
-			=> new Crow.VkvgBackend.Surface (vkvgDev, data, width, height);
+			=> new Surface (vkvgDev, data, width, height);
 		public override ISurface MainSurface => surf;
-		public override IRegion CreateRegion () => new Crow.VkvgBackend.Region ();
+		public override IRegion CreateRegion () => new Region ();
 		public override IContext CreateContext (ISurface surf)
 		{
-			Crow.VkvgBackend.Context gr = new Crow.VkvgBackend.Context (surf as Crow.VkvgBackend.Surface);
+			Context gr = new Context (surf as Surface);
 			return gr;
 		}
 		//IPattern CreatePattern (PatternType patternType);
@@ -150,11 +150,11 @@ namespace Crow.Backends
 		{
 			switch (gradientType) {
 			case GradientType.Vertical:
-				return new Crow.VkvgBackend.LinearGradient (0, bounds.Top, 0, bounds.Bottom);
+				return new LinearGradient (0, bounds.Top, 0, bounds.Bottom);
 			case GradientType.Horizontal:
-				return new Crow.VkvgBackend.LinearGradient (bounds.Left, 0, bounds.Right, 0);
+				return new LinearGradient (bounds.Left, 0, bounds.Right, 0);
 			case GradientType.Oblic:
-				return new Crow.VkvgBackend.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+				return new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
 			case GradientType.Radial:
 				throw new NotImplementedException ();
 			}
@@ -181,10 +181,10 @@ namespace Crow.Backends
 		public override ISvgHandle LoadSvg(Stream stream)
 		{
 			using (BinaryReader sr = new BinaryReader (stream))
-				return new Crow.VkvgBackend.SvgHandle(vkvgDev, sr.ReadBytes ((int)stream.Length));
+				return new SvgHandle(vkvgDev, sr.ReadBytes ((int)stream.Length));
 		}
 		public override ISvgHandle LoadSvg(string svgFragment) =>
-			new Crow.VkvgBackend.SvgHandle (vkvgDev, System.Text.Encoding.Unicode.GetBytes (svgFragment));
+			new SvgHandle (vkvgDev, System.Text.Encoding.Unicode.GetBytes (svgFragment));
 		bool disposeContextOnFlush;
 		IRegion clipping;
 		protected void clear(IContext ctx) {
@@ -202,7 +202,7 @@ namespace Crow.Backends
 			IContext ctx = existingContext;
 			if (ctx == null) {
 				disposeContextOnFlush = true;
-				ctx = new Crow.VkvgBackend.Context (surf);
+				ctx = new Context (surf);
 			} else
 				disposeContextOnFlush = false;
 
@@ -241,7 +241,7 @@ namespace Crow.Backends
 
 			blitSource?.Dispose ();
 			surf?.Dispose ();
-			surf = new Crow.VkvgBackend.Surface (vkvgDev, (int)width, (int)height);
+			surf = new Surface (vkvgDev, (int)width, (int)height);
 
 			cmdPool.Reset();
 
