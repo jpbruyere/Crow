@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drawing2D", "Drawing2D\Draw
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backends", "Backends", "{451F5727-2A2E-4361-A41B-089429ADE8F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow.CairoBackend", "Backends\Crow.CairoBackend\Crow.CairoBackend.csproj", "{E06441A9-0CFD-45BB-9478-99D28CEB327F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow.CairoBackend", "Backends\CairoBackend\Crow.CairoBackend.csproj", "{E06441A9-0CFD-45BB-9478-99D28CEB327F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow.VkvgBackend", "Backends\VkvgBackend\Crow.VkvgBackend.csproj", "{34976828-80CF-4AC5-8C81-F66F635DC5FC}"
 EndProject
