@@ -12,7 +12,9 @@ using Glfw;
 using vke;
 using Vulkan;
 using static Vulkan.Vk;
-using Device = vke.Device;
+using Device = vkvg.Device;
+using vkvg;
+using SampleCount = Drawing2D.SampleCount;
 
 namespace Crow.VkvgBackend
 {
