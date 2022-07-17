@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<Container Margin="10" Width="500"  Background="/mnt/devel/crow/Samples/AnimTest/ui/background.jpg">
+<!--	<Image Path="/mnt/devel/crow/Samples/AnimTest/ui/background.jpg" SvgSub="True" Height="200"/>-->
+	<HorizontalStack Height="Fit" Width="Fit" Spacing="10" VerticalAlignment="Bottom" >
+		<Label Background="Teal" Width="30%" Margin="10" CornerRadius="10" Font="bold, 14" TextAlignment="Center"/>
+		<Label Background="Teal" Width="30%" Margin="10" CornerRadius="10" Font="bold, 14" TextAlignment="Center"/>
+		<Label Background="Teal" Width="30%" Margin="10" CornerRadius="10" Font="bold, 14" TextAlignment="Center"/>
+	</HorizontalStack>
+</Container>
+

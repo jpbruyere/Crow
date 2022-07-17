@@ -77,7 +77,7 @@
 		<Container Name="CrowContainer" Height="60%" Background="Black"/>
 		<Splitter/>
 		<VerticalStack CacheEnabled="true">
-			<Menu Data="{EditorAllCommands}" Height="Fit" Width="Stretched">
+			<!--<Menu Data="{EditorAllCommands}" Height="Fit" Width="Stretched">
 				<ItemTemplate DataType="Crow.Command" Path="Interfaces/menuCommand.itmp"/>
 				<ItemTemplate DataType="Crow.CommandGroup" >
 					<MenuItem Data="{Commands}" Width="Fit" IsEnabled="{CanExecute}"
@@ -85,8 +85,8 @@
 							ItemTemplate="Interfaces/menuItem.itmp">
 					</MenuItem>
 				</ItemTemplate>
-			</Menu>
-		<!--	<Wrapper Orientation="Vertical" Height="Fit">
+			</Menu>-->
+			<Wrapper Orientation="Vertical" Height="Fit">
 				<Button Style="IcoButton" Command="{CMDNew}" />
 				<Button Style="IcoButton" Command="{CMDSave}" />
 				<Button Style="IcoButton" Command="{CMDSaveAs}" />
@@ -160,11 +160,11 @@
 							Tooltip="Add '*source* where you want to load the source in the editor."/>
 					</VerticalStack>
 				</Popper>
-			</Wrapper>-->
+			</Wrapper>
 			<HorizontalStack>
 				<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"
 						TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorEditCommands}"
-						SelectionChanged="onEditorSelectionChanged"
+						SelectionChanged="onEditorSelectionChanged" ClipToClientRect="true"
 						Foreground="DarkGrey" Background="White" MouseWheelSpeed="20"/>
 				<ScrollBar Value="{²../tb.ScrollY}"
 						LargeIncrement="{../tb.PageHeight}" SmallIncrement="1"

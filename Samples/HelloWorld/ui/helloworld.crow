@@ -1,2 +1,9 @@
 ﻿<?xml version="1.0"?>
-<Label Text="Hello World"/>
+
+	<!--<Widget Background="hgradient|0:Black|0.5:Blue|1:Red" Margin="100" />-->
+	<VerticalStack>
+		<Image Path="#Crow.Icons.checkbox.svg" SvgSub="True" Height="200"/>
+		<CheckBox/>
+
+	</VerticalStack>
+	<!--<ColorPicker/>-->

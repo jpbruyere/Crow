@@ -69,7 +69,6 @@ namespace Crow
 				else
 					widthRatio = heightRatio;
 			}
-
 			using (ISurface tmp = iFace.Backend.CreateSurface (bounds.Width, bounds.Height)) {
 				using (IContext gr = iFace.Backend.CreateContext (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);

@@ -18,6 +18,7 @@ namespace Drawing2D
 		void Clear ();
 		ISurface CreateSimilar (int width, int height);*/
 		void Resize (int width, int height);
+		IntPtr Handle { get; }
 	}
 }
 

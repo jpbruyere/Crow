@@ -17,7 +17,12 @@ namespace HelloWorld
 		}
 		protected override void OnInitialized()
 		{
-			Load ("/mnt/devel/crow/Samples/HelloWorld/ui/helloworld.crow");
+			Load ("/mnt/devel/crow/Samples/AnimTest/ui/anim.crow");
+		}
+
+		public override void UpdateFrame()
+		{
+			base.UpdateFrame();
 		}
 	}
 }

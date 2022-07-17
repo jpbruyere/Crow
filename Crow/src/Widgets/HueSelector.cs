@@ -37,7 +37,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		
+
 		public virtual double Hue {
 			get { return hue; }
 			set {
@@ -51,7 +51,7 @@ namespace Crow
 		}
 		protected override void onDraw (IContext gr)
 		{
-			base.onDraw (gr);
+			//base.onDraw (gr);
 
 			RectangleD r = ClientRectangle;
 			r.Height -= 4;
@@ -60,13 +60,13 @@ namespace Crow
 			Gradient grad = new Gradient (
 				Orientation == Orientation.Vertical ? GradientType.Vertical : GradientType.Horizontal);
 
-			grad.Stops.Add (new Gradient.ColorStop (0,     new Color (1, 0, 0, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.167, new Color (1, 1, 0, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.333, new Color (0, 1, 0, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.5,   new Color (0, 1, 1, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.667, new Color (0, 0, 1, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.833, new Color (1, 0, 1, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (1,     new Color (1, 0, 0, 1)));
+			grad.Stops.Add (new Gradient.ColorStop (0,     new Color (1.0, 0.0, 0.0, 1.0)));
+			grad.Stops.Add (new Gradient.ColorStop (0.167, new Color (1.0, 1.0, 0.0, 1.0)));
+			grad.Stops.Add (new Gradient.ColorStop (0.333, new Color (0.0, 1.0, 0.0, 1.0)));
+			grad.Stops.Add (new Gradient.ColorStop (0.5,   new Color (0.0, 1.0, 1.0, 1.0)));
+			grad.Stops.Add (new Gradient.ColorStop (0.667, new Color (0.0, 0.0, 1.0, 1.0)));
+			grad.Stops.Add (new Gradient.ColorStop (0.833, new Color (1.0, 0.0, 1.0, 1.0)));
+			grad.Stops.Add (new Gradient.ColorStop (1,     new Color (1.0, 0.0, 0.0, 1.0)));
 
 			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
@@ -74,7 +74,7 @@ namespace Crow
 
 			r = ClientRectangle;
 
-			switch (cursor) {
+			/*switch (cursor) {
 			case CursorType.Rectangle:
 				if (Orientation == Orientation.Horizontal) {
 					r.Width = 5;
@@ -103,9 +103,9 @@ namespace Crow
 					gr.LineTo (r.Left, r.Bottom-0.5);
 					gr.LineTo (r.Left, y);
 					gr.ClosePath ();
-				} else { 
+				} else {
 				}
-				break;			
+				break;
 			}
 
 			gr.SetSource (Colors.Black);
@@ -113,7 +113,7 @@ namespace Crow
 			gr.StrokePreserve ();
 			gr.SetSource (Colors.White);
 			gr.LineWidth = 1.0;
-			gr.Stroke ();
+			gr.Stroke ();*/
 		}
 
 		public override void OnLayoutChanges (LayoutingType layoutType)

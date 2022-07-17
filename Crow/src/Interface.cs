@@ -160,39 +160,42 @@ namespace Crow
 		/// backends are search where the main crow assembly is.
 		/// </summary>
 		public static string BackendsDirectory = null;
+		protected static Type getBackendType (IEnumerable<Type> backendTypes) {
+			if (backendTypes == null)
+				return null;
+			switch (PreferedBackendType) {
+				case BackendType.Default:
+					return backendTypes.FirstOrDefault(be => be.Name == "DefaultBackend");
+				case BackendType.Egl:
+					return backendTypes.FirstOrDefault(be => be.Name == "EglBackend");
+				case BackendType.Vulkan:
+					return backendTypes.FirstOrDefault(be => be.Name == "VulkanBackend");
+				case BackendType.Gl:
+					return backendTypes.FirstOrDefault(be => be.Name == "GlBackend");
+				default:
+					return backendTypes.FirstOrDefault();
+			}
+		}
 		protected static bool tryFindBackendType (out Type backendType) {
 			backendType = default;
-			//IEnumerable<AssemblyName> backendAssemblies = Assembly.GetEntryAssembly ().GetReferencedAssemblies().Where (ra=>backends.Contains (ra.Name));
+			//search loaded assemblies
 			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
 			foreach (Assembly a in ldCtx.Assemblies.Where (asb => backends.Contains (asb.GetName ().Name))) {
-				IEnumerable<Type> backendTypes = a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract);
-				if (backendTypes != null) {
-					backendType = backendTypes.FirstOrDefault();
+				backendType = getBackendType (a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract));
+				if (backendType != null)
 					return true;
-				}
 			}
+
 			string bp =
 				(!string.IsNullOrEmpty(BackendsDirectory) && Directory.Exists(BackendsDirectory)) ?
 					BackendsDirectory :	Path.GetDirectoryName (Assembly.GetExecutingAssembly().Location);
+			//search backend directory
 			foreach (string b in backends) {
 				string bPath = Path.Combine (bp,$"Crow.{b}.dll");
 				if (File.Exists (bPath)) {
 					Assembly a = ldCtx.LoadFromAssemblyPath (bPath);
-					IEnumerable<Type> backendTypes = a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract);
-					if (backendTypes != null) {
-						if (PreferedBackendType == BackendType.Default)
-							backendType = backendTypes.FirstOrDefault(be => be.Name == "DefaultBackend");
-						else if (PreferedBackendType == BackendType.Egl)
-							backendType = backendTypes.FirstOrDefault(be => be.Name == "EglBackend");
-						else if (PreferedBackendType == BackendType.Vulkan)
-							backendType = backendTypes.FirstOrDefault(be => be.Name == "VulkanBackend");
-						else if (PreferedBackendType == BackendType.Gl)
-							backendType = backendTypes.FirstOrDefault(be => be.Name == "GlBackend");
-
-						if (backendType == null)
-							backendType = backendTypes.FirstOrDefault();
-						return backendType != null;
-					}
+					backendType = getBackendType (a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract));
+					return backendType != null;
 				}
 			}
 
@@ -433,9 +436,7 @@ namespace Crow
 			Glfw3.SetCursorPosCallback (hWin, HandleCursorPosDelegate);
 			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
 			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
-#if !VKVG//resize is processed on context.Render failing
 			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
-#endif
 			Glfw3.SetWindowRefreshCallback (hWin, HandleWindowRefreshDelegate);
 		}
 
@@ -451,7 +452,7 @@ namespace Crow
 		/// <summary>
 		/// search for graphic object type in crow assembly, if not found,
 		/// search for type independently of namespace in all the loaded assemblies
-		/// </summary>
+		/// </summary>	
 		/// <remarks>
 		/// </remarks>
 		/// <returns>the corresponding type object</returns>
@@ -675,7 +676,13 @@ namespace Crow
 			Terminate ();
 		}
 		public virtual void Terminate () {}
-		public virtual void UpdateFrame () {}
+		int cpt;
+		public virtual void UpdateFrame () {
+			if (cpt++ > 1000) {
+				PerformanceMeasure.Notify ();
+				cpt=0;
+			}
+		}
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
 
 		public bool Shift => Glfw3.GetKey(hWin, Key.LeftShift) == InputAction.Press ||
@@ -1176,8 +1183,6 @@ namespace Crow
 
 				Monitor.Exit (UpdateMutex);
 			}
-
-			PerformanceMeasure.Notify ();
 		}
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
@@ -1610,6 +1615,7 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.MouseMove);
 
 			try {
+				Monitor.Enter (UpdateMutex);
 
 				int deltaX = x - MousePosition.X;
 				int deltaY = y - MousePosition.Y;
@@ -1723,6 +1729,7 @@ namespace Crow
 				HoverOrDropTarget = null;
 				return false;
 			} finally {
+				Monitor.Exit (UpdateMutex);
 				DbgLogger.EndEvent (DbgEvtType.MouseMove);
 			}
 		}
@@ -1736,6 +1743,7 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.MouseDown);
 
 			try {
+				Monitor.Enter (UpdateMutex);
 				doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
 				lastMouseDown.Restart ();
 
@@ -1750,6 +1758,7 @@ namespace Crow
 				return true;
 
 			} finally {
+				Monitor.Exit (UpdateMutex);
 				DbgLogger.EndEvent (DbgEvtType.MouseDown);
 			}
 		}
@@ -1763,6 +1772,7 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.MouseUp);
 
 			try {
+				Monitor.Enter (UpdateMutex);
 				mouseRepeatTimer.Reset ();
 				lastMouseDownEvent = null;
 
@@ -1803,6 +1813,7 @@ namespace Crow
 
 				return true;
 			} finally {
+				Monitor.Exit (UpdateMutex);
 				DbgLogger.EndEvent (DbgEvtType.MouseUp);
 			}
 		}

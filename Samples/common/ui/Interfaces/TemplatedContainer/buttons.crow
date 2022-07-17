@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<VerticalStack Margin="10" Background="Grey">
+	<Button
+		Foreground="LightGrey"
+		MouseEnter="{Foreground=White}"
+		MouseLeave="{Foreground=LightGrey}"
+		Background="vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet"
+		MouseUp="{Background=vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet}"
+		MouseDown="{Background=vgradient|0:Jet|0.1:Grey|0.9:Grey|1:LightGrey}">
+		<Template>
+			<Border Foreground="Black" CornerRadius="10" Background="{./Background}" Margin="7">
+				<Label Foreground="{./Foreground}" Text="{./Caption}"/>
+			</Border>
+		</Template>
+	</Button >
+	<CheckBox Width="200"
+		Foreground="Black"
+		Background="vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet"
+		Unchecked="{Background=vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet};{Foreground=Black}"
+		Checked="{Background=vgradient|0:Jet|0.1:Grey|0.9:Grey|1:LightGrey};{Foreground=DodgerBlue}">
+		<Template>
+			<Border Foreground="{./Foreground}" CornerRadius="10" Background="{./Background}" Margin="7">
+				<Label Text="{./Caption}"/>
+			</Border>
+		</Template>
+	</CheckBox >
+	<HorizontalStack Height="Fit" Width="Fit">
+		<RadioButton Width="200"
+			Foreground="Black"
+			Background="vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet"
+			Unchecked="{Background=vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet};{Foreground=Black}"
+			Checked="{Background=vgradient|0:Jet|0.1:Grey|0.9:Grey|1:LightGrey};{Foreground=DodgerBlue}">
+			<Template>
+				<Border Foreground="{./Foreground}" CornerRadius="10" Background="{./Background}" Margin="7">
+					<Label Text="{./Caption}"/>
+				</Border>
+			</Template>
+		</RadioButton >
+		<RadioButton Width="200"
+			Foreground="Black"
+			Background="vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet"
+			Unchecked="{Background=vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet};{Foreground=Black}"
+			Checked="{Background=vgradient|0:Jet|0.1:Grey|0.9:Grey|1:LightGrey};{Foreground=DodgerBlue}">
+			<Template>
+				<Border Foreground="{./Foreground}" CornerRadius="10" Background="{./Background}" Margin="7">
+					<Label Text="{./Caption}"/>
+				</Border>
+			</Template>
+		</RadioButton >
+		<RadioButton Width="200"
+			Foreground="Black"
+			Background="vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet"
+			Unchecked="{Background=vgradient|0:LightGrey|0.1:Grey|0.9:Grey|1:Jet};{Foreground=Black}"
+			Checked="{Background=vgradient|0:Jet|0.1:Grey|0.9:Grey|1:LightGrey};{Foreground=DodgerBlue}">
+			<Template>
+				<Border Foreground="{./Foreground}" CornerRadius="10" Background="{./Background}" Margin="7">
+					<Label Text="{./Caption}"/>
+				</Border>
+			</Template>
+		</RadioButton >
+	</HorizontalStack>
+</VerticalStack>

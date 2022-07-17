@@ -1685,9 +1685,9 @@ namespace Crow
 		/// <param name="layoutable">The children that is calling the constraints</param>
 		/// <param name="layoutType">The currently registering layouting types</param>
 		public virtual void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType){	}
-		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
 
 		internal ReaderWriterLockSlim layoutMutex = new ReaderWriterLockSlim (LockRecursionPolicy.SupportsRecursion);
+		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed, this);
@@ -1778,6 +1778,7 @@ namespace Crow
 			if (LayoutChanged != null)
 				LayoutChanged.Invoke (this, new LayoutingEventArgs (layoutType));
 		}
+		//Todo: is it necessary?? Raise method already check for null handler.
 		internal protected void raiseLayoutChanged(LayoutingType layoutingType){
 			if (LayoutChanged != null)
 				LayoutChanged.Raise (this, new LayoutingEventArgs(layoutingType));

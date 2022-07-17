@@ -96,5 +96,9 @@ namespace Crow.CairoBackend {
 		public int Stride {
 			get { return NativeMethods.cairo_image_surface_get_stride (handle); }
 		}
+		public override void Resize(int width, int height)
+		{
+			
+		}
 	}
 }

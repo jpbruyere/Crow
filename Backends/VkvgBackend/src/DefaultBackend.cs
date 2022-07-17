@@ -32,7 +32,7 @@ namespace Crow.VkvgBackend
 		protected Fence drawFence;
 		Surface surf;
 		Device vkvgDev;
-		SampleCount samples = SampleCount.Sample_1;
+		SampleCount samples = SampleCount.Sample_8;
 		bool vsync = false;
 
 		bool tryGetPhy (vke.PhysicalDeviceCollection physicalDevices, VkPhysicalDeviceType phyType, out PhysicalDevice phy, bool swapchainSupport) {
@@ -189,6 +189,7 @@ namespace Crow.VkvgBackend
 			new SvgHandle (vkvgDev, System.Text.Encoding.Unicode.GetBytes (svgFragment));
 		bool disposeContextOnFlush;
 		IRegion clipping;
+		volatile bool resizeMainSurface = false;
 		protected void clear(IContext ctx) {
 			for (int i = 0; i < clipping.NumRectangles; i++)
 				ctx.Rectangle (clipping.GetRectangle (i));
@@ -200,6 +201,11 @@ namespace Crow.VkvgBackend
 		}
 		public override IContext PrepareUIFrame(IContext existingContext, IRegion clipping)
 		{
+			if (resizeMainSurface) {
+				createMainSurface (swapChain.Width, swapChain.Height);
+				clipping.UnionRectangle (new Rectangle(new Size((int)swapChain.Width, (int)swapChain.Height)));
+				resizeMainSurface = false;
+			}
 			this.clipping = clipping;
 			IContext ctx = existingContext;
 			if (ctx == null) {
@@ -216,15 +222,16 @@ namespace Crow.VkvgBackend
 		{
 			if (disposeContextOnFlush)
 				ctx.Dispose ();
-			clipping = null;
-
-			dev.WaitIdle();
 
 			int idx = swapChain.GetNextImage ();
 			if (idx < 0) {
-				createMainSurface (swapChain.Width, swapChain.Height);
+				resizeMainSurface = true;
 				return;
 			}
+
+			clipping = null;
+
+			//dev.WaitIdle();
 
 			drawFence.Wait ();
 			drawFence.Reset ();
@@ -232,7 +239,7 @@ namespace Crow.VkvgBackend
 			graphicQueue.Submit (cmds[idx], swapChain.presentComplete, drawComplete[idx], drawFence);
 			(graphicQueue as PresentQueue).Present (swapChain, drawComplete[idx]);
 
-			dev.WaitIdle();
+			//dev.WaitIdle();
 		}
 		public override void ResizeMainSurface (int width, int height) {
 			//resize is done on swapchain image aquisition failure

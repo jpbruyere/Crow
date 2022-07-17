@@ -661,7 +661,8 @@ namespace Crow.CairoBackend
 		public void RestoreTransformations()
 			=> NativeMethods.cairo_set_matrix (handle, ref savedMat);
 		public void SetSource(IPattern pat) => NativeMethods.cairo_set_source (handle, (pat as Pattern).handle);
-		public void SetSource(ISurface surf, double x = 0, double y = 0)
-			=> NativeMethods.cairo_set_source_surface (handle, (surf as Surface).handle, x, y);
+		public async void SetSource(ISurface surf, double x = 0, double y = 0) {
+			NativeMethods.cairo_set_source_surface (handle, surf.Handle, x, y);
+		}
 	}
 }

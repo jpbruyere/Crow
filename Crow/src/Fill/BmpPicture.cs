@@ -95,7 +95,7 @@ namespace Crow
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
 
-					using (ISurface imgSurf = iFace.Backend.CreateSurface (bounds.Width, bounds.Height)) {
+					using (ISurface imgSurf = iFace.Backend.CreateSurface (image, Dimensions.Width, Dimensions.Height)) {
 						gr.SetSource (imgSurf, 0,0);
 						gr.Paint ();
 					}

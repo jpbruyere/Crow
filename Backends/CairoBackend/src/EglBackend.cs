@@ -7,11 +7,13 @@ namespace Crow.CairoBackend
 {
 	public class EglBackend : CairoBackendBase {
 		EGLDevice device;
+		GLSurface winSurf;
 		/// <summary>
 		/// Create a new generic backend bound to the application surface
 		/// </summary>
 		/// <param name="width">backend surface width</param>
 		/// <param name="height">backend surface height</param>
+		/// <param name="nativeWindoPointer"></param>
 		public EglBackend (int width, int height, IntPtr nativeWindoPointer)
 		: base (width, height, nativeWindoPointer) {
 			if (nativeWindoPointer == IntPtr.Zero) {
@@ -32,7 +34,9 @@ namespace Crow.CairoBackend
 			Glfw3.SwapInterval (0);
 
 			device = new EGLDevice (Glfw3.GetEGLDisplay (), Glfw3.GetEGLContext (hWin));
-			surf = new GLSurface (device, Glfw3.GetEGLSurface (hWin), width, height);
+			//surf = new GLTextureSurface (device, width, height);
+			surf = new ImageSurface (Format.ARGB32, width, height);
+			winSurf = new GLSurface (device, Glfw3.GetEGLSurface (hWin), width, height);
 		}
 		/// <summary>
 		/// Create a new offscreen backend, used in perfTests
@@ -61,9 +65,20 @@ namespace Crow.CairoBackend
 		}
 		public override void FlushUIFrame(IContext ctx)
 		{
-			base.FlushUIFrame (ctx);
 
-			(surf as GLSurface).SwapBuffers ();
+			base.FlushUIFrame (ctx);
+			surf.Flush();
+			using (Context gr = new Context (winSurf)) {
+				gr.SetSource (surf);
+				gr.Paint();
+			}
+			winSurf.SwapBuffers ();
+		}
+		public override void ResizeMainSurface(int width, int height)
+		{
+			base.ResizeMainSurface(width, height);
+			winSurf?.Dispose();
+			winSurf = new GLSurface (device, Glfw3.GetEGLSurface (hWin), width, height);
 		}
 	}
 }

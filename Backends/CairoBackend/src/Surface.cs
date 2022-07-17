@@ -41,6 +41,8 @@ namespace Crow.CairoBackend {
 	public class Surface : ISurface
 	{
 		internal IntPtr handle = IntPtr.Zero;
+		public IntPtr Handle => handle;
+
 
 		protected Surface()
 		{

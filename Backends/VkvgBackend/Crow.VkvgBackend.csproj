@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="vke" Version="0.2.0-beta" />
-    <PackageReference Include="vkvg.net" Version="0.5.0-beta" />
+    <PackageReference Include="vkvg.net" Version="0.6.0-beta" />
     <ProjectReference Include="..\..\Drawing2D\Drawing2D.csproj" />
   </ItemGroup>
 

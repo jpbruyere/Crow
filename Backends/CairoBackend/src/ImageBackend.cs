@@ -79,6 +79,15 @@ namespace Crow.CairoBackend
 
 			base.FlushUIFrame (ctx);
 		}
+		public override void ResizeMainSurface(int width, int height)
+		{
+			if (surf is ImageSurface) {
+				surf?.Dispose();
+				surf = new ImageSurface (Format.ARGB32, width, height);
+			} else {
+				base.ResizeMainSurface(width, height);
+			}
+		}
 	}
 }
 

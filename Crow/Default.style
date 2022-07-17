@@ -346,6 +346,6 @@ MessageBox, Popper, Slider, Spinner, TextInheritBox, NumericControl {
 	Margin="0";
 	BubbleEvents="MouseWheel|Keyboard";
 }
-TemplatedControl, GenericStack {
+TemplatedControl, GenericStack, Image {
 	CacheEnabled="true";
 }

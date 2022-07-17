@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<Widget Height="400" Width="260" Background="/mnt/devel/crow/Samples/AnimTest/ui/background.jpg"/>
+<!--<Widget Height="100" Width="100" Background="#Crow.Icons.checkbox.svg"/>-->
+

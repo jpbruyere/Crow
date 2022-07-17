@@ -14,6 +14,7 @@ using Crow.Text;
 using System.Collections.Generic;
 using Encoding = System.Text.Encoding;
 using Samples;
+using System.Threading;
 
 namespace ShowCase
 {
@@ -30,6 +31,8 @@ namespace ShowCase
 		};
 		static void Main ()
 		{
+			//Interface.PreferedBackendType = Drawing2D.BackendType.Egl;
+			
 			initDebugLog ();
 
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
@@ -43,6 +46,40 @@ namespace ShowCase
 
 				app.Run ();
 			}
+		}
+		public override void Run () {
+			initBackend ();
+
+			if (!SingleThreaded) {
+				Thread t = new Thread (InterfaceThread) {
+					IsBackground = true
+				};
+				t.Start ();
+			}
+
+			Init ();
+
+			if (SingleThreaded) {
+				while (!Glfw3.WindowShouldClose (WindowHandle)) {
+					Glfw3.PollEvents ();
+					try	{
+						Update();
+						UpdateFrame ();
+					} catch (Exception ex) {
+						showError (ex);
+						crowContainer.SetChild (null);
+					}
+					Thread.Sleep (UPDATE_INTERVAL);
+				}
+			} else {
+				while (!Glfw3.WindowShouldClose (hWin)) {
+					Glfw3.PollEvents ();
+					UpdateFrame ();
+					Thread.Sleep (POLLING_INTERVAL);
+				}
+			}
+
+			Terminate ();
 		}
 		public Container crowContainer;
 

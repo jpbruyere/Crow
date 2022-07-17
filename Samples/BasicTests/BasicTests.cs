@@ -12,19 +12,19 @@ namespace Samples
 		static void Main ()
 		{
 			using (BasicTests app = new BasicTests ()) {
-				app.SolidBackground = false;
+				//app.SolidBackground = false;
 				app.Run ();
 			}
 		}
 
 		protected override void OnInitialized ()
 		{
-			Commands = new CommandGroup (
+			/*Commands = new CommandGroup (
 				new Crow.Command("command1", new Action(() => Console.WriteLine ("command1 triggered"))),
 				new Crow.Command("command2", new Action(() => Console.WriteLine ("command2 triggered"))),
 				new Crow.Command("command3", new Action(() => Console.WriteLine ("command3 triggered"))),
 				new Crow.Command("command4", new Action(() => Console.WriteLine ("command4 triggered")))
-			);
+			);*/
 
 			// += KeyboardKeyDown1;
 
@@ -55,12 +55,10 @@ namespace Samples
 
 		int idx = 0;
 		string [] testFiles;
-
-
-		public override bool OnKeyDown (Key key)
+		public override bool OnKeyDown (KeyEventArgs e)
 		{
 			try {
-				switch (key) {
+				switch (e.Key) {
 				case Key.Escape:
 					Quit ();
 					break;
@@ -75,7 +73,7 @@ namespace Samples
 					NotifyValueChanged ("TestList", TestList);
 					break;
 				default:
-					return base.OnKeyDown (key);
+					return base.OnKeyDown (e);
 				}
 
 				ClearInterface ();
