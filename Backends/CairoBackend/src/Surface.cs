@@ -142,7 +142,7 @@ namespace Crow.CairoBackend {
 			handle = IntPtr.Zero;
 		}
 		public virtual void Resize (int width, int height) {
-			
+			throw new NotImplementedException();
 		}
 
 		public Status Finish ()

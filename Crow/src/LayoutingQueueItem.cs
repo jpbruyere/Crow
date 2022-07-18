@@ -83,6 +83,16 @@ namespace Crow
 				}
 
 				try {
+					if (go.IsQueueForClipping) {
+						DbgLogger.AddEvent (DbgEvtType.GOProcessLayoutingWhileClipReg, this);
+#if DEBUG_LOG
+						result = Result.Discarded;
+#endif
+						LayoutingTries = 0;
+						DiscardCount++;
+						Layoutable.RegisteredLayoutings |= LayoutType;
+						go.IFace.DiscardQueue.Enqueue (this);
+					}
 					if (go.Parent == null) {//TODO:improve this
 						//cancel layouting for object without parent, maybe some were in queue when
 						//removed from a listbox

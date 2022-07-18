@@ -1527,8 +1527,8 @@ namespace Crow
 
 			parentRWLock.EnterReadLock ();
 			if (parent != null) {
-				parent.RegisterClip (LastPaintedSlot);
-				parent.RegisterClip (Slot);
+				parent.RegisterChildClip (LastPaintedSlot);
+				parent.RegisterChildClip (Slot);
 			}else {
 				DbgLogger.SetMsg (DbgEvtType.GOClippingRegistration, "clipping reg canceled (no parent)");
 			}
@@ -1540,7 +1540,7 @@ namespace Crow
 		/// Add clip rectangle to this.clipping and propagate up to root
 		/// </summary>
 		/// <param name="clip">Clip rectangle</param>
-		public virtual void RegisterClip(Rectangle clip){
+		public virtual void RegisterChildClip(Rectangle clip){
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GORegisterClip, this);
 				return;
@@ -1573,7 +1573,7 @@ namespace Crow
 					Console.WriteLine ($"parent.regclip canceled p.Dirty:{p?.IsDirty} Cached:{p?.CacheEnabled}: {this.ToString()}");
 					return;
 				}*/
-				Parent.RegisterClip (r + Slot.Position);
+				Parent.RegisterChildClip (r + Slot.Position);
 			} finally {
 				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
 			}
@@ -2297,7 +2297,7 @@ namespace Crow
 			try
 			{
 				if (parent != null)
-					parent.RegisterClip (ContextCoordinates(LastPaintedSlot));
+					parent.RegisterChildClip (ContextCoordinates(LastPaintedSlot));
 			}
 			catch (System.Exception e)
 			{

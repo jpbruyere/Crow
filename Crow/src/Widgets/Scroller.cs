@@ -174,9 +174,9 @@ namespace Crow
 			m += new Point (ScrollX, ScrollY);
 			return true;
 		}
-		public override void RegisterClip (Rectangle clip)
+		public override void RegisterChildClip (Rectangle clip)
 		{
-			base.RegisterClip (clip - new Point(ScrollX,ScrollY));
+			base.RegisterChildClip (clip - new Point(ScrollX,ScrollY));
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{

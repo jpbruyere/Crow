@@ -25,7 +25,7 @@ namespace Crow
 		LayoutingType RequiredLayoutings { get; set; }
 		void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType);
 		void RegisterForLayouting(LayoutingType layoutType);
-		void RegisterClip(Rectangle clip);
+		void RegisterChildClip(Rectangle clip);
 		bool UpdateLayout(LayoutingType layoutType);
 		bool PointIsIn(ref Point m);
 

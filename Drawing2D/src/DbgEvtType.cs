@@ -71,6 +71,7 @@ namespace Crow
 		GORegisterLayouting 			= Widget | Layouting | 0x01,
 		GOProcessLayouting				= Widget | Layouting | 0x02,
 		GOProcessLayoutingWithNoParent 	= Widget | Layouting | Warning | 0x01,
+		GOProcessLayoutingWhileClipReg 	= Widget | Layouting | Warning | 0x02,
 		GODraw							= Widget | Drawing | 0x01,
 		GORecreateCache					= Widget | Drawing | 0x02,
 		GOUpdateCache					= Widget | Drawing | 0x03,

@@ -15,9 +15,6 @@ namespace Crow
 {
 	public static class DbgLogger
 	{
-		/*public static DbgEvtType IncludeEvents = DbgEvtType.All;
-		public static DbgEvtType DiscardEvents = DbgEvtType.Focus;*/
-
 		public static List<DbgEvtType> IncludedEvents = new List<DbgEvtType> ();
 		public static bool ConsoleOutput = true;
 

@@ -19,7 +19,7 @@ namespace Samples
 	public class SampleBase : Interface
 	{
 		public SampleBase(IntPtr hWin) : base(800, 600, hWin) { }
-		public SampleBase() : base (800, 600, true) { }
+		public SampleBase() : base (800, 600, false) { }
 
 		public Version CrowVersion => Assembly.GetAssembly(typeof(Widget)).GetName().Version;
 

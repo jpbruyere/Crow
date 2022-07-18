@@ -1293,7 +1293,7 @@ namespace Crow
 
 		[Conditional ("DEBUG_HIGHLIGHT_FOCUS")]
 		internal void debugRegisterClip (Widget w) {
-			RegisterClip (w.ScreenCoordinates (w.Slot));
+			RegisterChildClip (w.ScreenCoordinates (w.Slot));
 		}
 		[Conditional ("DEBUG_HIGHLIGHT_FOCUS")]
 		void debugHighlightFocus (IContext ctx) {
@@ -1328,23 +1328,23 @@ namespace Crow
 				if (FocusedWidget is IEditableTextWidget lab) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {
 						if (textCursor != null && c != textCursor.Value)
-							RegisterClip (textCursor.Value);
+							RegisterChildClip (textCursor.Value);
 						textCursor = c;
-						MainSurface.Flush ();
+						//MainSurface.Flush ();
 					} else if (textCursor != null)
-						RegisterClip (textCursor.Value);
+						RegisterChildClip (textCursor.Value);
 				}
 				blinkingCursor.Restart ();
 				forceTextCursor = false;
 			} else if (textCursor != null && blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
-				RegisterClip (textCursor.Value);
+				RegisterChildClip (textCursor.Value);
 				textCursor = null;
 				blinkingCursor.Restart ();
 			} else if (FocusedWidget is IEditableTextWidget lab) {
 				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {
 						textCursor = c;
-						MainSurface.Flush ();
+						//MainSurface.Flush ();
 						blinkingCursor.Restart ();
 					}
 				}
@@ -1384,7 +1384,7 @@ namespace Crow
 		public void DeleteWidget(Widget g)
 		{
 			lock (UpdateMutex) {
-				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
+				RegisterChildClip (g.ScreenCoordinates (g.LastPaintedSlot));
 				GraphicTree.Remove (g);
 				g.Parent = null;
 				g.Dispose ();
@@ -1400,7 +1400,7 @@ namespace Crow
 //				}
 //			}
 			lock (UpdateMutex) {
-				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
+				RegisterChildClip (g.ScreenCoordinates (g.LastPaintedSlot));
 				GraphicTree.Remove (g);
 				g.Parent = null;
 			}
@@ -1413,7 +1413,7 @@ namespace Crow
 					//TODO:parent is not reset to null because object will be added
 					//to ObjectToRedraw list, and without parent, it fails
 					Widget g = GraphicTree [0];
-					RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
+					RegisterChildClip (g.ScreenCoordinates (g.LastPaintedSlot));
 					GraphicTree.RemoveAt (0);
 					g.Dispose ();
 				}
@@ -1472,7 +1472,7 @@ namespace Crow
 			}
 		}
 
-		protected void registerRefreshClientRectangle () => RegisterClip (clientRectangle);
+		protected void registerRefreshClientRectangle () => RegisterChildClip (clientRectangle);
 
 		#region Mouse and Keyboard Handling
 		MouseCursor cursor = MouseCursor.top_left_arrow;
@@ -2056,7 +2056,7 @@ namespace Crow
 
 		#region ILayoutable implementation
 		public virtual bool PointIsIn (ref Point m) => true;
-		public void RegisterClip (Rectangle r)
+		public void RegisterChildClip (Rectangle r)
 		{
 			clipping.UnionRectangle (r);
 		}

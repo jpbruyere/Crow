@@ -500,7 +500,7 @@ namespace Crow
 				lock (IFace.UpdateMutex) {
 					Widget p = Parent as Widget;
 					if (p is Group g) {
-							RegisterClip (p.ScreenCoordinates (p.LastPaintedSlot));
+							RegisterChildClip (p.ScreenCoordinates (p.LastPaintedSlot));
 							g.DeleteChild (this);
 						//(Parent as Group).RegisterForRedraw ();
 					} else if (Parent is Container c)

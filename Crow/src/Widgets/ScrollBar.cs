@@ -27,7 +27,7 @@ namespace Crow
 			set {
 				if (cursorRatio == value)
 					return;
-				if (double.IsFinite(value))
+				if (double.IsFinite(value) && cursorRatio < 1.0)
 					cursorRatio = value;
 				else
 					cursorRatio = -1;
@@ -36,7 +36,7 @@ namespace Crow
         }
 
 		void updateCursor () {
-			if (cursorRatio < 0 || !double.IsFinite(cursorRatio))
+			if (cursorRatio < 0 || !double.IsFinite(cursorRatio) || cursorRatio > 1.0)
 				return;
 			ILayoutable l = cursor?.Parent;
 			if (l == null)
