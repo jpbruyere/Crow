@@ -75,13 +75,8 @@ namespace Crow.CairoBackend
 		}
 		public override void FlushUIFrame(IContext ctx)
 		{
-			//clear (ctx);
 			ctx.PopGroupToSource ();
-			//ctx.Save();
-			//ctx.Operator = Operator.Source;
 			ctx.Paint ();
-			//ctx.Restore();
-
 			surf.Flush ();
 
 			base.FlushUIFrame (ctx);

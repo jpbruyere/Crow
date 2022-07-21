@@ -554,9 +554,9 @@ namespace Crow
 				rect = default;
 				return false;
 			}
-			//}
+			
 			Rectangle c = ScreenCoordinates (textCursor.Value + Slot.Position + ClientRectangle.Position);
-			ctx.ResetClip ();
+			ctx.ResetClip();
 			Foreground.SetAsSource (IFace, ctx, c);
 			ctx.LineWidth = 1.0;
 			ctx.MoveTo (0.5 + c.X, c.Y);
