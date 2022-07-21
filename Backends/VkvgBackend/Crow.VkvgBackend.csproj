@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
 
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
