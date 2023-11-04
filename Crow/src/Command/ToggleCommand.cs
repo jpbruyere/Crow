@@ -3,13 +3,9 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.ComponentModel;
-using System.Reflection;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Reflection.Emit;
 
-namespace Crow {
+namespace Crow
+{
 	/// <summary>
 	/// helper class to bind in one step icon, caption, action, and validity tests to a controls
 	/// </summary>

@@ -213,7 +213,6 @@ namespace Crow
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (!Clipping.IsEmpty) {
 				using (IContext gr = IFace.Backend.CreateContext (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
@@ -252,20 +251,6 @@ namespace Crow
 #if DEBUG_STATS
 		public override long ChildCount => child == null ? 0 : 1 + child.ChildCount;
 #endif
-
-		/*public override bool IsVisible {
-			get => base.IsVisible;
-			set {
-				if (value == isVisible)
-					return;
-
-				base.IsVisible = value;
-
-				if (isVisible &&  child != null) {
-					child.RegisterForRedraw();
-				}
-			}
-		}*/
 	}
 }
 

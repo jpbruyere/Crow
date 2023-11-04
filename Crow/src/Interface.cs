@@ -111,7 +111,7 @@ namespace Crow
 				if (crowAssemblies.Contains (a))
 					return;
 				crowAssemblies.Add (a);
-				loadStylingFromAssembly (a);
+				init_internal ();
 			}
 		}
 		/// <summary>
@@ -201,7 +201,6 @@ namespace Crow
 
 			return false;
 		}
-
 
 		#region CTOR
 		static Interface ()
@@ -825,6 +824,7 @@ namespace Crow
 			ItemTemplates = new Dictionary<string, ItemTemplate> (initCapacity);
 			knownCrowWidgetTypes = new Dictionary<string, Type> (initCapacity);
 			knownExtMethods = new Dictionary<string, MethodInfo> (initCapacity);
+			sharedPictures = new Dictionary<string, sharedPicture> (initCapacity);
 		}
 		void loadThemeFiles () {
 			if (string.IsNullOrEmpty (Theme))
@@ -907,7 +907,7 @@ namespace Crow
 		/// <summary>
 		/// share a single store for picture resources among usage in different controls
 		/// </summary>
-		internal Dictionary<string, sharedPicture> sharedPictures = new Dictionary<string, sharedPicture> ();
+		internal Dictionary<string, sharedPicture> sharedPictures;
 
 		static bool tryFindResource (Assembly a, string resId, out Stream stream) {
 			stream = null;
@@ -1223,12 +1223,14 @@ namespace Crow
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Clipping);
 
 			Widget g = null;
+			lock (ClippingMutex) {
 			while (ClippingQueue.Count > 0) {
-				lock (ClippingMutex) {
+				
 					g = ClippingQueue.Dequeue ();
 					g.IsQueueForClipping = false;
-				}
+				
 				g.ClippingRegistration ();
+			}
 			}
 
 			PerformanceMeasure.End (PerformanceMeasure.Kind.Clipping);

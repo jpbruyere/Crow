@@ -118,13 +118,10 @@ namespace Crow
 
 			parentElem.AppendChild (xe);
 		}
-		public Surface CreateIcon (int dragIconSize = 32) {
-#if VKVG
-			Surface di = new Surface (IFace.vkvgDevice, dragIconSize, dragIconSize);
-#else
-			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
-#endif
-			using (Context ctx = new Context (di)) {
+		public ISurface CreateIcon (int dragIconSize = 32) {
+			
+			ISurface ico = IFace.Backend.CreateSurface (dragIconSize, dragIconSize);
+			using (IContext ctx = IFace.Backend.CreateContext (ico)) {
 				double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
 				double s = (double)dragIconSize / div;
 				ctx.Scale (s, s);
@@ -138,7 +135,7 @@ namespace Crow
 					ctx.Paint ();
 				}
 			}
-			return di;
+			return ico;
 		}
 		public string DesignName => LogName + design_id;
 #endif

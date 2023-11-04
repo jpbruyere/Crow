@@ -30,6 +30,13 @@ InactiveTabItem = "DarkGrey";
 FolderIcon	= "#Crow.Icons.folder.svg";
 FileIcon	= "#Crow.Icons.file.svg";
 
+FontSmall	= "sans, 10";
+FontNormal	= "sans, 12"; 
+FontBig		= "sans, 16";
+
+Widget {
+	Font	= "${FontNormal}";
+}
 Border {
 	BorderWidth	= "${ControlBorderWidth}";
 	Foreground  = "${ControlBorderColor}";
@@ -146,7 +153,7 @@ MessageBox {
 	Background = "0.1,0.1,0.2,0.85";
 	Width = "Fit";
 	Caption="MessageBox";
-	Font = "serif, 12";
+	Font = "${FontNormal}";
 	//MinimumSize = "200,120";
 	AlwaysOnTop = "true";
 	Resizable = "false";
