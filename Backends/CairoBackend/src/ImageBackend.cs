@@ -65,6 +65,8 @@ namespace Crow.CairoBackend
 		{
 			IContext ctx = base.PrepareUIFrame (existingContext, clipping);
 
+			//clear(ctx);
+
 			for (int i = 0; i < clipping.NumRectangles; i++)
 				ctx.Rectangle (clipping.GetRectangle (i));
 			ctx.Clip ();

@@ -967,10 +967,6 @@ namespace Crow
 
 				isVisible = value;
 
-				/*if (!isVisible)
-					unshownPostActions ();
-				RegisterForLayouting (LayoutingType.Sizing);*/
-
 				if (isVisible){
 					IsDirty = true;
 				} else {

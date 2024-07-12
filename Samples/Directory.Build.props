@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net6</TargetFrameworks>
 		<!--<TargetFrameworks>net5</TargetFrameworks>-->
 		<OutputType>Exe</OutputType>
 

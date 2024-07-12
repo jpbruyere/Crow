@@ -14,7 +14,7 @@ namespace Crow
 	/// does not expose child to allow reuse of container
 	/// behaviour for widgets that have other xml hierarchy: example
 	/// TemplatedControl may have 3 children (template,templateItem,content) but
-	/// behave exactely as a container for layouting and drawing
+	/// behave exactly as a container for layouting and drawing
 	/// </summary>
 	[DesignIgnore]
 	public class PrivateContainer : Widget
@@ -54,7 +54,7 @@ namespace Crow
 				child.Dispose ();
 			}
 
-			child = _child as Widget;
+			child = _child;
 
 			if (child != null) {
 				child.Parent = this;
@@ -64,12 +64,12 @@ namespace Crow
 			}
 		}
 		//dispose child if not null
-		protected virtual void deleteChild () {
+		/*protected virtual void deleteChild () {
 			Widget g = child;
 			SetChild (null);
 			if (g != null)
 				g.Dispose ();
-		}
+		}*/
 
 		#region Widget Overrides
 

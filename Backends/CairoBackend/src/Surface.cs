@@ -85,7 +85,9 @@ namespace Crow.CairoBackend {
 			case SurfaceType.Svg:
 				return new SvgSurface (surface, owned);
 			case SurfaceType.GL:
+#if CAIRO_HAS_GL
 				return new GLSurface (surface, owned);
+#endif
 			default:
 				return new Surface (surface, owned);
 			}

@@ -11,13 +11,9 @@ namespace HelloWorld
 			//Interface.PreferedBackendType = Drawing2D.BackendType.Egl;
 			using (Program app = new Program ()) {
 				//app.Initialized += (sender, e) => app.LoadIMLFragment (@"<Label Text='Hello World' Background='Red' Top='50' Margin='0'/>");
-				//app.Initialized += (sender, e) => app.LoadIMLFragment (@"<Window Caption='hello world'/>");
+				app.Initialized += (sender, e) => app.LoadIMLFragment (@"<Container Width='Stretched' ><Window Caption='hello world' Background='Jet'/></Container>");
 				app.Run ();
 			}
-		}
-		protected override void OnInitialized()
-		{
-			Load ("/mnt/devel/crow/Samples/HelloWorld/ui/helloworld.crow");
 		}
 	}
 }

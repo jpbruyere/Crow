@@ -29,6 +29,9 @@
 //
 
 using System;
+
+#if CAIRO_HAS_GL
+
 using OpenGL;
 using static OpenGL.Gl;
 
@@ -93,3 +96,4 @@ namespace Crow.CairoBackend {
 		}
 	}
 }
+#endif

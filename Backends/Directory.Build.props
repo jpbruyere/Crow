@@ -30,7 +30,7 @@
 		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageIcon>crow.png</PackageIcon>
-		<PackageCopyright>Copyright 2021</PackageCopyright>
+		<PackageCopyright>Copyright 2023</PackageCopyright>
 
 	</PropertyGroup>
 	<ItemGroup>

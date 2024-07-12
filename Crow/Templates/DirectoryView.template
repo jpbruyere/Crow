@@ -6,7 +6,7 @@
 				Selected="{Background=${ControlHighlight}}"
 				Unselected="{Background=Transparent}">
 			<HorizontalStack>
-				<Image Margin="1" Width="14" Height="14" Path="#Crow.Icons.file.svg"/>
+				<Image Margin="1" Width="${IconSize}" Height="${IconSize}" Path="#Crow.Icons.file.svg"/>
 				<Label Text="{Name}" Width="Stretched"/>
 			</HorizontalStack>
 		</ListItem>
@@ -23,13 +23,13 @@
 								MouseEnter="{Foreground=DimGrey}"
 								MouseLeave="{Foreground=Transparent}">
 							<HorizontalStack Background="{./Background}" Spacing="1">
-								<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+								<Image Margin="1" Width="${IconSize}" Height="${IconSize}" Focusable="true" MouseDown="./onClickForExpand"
 									Path="{./Image}"
 									Visible="{./IsExpandable}"
 									SvgSub="{./IsExpanded}"
 									MouseEnter="{Background=LightGrey}"
 									MouseLeave="{Background=Transparent}"/>
-								<Image Margin="1" Width="16" Height="16"
+								<Image Margin="1" Width="${IconSize}" Height="${IconSize}"
 									Path="#Crow.Icons.folder.svg" SvgSub="{./IsExpanded}"/>
 								<Label Text="{./Caption}"/>
 							</HorizontalStack>

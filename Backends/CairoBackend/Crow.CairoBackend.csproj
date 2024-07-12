@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="glfw-sharp" Version="$(GlfwSharpVersion)" />
-    <PackageReference Include="OpenGL.Net" Version="0.8.4" />
+    <!--<PackageReference Include="OpenGL.Net" Version="0.8.4" />-->
     <ProjectReference Include="..\..\Drawing2D\Drawing2D.csproj" />
   </ItemGroup>
 

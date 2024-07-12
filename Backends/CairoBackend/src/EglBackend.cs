@@ -3,6 +3,7 @@ using System.IO;
 using Drawing2D;
 using Glfw;
 
+#if CAIRO_HAS_GL
 namespace Crow.CairoBackend
 {
 	public class EglBackend : CairoBackendBase {
@@ -83,3 +84,4 @@ namespace Crow.CairoBackend
 	}
 }
 
+#endif

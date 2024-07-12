@@ -10,9 +10,9 @@
 				<ListItem Margin="1" Width="Stretched" 
 					Selected="{Background=RoyalBlue}"
 					Unselected="{Background=Transparent}">
-					<HorizontalStack Height="Fit" >
-						<Widget Width="20" Height="14" Background="{}" CornerRadius="3"/>
-						<Label Text="{}" Width="Stretched" />
+					<HorizontalStack Height="Fit" Spacing="10" >
+						<Widget Width="60" Height="40" Background="{}" CornerRadius="3"/>
+						<Label Text="{}" Width="Stretched" Font="Mono, 20" />
 					</HorizontalStack>
 				</ListItem>
 			</ItemTemplate>
