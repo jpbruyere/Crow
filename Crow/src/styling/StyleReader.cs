@@ -210,6 +210,8 @@ namespace Crow
 							token.Append (ReadChar ());
 							while (nextCharIsValidCharName)
 								token.Append (ReadChar ());
+						} else {
+							throw new ParserException (line, column, $"Unexpected char ({ReadChar ()})", resId);
 						}
 						break;
 					}

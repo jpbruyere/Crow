@@ -277,7 +277,10 @@ namespace Crow
 				} else
 					throw new Exception ("docking error");
 
-				IFace.AddWidget (this);
+				if (floatingGroup is null)
+					IFace.AddWidget (this);
+				else 
+					floatingGroup.AddChild(this);
 
 				Left = IFace.MousePosition.X - 10;
 				Top = IFace.MousePosition.Y - 10;
@@ -299,8 +302,13 @@ namespace Crow
 			Undock ();
 			return true;
 		}
-		void dock () {
-			IFace.RemoveWidget (this);
+		void unfloat () {
+			if (Parent == IFace) {
+				IFace.RemoveWidget (this);
+			} else {
+				floatingGroup = Parent as Group;
+				floatingGroup.RemoveChild(this);
+			}
 
 			undockingMousePosOrig = IFace.MousePosition;
 			//undockingMousePosOrig = lastMousePos;
@@ -312,7 +320,7 @@ namespace Crow
 		}
 		void Dock (DockWindow target) {
 			lock (IFace.UpdateMutex) {
-				dock ();
+				unfloat ();
 
 				if (target.LogicalParent is TabView tv) {
 					tv.AddItem (this);
@@ -341,7 +349,7 @@ namespace Crow
 		}
 		void Dock (DockStack target){
 			lock (IFace.UpdateMutex) {
-				dock ();
+				unfloat ();
 
 				target.Dock (this);
 			}

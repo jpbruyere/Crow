@@ -61,8 +61,17 @@ namespace Crow.VkvgBackend
 			graphicQueue = new Queue (dev, VkQueueFlags.Graphics);
 			dev.Activate (enabledFeatures);
 
-			vkvgDev = new Device (
-				instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, samples);
+			DeviceCreateInfo info = new DeviceCreateInfo {
+				samples = this.samples,
+				deferredResolve = false,
+				inst = instance.Handle,
+				phy = phy.Handle,
+				vkdev = dev.VkDev.Handle,
+				qFamIdx = graphicQueue.qFamIndex,
+				qIndex = 0
+			}; 
+
+			vkvgDev = new vkvg.Device (info);
 
 			surf = new Surface (vkvgDev, (int)width, (int)height);
 		}
@@ -126,8 +135,16 @@ namespace Crow.VkvgBackend
 
 			cmdPool.SetName ("main CmdPool");
 
-			vkvgDev = new Device (
-				instance.Handle, phy.Handle, dev.VkDev.Handle, graphicQueue.qFamIndex, samples);
+			DeviceCreateInfo info = new DeviceCreateInfo {
+				samples = this.samples,
+				deferredResolve = false,
+				inst = instance.Handle,
+				phy = phy.Handle,
+				vkdev = dev.VkDev.Handle,
+				qFamIdx = graphicQueue.qFamIndex,
+				qIndex = 0
+			}; 
+			vkvgDev = new vkvg.Device (info);
 			vkvgDev.SetDpy (72,72);
 
 			createMainSurface ((uint)width, (uint)height);

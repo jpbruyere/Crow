@@ -54,7 +54,7 @@ namespace Crow.SkiaBackend
 		internal vke.Image Img => img;
 
 
-		public void Flush() => skSurf.Flush ();
+		public void Flush() => skSurf.Canvas.Flush();
 
 		public void Resize(int width, int height)
 		{

@@ -2,12 +2,12 @@ TestCst = "This is a constant test.";
 
 FpsLabel {
 	Width = "30";
-	Font = "droid, 10";
+	Font = "mono, 10";
 	Margin = "0";
 	TextAlignment = "Center";
 }
 FpsDisp {
-	Font = "droid bold, 10";
+	Font = "mono bold, 10";
 	Width = "60";
 	Margin = "0";
 	CornerRadius = "3";
@@ -36,11 +36,11 @@ CheckBox3 {
 	Unchecked = "{Background=Jet}";
 }
 labPerf {
-	Font = "droid, 8";
+	Font = "mono, 8";
 	Width = "50%";
 }
 labPerfVal{
-	Font = "droid, 8";
+	Font = "mono, 8";
 	Width = "50%";
 }
 DbgLogViewer{
@@ -62,7 +62,14 @@ DockStack {
 	//DragLeave="{Background=Transparent}";
 	//EndDrag="{Background=Jet}";
 }
-
+SimpleDockWin {
+	Template= "#ui.dockwinsimple.itmp";
+	Background = "Yellow";
+	Width="200";
+	Height="200";
+	Movable="true";
+	CacheEnabled="false";
+}
 valignStyle {
 	Template="#ui.enumSingleSVG.itmp";
 	Checked="{Background=MediumSeaGreen}";

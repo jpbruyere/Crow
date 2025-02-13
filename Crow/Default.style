@@ -118,6 +118,7 @@ TextBox {
 	Height = "Fit";
 	//Text = "TextBox";
 	Margin = "1";
+	BubbleEvents= "None";
 }
 Menu {
 	Margin = "0";
