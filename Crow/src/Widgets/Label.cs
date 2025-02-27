@@ -289,10 +289,10 @@ namespace Crow
 				LineBreak = Environment.NewLine;
 				return;
             }
-			LineBreak = _text.GetLineBreak (lines[0]).ToString ();
+			LineBreak = _text.AsSpan().GetLineBreak (lines[0]).ToString ();
 
 			for (int i = 1; i < lines.Count; i++) {
-				ReadOnlySpan<char> lb = _text.GetLineBreak (lines[i]);
+				ReadOnlySpan<char> lb = _text.AsSpan().GetLineBreak (lines[i]);
 				if (!lb.SequenceEqual (LineBreak)) {
 					mixedLineBreak = true;
 					break;
@@ -377,7 +377,7 @@ namespace Crow
 					if (lines[i].Length == 0)
 						lines.UpdateLineLengthInPixel (i, 0);// (int)Math.Ceiling (fe.MaxXAdvance);
 					else {
-						gr.TextExtents (_text.GetLine (lines[i]), Interface.TAB_SIZE, out tmp);
+						gr.TextExtents (_text.AsSpan().GetLine (lines[i]), Interface.TAB_SIZE, out tmp);
 						lines.UpdateLineLengthInPixel (i, (int)Math.Ceiling (tmp.XAdvance));
 					}
 				}
@@ -420,8 +420,7 @@ namespace Crow
 						selStart = SelectionStart.Value;
 						selEnd = CurrentLoc.Value;
 					}
-				} else
-					IFace.forceTextCursor = true;
+				}
 			}
 
 			if (!string.IsNullOrEmpty (_text)) {
@@ -439,7 +438,7 @@ namespace Crow
 							if (bytes.Length < size)
 								bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
-							encodedBytes = _text.GetLine (lines[i]).ToUtf8 (bytes);
+							encodedBytes = _text.AsSpan().GetLine (lines[i]).ToUtf8 (bytes);
 							bytes[encodedBytes++] = 0;
 
 							if (lines[i].LengthInPixel < 0) {
@@ -555,8 +554,8 @@ namespace Crow
 				return false;
 			}
 			
-			Rectangle c = ScreenCoordinates (textCursor.Value + Slot.Position + ClientRectangle.Position);
-			ctx.ResetClip();
+			Rectangle c = ContextCoordinates(textCursor.Value + Slot.Position + ClientRectangle.Position);
+			
 			Foreground.SetAsSource (IFace, ctx, c);
 			ctx.LineWidth = 1.0;
 			ctx.MoveTo (0.5 + c.X, c.Y);
@@ -574,7 +573,7 @@ namespace Crow
 			if (loc.HasVisualX)
 				return;
 			TextLine ls = lines[loc.Line];
-			ReadOnlySpan<char> curLine = _text.GetLine (ls);
+			ReadOnlySpan<char> curLine = _text.AsSpan().GetLine (ls);
 			double cPos = getX (clientWidth, ls);
 
 			if (loc.Column >= 0) {
@@ -733,7 +732,7 @@ namespace Crow
 					else if (!SelectionStart.HasValue)
 						SelectionStart = CurrentLoc;
 					CurrentLoc = hoverLoc;
-					IFace.forceTextCursor = true;
+					IFace.forceTextCursor();
 					RegisterForRedraw ();
 					e.Handled = true;
 				}
@@ -820,7 +819,7 @@ namespace Crow
 				base.onKeyDown (sender, e);
 				return;
 			}
-			IFace.forceTextCursor = true;
+			IFace.forceTextCursor();
 			e.Handled = true;
 		}
 		#endregion

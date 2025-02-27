@@ -1,0 +1,17 @@
+﻿<VerticalStack Margin="10">
+	<TextBox Text="{²ObsListNewItem}"/>
+	<Label Name="curItem" Text="{../lb.SelectedItem}"/>
+	<HorizontalStack Height="Fit">
+	<Button Command="{CMDObsListAdd}" />
+	<Button Command="{CMDObsListRemove}" IsEnabled="{../lb.SelectionIsEmpty}" />
+	</HorizontalStack>
+	<ListBox Name="lb" Data="{ObservableTestList}" >
+		<Template>
+			<Border Style="ControlBorder" MinimumSize="10,10" Background="{./Background}" CornerRadius="{./CornerRadius}">
+				<Scroller  Name="scroller1" >
+					<VerticalStack Height="Fit" Name="ItemsContainer" VerticalAlignment="Top"/>
+				</Scroller>
+			</Border>
+		</Template>
+	</ListBox>
+</VerticalStack>

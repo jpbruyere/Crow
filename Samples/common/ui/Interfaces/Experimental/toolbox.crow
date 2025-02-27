@@ -1,0 +1,24 @@
+﻿<DockWindow Height="Fit" Width="Fit">
+	<Template>
+		<Border Background="{./Background}" Margin="5" CornerRadius="0">
+			<HorizontalStack>
+				<Widget Width="12" Height="Stretched" Background="Onyx" Name="MoveHandle" Focusable="true" CornerRadius="5"/>
+				<Container Name="Content" Width="Stretched"/>
+			</HorizontalStack>
+		</Border>
+	</Template>
+	<ListBox Data="{Commands}" Fit="true">
+		<Template>
+			<HorizontalStack Name="ItemsContainer" Spacing="5" />
+		</Template>
+		<ItemTemplate>
+			<Button Command="{}" MinimumSize="1,1" Width="40" Height="40" Background="vgradient|0:DimGrey|1:Black" CornerRadius="0" >
+				<Template>
+					<Border Style="ButtonBorder" Width="Stretched" Height="Stretched" Margin="10" Background="{./Background}" CornerRadius="{../CornerRadius}">
+						<Image Path="{./Icon}" Tooltip="{./Caption}" Scaled="true" KeepProportions="true" Margin="0"/>
+					</Border>
+				</Template>
+			</Button>
+		</ItemTemplate>
+	</ListBox >
+</DockWindow>

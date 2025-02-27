@@ -9,6 +9,9 @@ using Drawing2D;
 
 namespace Crow
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class Window : TemplatedContainer
 	{
 		public enum Direction

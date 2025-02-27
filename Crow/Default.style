@@ -265,7 +265,7 @@ HSVSpinner {
 }
 TxtInFileDialog {
 	Margin = "1";
-	Font = "droid, 12";
+	Font = "mono, 12";
 }
 CheckBoxAlt {
 	Template= "#Crow.CheckBox2.template";
@@ -304,6 +304,9 @@ HScrollBar {
     Height = "14";
     Width = "Inherit";
     Orientation = "Horizontal";
+}
+ScrollingListBox {
+	Template= "#Crow.ScrollingListBox.template";
 }
 EnumSelector {
     Width = "Fit";

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ListBox Data="{AvailaibleDbgEvents}">
+	<Template>
+		<Wrapper Name="ItemsContainer"/>
+	</Template>
+	<ItemTemplate>
+		<ListItem Width="200" Selected="{lab.Background=RoyalBlue}">
+			<Border Foreground="Transparent" MouseEnter="{Foreground=Grey}" MouseLeave="{Foreground=Transparent}">
+				<Label Name="lab" Text="{}" Width="Stretched"/>
+			</Border>
+		</ListItem>
+	</ItemTemplate>
+</ListBox> 

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<Window Width="80%" Height="90%">
+<ListBox Name="ColorList" Data="{TestList}" Margin="5">
+	<Template>
+		<Wrapper Name="ItemsContainer" Background="White"/>
+	</Template>
+	<ItemTemplate>
+		<VerticalStack Height="Fit" Width="200">
+			<Label Text="private void + '" Font="mono, 16" Foreground="{}" Width="Stretched" />
+			<Label Text="{}" Font="mono, 9" Foreground="LightGrey" HorizontalAlignment="Left" />
+		</VerticalStack>
+	</ItemTemplate>
+
+</ListBox>
+</Window>

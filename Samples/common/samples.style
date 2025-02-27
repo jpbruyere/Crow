@@ -1,4 +1,10 @@
 TestCst = "This is a constant test.";
+InactiveTabBackground = "DarkGrey";
+SelectedTabBackground = "Onyx";
+InactiveTabForeground = "Grey";
+SelectedTabForeground = "White";
+SmallUIFont = "sans, 12";
+SmallFont = "consolas, 12";
 
 FpsLabel {
 	Width = "30";

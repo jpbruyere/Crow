@@ -6,7 +6,7 @@
 		<Authors>Jean-Philippe Bruyère</Authors>
 		<LangVersion>7.3</LangVersion>
 
-		<CrowVersion>1.3.1</CrowVersion>
+		<CrowVersion>1.3.2</CrowVersion>
 		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
 
 		<!-- If you dont have a native libstb on your system, enable the managed version of stb here
@@ -15,7 +15,7 @@
 
 		<!-- Compile with logging enabled, this will slow down apps, use this only
 			 for debugging purpose-->
-		<CrowDebugLogEnabled>false</CrowDebugLogEnabled>
+		<CrowDebugLogEnabled>true</CrowDebugLogEnabled>
 
 		<!-- Collect several statistics on widgets-->
 		<CrowDebugStatsEnabled>false</CrowDebugStatsEnabled>

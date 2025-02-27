@@ -220,8 +220,15 @@ namespace Crow
 
 			return cursor;
 		}
-
-		void updateMaxScrolls (LayoutingType layout) {
+        public override bool Paint(IContext ctx)
+        {
+            bool painted = base.Paint(ctx);
+			if (HasFocus && painted && IFace.drawTextCursor) {
+				DrawCursor(ctx, out Rectangle r);
+			}
+			return painted;
+        }
+        void updateMaxScrolls (LayoutingType layout) {
 			Rectangle cb = ClientRectangle;
 			if (layout == LayoutingType.Width) {
 				MaxScrollX = cachedTextSize.Width - cb.Width;
@@ -339,7 +346,7 @@ namespace Crow
 		}
 		#endregion
 
-		protected void update (TextChange change) {
+		protected void update (TextChange change, int charLocOffset = 0) {
 			lock (linesMutex) {
 				ReadOnlySpan<char> src = Text.AsSpan ();
 				Span<char> tmp = stackalloc char[src.Length + (change.ChangedText.Length - change.Length)];
@@ -353,9 +360,9 @@ namespace Crow
 				//lines.Update (_text);
 				SelectionStart = null;
 
-				CurrentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
+				CurrentLoc = lines.GetLocation (change.Start + change.ChangedText.Length + charLocOffset);
 				textMeasureIsUpToDate = false;
-				IFace.forceTextCursor = true;
+				IFace.forceTextCursor();
 			}
 
 			NotifyValueChanged ("Text", Text);

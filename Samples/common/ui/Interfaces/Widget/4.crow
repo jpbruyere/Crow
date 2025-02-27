@@ -4,22 +4,22 @@
 		<ProgressBar CornerRadius="5" Background="DimGrey" Margin="1" Maximum="1000" Value="{fps}" Width="200" Height="15"/>
 		<HorizontalStack Fit="true">
 			<Label Text="Memory:" Width="50" TextAlignment="Right"/>
-			<Label Text="{memory}" Font="droid,12" TextAlignment="Center"
+			<Label Text="{memory}" Font="mono,12" TextAlignment="Center"
 				Background="vgradient|0:Blue|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -39,17 +39,17 @@
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -69,109 +69,17 @@
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
-			<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Min:" Width="50" TextAlignment="Right"/>
-			<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Max:" Width="50" TextAlignment="Right"/>
-			<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
-		<HorizontalStack Fit="true">
-			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
-			<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Min:" Width="50" TextAlignment="Right"/>
-			<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Max:" Width="50" TextAlignment="Right"/>
-			<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
-			<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Min:" Width="50" TextAlignment="Right"/>
-			<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Max:" Width="50" TextAlignment="Right"/>
-			<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
-				Background="vgradient|0:Green|1:Black"/>
-		</HorizontalStack>
-		<HorizontalStack Fit="true">
-			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -193,17 +101,17 @@
 	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -223,17 +131,17 @@
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -253,17 +161,17 @@
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -285,17 +193,17 @@
 	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -315,17 +223,17 @@
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
@@ -345,17 +253,109 @@
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="Right"/>
-			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-			<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
-			<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
+			<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Min:" Width="50" TextAlignment="Right"/>
+			<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Max:" Width="50" TextAlignment="Right"/>
+			<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+	</VerticalStack>
+	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+		<HorizontalStack Fit="true">
+			<Label Text="Update:" Width="50" TextAlignment="Right"/>
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
+			<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Min:" Width="50" TextAlignment="Right"/>
+			<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Max:" Width="50" TextAlignment="Right"/>
+			<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Update:" Width="50" TextAlignment="Right"/>
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
+			<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Min:" Width="50" TextAlignment="Right"/>
+			<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Max:" Width="50" TextAlignment="Right"/>
+			<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Update:" Width="50" TextAlignment="Right"/>
+			<Label Name="labUpdate" Text="{update}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
+			<Label Name="labLayouting" Text="{layouting}" Font="mono,12" Width="80" TextAlignment="Center"
+				Background="vgradient|0:Green|1:Black"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
+			<Label Name="labDrawing" Text="{drawing}" Font="mono,12" Width="80" TextAlignment="Center"
 				Background="vgradient|0:Green|1:Black"/>
 		</HorizontalStack>
 		<HorizontalStack Fit="true">

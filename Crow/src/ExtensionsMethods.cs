@@ -15,6 +15,17 @@ namespace Crow
 {
 	public static class ExtensionsMethods
 	{
+		#region  CrowAssemblyPriority
+		internal static bool TryGetCrowAssemblyPriority(this Assembly a, out int priority) {
+			priority = -1;
+			if (a.GetCustomAttributes(typeof(CrowAssemblyPriority)).FirstOrDefault() is CrowAssemblyPriority cap) {
+				priority = cap.Priority;
+				return true;
+			}			
+			return false;
+		}
+		#endregion
+
 		#region Cairo extensions
 
 		public static void Rectangle(this IContext ctx, Rectangle r, double stroke = 0.0)

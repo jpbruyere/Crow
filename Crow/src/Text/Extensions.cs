@@ -7,27 +7,26 @@ namespace Crow.Text
 {
     public static class Extensions
     {
-		public static ReadOnlySpan<char> GetLine (this string str, TextLine ls) {
+		public static ReadOnlySpan<char> GetLine (this ReadOnlySpan<char> str, TextLine ls) {
 			if (ls.Start >= str.Length)
 				return "".AsSpan ();
-			return str.AsSpan ().Slice (ls.Start, ls.Length);
+			return str.Slice (ls.Start, ls.Length);
 		}
-		public static ReadOnlySpan<char> GetLine (this string str, TextLine ls, int offset) {
+		public static ReadOnlySpan<char> GetLine (this ReadOnlySpan<char> str, TextLine ls, int offset) {
 			int start = ls.Start + offset;
 			if (start >= str.Length)
 				return "".AsSpan ();
-			return str.AsSpan ().Slice (start, ls.Length);
-
+			return str.Slice (start, ls.Length);
 		}
 		public static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, TextLine ls) {
 			if (ls.Start >= str.Length)
 				return "".AsSpan ();
 			return str.AsSpan ().Slice (ls.Start, ls.LengthIncludingLineBreak);
 		}
-		public static ReadOnlySpan<char> GetLineBreak (this string str, TextLine ls) {
+		public static ReadOnlySpan<char> GetLineBreak (this ReadOnlySpan<char> str, TextLine ls) {
 			if (ls.LineBreakLength == 0)
 				return "".AsSpan ();
-			return str.AsSpan ().Slice (ls.End, ls.LineBreakLength);
+			return str.Slice (ls.End, ls.LineBreakLength);
 		}
 		public static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, TextLine ls, int offset) {
 			int start = ls.Start + offset;

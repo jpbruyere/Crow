@@ -409,7 +409,8 @@ namespace Crow
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
-				cb.Inflate ( - margin);
+				cb.Inflate (-margin);
+				//return cb.IsValid ? cb : Slot.Size;
 				return cb;
 			}
 		}
@@ -1986,10 +1987,10 @@ namespace Crow
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
-		public virtual void Paint (IContext ctx)
+		public virtual bool Paint (IContext ctx)
 		{
 			if (!IsVisible)
-				return;
+				return false;
 
 			DbgLogger.StartEvent (DbgEvtType.GOPaint, this);
 
@@ -2006,7 +2007,7 @@ namespace Crow
 #endif
 				DbgLogger.AddEvent (DbgEvtType.Warning);
 				DbgLogger.EndEvent (DbgEvtType.GOPaint);
-				return;
+				return false;
 			}
 			//lock (this) {
 				if (cacheEnabled) {
@@ -2044,6 +2045,7 @@ namespace Crow
 			Painted.Raise (this, null);
 
 			DbgLogger.EndEvent (DbgEvtType.GOPaint);
+			return true;
 		}
 		void paintDisabled(IContext gr, Rectangle rb){
 			//gr.Operator = Operator.Xor;

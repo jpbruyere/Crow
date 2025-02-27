@@ -6,15 +6,15 @@
 		<TextBox Background="DarkGrey" Width="50" TextAlignment="Right" Foreground="White"/>
 	</HorizontalStack>
 	
-	<TextBox Text="A\nBB\nCCC\nDDDD" Focused="true" Name="tb" Multiline="true" Font="droid,16" Margin="5" />
-	<TextBox Multiline="true" Font="droid,16" Name="tb5" Margin="5" Text="{../tb.Selection}"/>
-	<TextBox Font="droid,10" Name="tb2" Margin="0" Text="this is a test of a text box"/>
-	<TextBox Font="droid,10" Name="tb3" Margin="5" Text="this is a test of a text box"/>
-	<TextBox Font="droid,10" Name="tb4" Margin="5" Text="this is a test of a text box"/>
-	<TextBox Font="droid,10" Name="tb5" Margin="20" Text="this is a test of a text box"/>
-	<TextBox Multiline="true" Font="droid,10" Name="tb6" Margin="5" Text="this is a test of a text box\nthis is a test of a text box"/>
-	<TextBox Multiline="true" Font="droid,10" Name="tb7" Margin="1" TextAlignment="Center"
+	<TextBox Text="A\nBB\nCCC\nDDDD" Focused="true" Name="tb" Multiline="true" Font="mono,16" Margin="5" />
+	<TextBox Multiline="true" Font="mono,16" Name="tb5" Margin="5" Text="{../tb.Selection}"/>
+	<TextBox Font="mono,10" Name="tb2" Margin="0" Text="this is a test of a text box"/>
+	<TextBox Font="mono,10" Name="tb3" Margin="5" Text="this is a test of a text box"/>
+	<TextBox Font="mono,10" Name="tb4" Margin="5" Text="this is a test of a text box"/>
+	<TextBox Font="mono,10" Name="tb5" Margin="20" Text="this is a test of a text box"/>
+	<TextBox Multiline="true" Font="mono,10" Name="tb6" Margin="5" Text="this is a test of a text box\nthis is a test of a text box"/>
+	<TextBox Multiline="true" Font="mono,10" Name="tb7" Margin="1" TextAlignment="Center"
 		Text="this is a test of a text boxthis is a test\nthis is a test when line are centered"/>
-	<TextBox Multiline="true" Font="droid,10" Name="tb8" Margin="1" TextAlignment="Center"
+	<TextBox Multiline="true" Font="mono,10" Name="tb8" Margin="1" TextAlignment="Center"
 		Text="this is a test of a text box\n\n\nthis is a test\nthis is a test when line are centered"/>
 </VerticalStack>

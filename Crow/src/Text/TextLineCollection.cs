@@ -118,9 +118,7 @@ namespace Crow.Text
 			int result = lines.AsSpan (0, length).BinarySearch (tl);
 			if (result < 0) {
 				result = ~result;
-				return result == 0 ?
-					new CharLocation (0, absolutePosition) :
-					new CharLocation (result - 1, absolutePosition - lines[result - 1].Start);
+				return new CharLocation (result - 1, absolutePosition - lines[result - 1].Start);
 			}
 			return new CharLocation (result, absolutePosition - lines[result].Start);
 		}

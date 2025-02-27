@@ -20,6 +20,9 @@ using Glfw;
 using Path = System.IO.Path;
 
 using Drawing2D;
+using System.Runtime.Loader;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Crow
 {
@@ -60,6 +63,8 @@ namespace Crow
 		/// the 'UpdateFrame' method in the 'Run' cycle and may be overriden.
 		/// </summary>
 		public static int POLLING_INTERVAL = 1;
+		/// <summary>Maximum total layoutings</summary>
+		public static long MAX_LAYOUTINGS_COUNT = 200000;
 		/// <summary>Crow configuration root path</summary>
 		public static string CROW_CONFIG_ROOT;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
@@ -97,8 +102,6 @@ namespace Crow
 		/// </summary>
 		//protected static Interface CurrentInterface;
 		#endregion
-
-		internal static List<Assembly> crowAssemblies = new List<Assembly> ();
 		/// <summary>
 		/// Add Assembly that may contains CROW ui ressources like custom widget classes, IML, images, ...
 		/// Styling fond in those assemblies are automatically loaded on addition;
@@ -126,6 +129,7 @@ namespace Crow
 				init_internal ();
 			}
 		}
+		internal static List<Assembly> crowAssemblies;
 		static IntPtr resolveUnmanaged(Assembly assembly, String libraryName)
 		{
 			try {
@@ -160,28 +164,35 @@ namespace Crow
 		/// backends are search where the main crow assembly is.
 		/// </summary>
 		public static string BackendsDirectory = null;
-		protected static Type getBackendType (IEnumerable<Type> backendTypes) {
+		protected static Type getBackend (IEnumerable<Type> backendTypes) {
 			if (backendTypes == null)
 				return null;
+			Type backend = null;
 			switch (PreferedBackendType) {
 				case BackendType.Default:
-					return backendTypes.FirstOrDefault(be => be.Name == "DefaultBackend");
+					backend = backendTypes.FirstOrDefault(be => be.Name == "DefaultBackend");
+					break;
 				case BackendType.Egl:
-					return backendTypes.FirstOrDefault(be => be.Name == "EglBackend");
+					backend = backendTypes.FirstOrDefault(be => be.Name == "EglBackend");
+					break;
 				case BackendType.Vulkan:
-					return backendTypes.FirstOrDefault(be => be.Name == "VulkanBackend");
+					backend = backendTypes.FirstOrDefault(be => be.Name == "VulkanBackend");
+					break;
 				case BackendType.Gl:
-					return backendTypes.FirstOrDefault(be => be.Name == "GlBackend");
+					backend = backendTypes.FirstOrDefault(be => be.Name == "GlBackend");
+					break;
 				default:
-					return backendTypes.FirstOrDefault();
+					backend = backendTypes.FirstOrDefault();
+					break;
 			}
+			return backend ?? backendTypes.FirstOrDefault();
 		}
-		protected static bool tryFindBackendType (out Type backendType) {
+		protected static bool tryFindBackend (out Type backendType) {
 			backendType = default;
 			//search loaded assemblies
 			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
 			foreach (Assembly a in ldCtx.Assemblies.Where (asb => backends.Contains (asb.GetName ().Name))) {
-				backendType = getBackendType (a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract));
+				backendType = getBackend (a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract));
 				if (backendType != null)
 					return true;
 			}
@@ -194,7 +205,7 @@ namespace Crow
 				string bPath = Path.Combine (bp,$"Crow.{b}.dll");
 				if (File.Exists (bPath)) {
 					Assembly a = ldCtx.LoadFromAssemblyPath (bPath);
-					backendType = getBackendType (a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract));
+					backendType = getBackend (a.ExportedTypes?.Where (e=>e.IsSubclassOf(typeof(CrowBackend)) && !e.IsAbstract));
 					return backendType != null;
 				}
 			}
@@ -205,7 +216,8 @@ namespace Crow
 		#region CTOR
 		static Interface ()
 		{
-			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
+			Assembly crowAssembly = Assembly.GetExecutingAssembly();
+			System.Runtime.Loader.AssemblyLoadContext ldCtx = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(crowAssembly);
 			ldCtx.ResolvingUnmanagedDll += resolveUnmanaged;
 
 			CROW_CONFIG_ROOT =
@@ -216,44 +228,14 @@ namespace Crow
 			if (!Directory.Exists (CROW_CONFIG_ROOT))
 				Directory.CreateDirectory (CROW_CONFIG_ROOT);
 
-		}
-		/// <summary>
-		/// Each time this array is set, the resolved Assemblies will be
-		/// added to the CrowAssemblies list, see 'AddCrowAssembly' for details.
-		/// </summary>
-		/// <value></value>
-		public static string [] CrowAssemblyNames {
-			set {
-				if (value == null)
-					return;
-				preloadCrowAssemblies (value);
-			}
-		}
-		static void preloadCrowAssemblies (string [] crowAssemblyNames) {
-			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
-			/*Assembly ea = Assembly.GetEntryAssembly ();
-			System.IO.FileStream[] files = ea.GetFiles ();
-			foreach (AssemblyName an in ea.GetReferencedAssemblies()) {
-				try {
-					Assembly a = Assembly.ReflectionOnlyLoad (an.Name);
-					if (a == Assembly.GetExecutingAssembly ())
-						continue;
-					if (a.GetCustomAttribute (typeof (CrowAttribute)) != null)
-						crowAssemblies.Add (a);
-				} catch {
-
-				}
-			}*/
-			foreach (string assemblyName in crowAssemblyNames) {
-				try {
-					crowAssemblies.Add (Assembly.Load (assemblyName));
-				} catch (Exception ex) {
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine ($"Unable to preload CrowAssembly: {assemblyName}: {ex}");
-					Console.ResetColor();
+			SortedDictionary<int, Assembly> assemblies = new SortedDictionary<int, Assembly>();
+			AssemblyLoadContext ctx = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
+			foreach (Assembly assembly in ctx.Assemblies) {
+				if (assembly != crowAssembly && assembly.TryGetCrowAssemblyPriority(out int priority)) {
+					assemblies.Add(priority, assembly);
 				}
 			}
-
+			crowAssemblies = assemblies.Values.Reverse().ToList();
 		}
 		/// <summary>
 		/// Create a new Crow Interface by providing an existing valid GLFW window handle.
@@ -440,7 +422,7 @@ namespace Crow
 		}
 
 		protected virtual void initBackend () {
-			if (!tryFindBackendType (out Type backendType))
+			if (!tryFindBackend (out Type backendType))
 				throw new Exception ("No backend found.");
 			backend = (CrowBackend)Activator.CreateInstance (backendType, new object[] {clientRectangle.Width, clientRectangle.Height, hWin});
 			hWin = backend.hWin;
@@ -464,14 +446,12 @@ namespace Crow
 				knownCrowWidgetTypes.Add (typeName, t);
 				return t;
 			}
-			//TODO:LoadContext may now be used there!!!
 			foreach (Type expT in Assembly.GetEntryAssembly ().GetExportedTypes ()) {
 				if (expT.Name != typeName)
 					continue;
 				knownCrowWidgetTypes.Add (typeName, expT);
 				return expT;
 			}
-
 			foreach (Assembly a in Interface.crowAssemblies) {
 				foreach (Type expT in a.GetExportedTypes ()) {
 					if (expT.Name != typeName)
@@ -489,7 +469,7 @@ namespace Crow
 			if (knownExtMethods.ContainsKey (key))
 				return knownExtMethods [key];
 
-			//System.Diagnostics.Debug.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+			Debug.WriteLine ($"[iface] search extension method: {t};{methodName} => key={key}");
 
 			MethodInfo mi = null;
 			if (!CompilerServices.TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
@@ -707,13 +687,6 @@ namespace Crow
 		}
 #endif
 
-
-
-
-
-
-
-
 		#region DragAndDrop
 		public bool DragAndDropInProgress => DragAndDropOperation != null;
 		public Widget DropTarget => DragAndDropOperation?.DropTarget;
@@ -725,7 +698,7 @@ namespace Crow
 		public void ClearDragImage () {
 			lock (UpdateMutex) {
 				if (DragImage == null)
-					return;
+					return;				
 				clipping.UnionRectangle (lastDragImageBounds);
 				DragImage.Dispose();
 				DragImage = null;
@@ -925,16 +898,19 @@ namespace Crow
 				string resId = path.Substring (1);
 				if (tryFindResource (Assembly.GetEntryAssembly (), resId, out stream))
 					return stream;
-				string[] assemblyNames = resId.Split ('.');
+				/*string[] assemblyNames = resId.Split ('.');
 				if (AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyNames[0]).TryGetResource (resId, out stream))
 					return stream;
 				if (assemblyNames.Length > 3)
 					if (tryFindResource (AppDomain.CurrentDomain.GetAssemblies ()
 						.FirstOrDefault (aa => aa.GetName ().Name == $"{assemblyNames[0]}.{assemblyNames[1]}"), resId, out stream))
-						return stream;
+						return stream;*/
 				foreach (Assembly ca in crowAssemblies)
 					if (tryFindResource (ca, resId, out stream))
 						return stream;
+				if (tryFindResource (Assembly.GetExecutingAssembly (), resId, out stream))
+					return stream;
+
 				throw new Exception ("Resource not found: " + path);
 			}
 			if (!File.Exists (path))
@@ -1151,6 +1127,13 @@ namespace Crow
 				} else if (lastMouseDown.ElapsedMilliseconds > DEVICE_REPEAT_DELAY)
 					mouseRepeatTimer.Start ();
 			}
+			if (FocusedWidget != null && typeof(IEditableTextWidget).IsAssignableFrom(FocusedWidget.GetType())) {
+				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
+					blinkingCursor.Restart();
+					drawTextCursor = !drawTextCursor;
+					FocusedWidget?.RegisterForRepaint();
+				}
+			}
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
@@ -1171,7 +1154,7 @@ namespace Crow
 						clipping.UnionRectangle(lastDragImageBounds);
 				}
 
-				if (!clipping.IsEmpty || shouldDrawTextCursor) {
+				if (!clipping.IsEmpty) {
 					ctx = Backend.PrepareUIFrame (ctx, clipping);
 					processDrawing (ctx);
 					Backend.FlushUIFrame (ctx);
@@ -1198,9 +1181,13 @@ namespace Crow
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Layouting);
 				try {
 					DiscardQueue = new Queue<LayoutingQueueItem> (LayoutingQueue.Count);
-					while (LayoutingQueue.Count > 0) {
+					long totLayoutings = 0;
+					while (LayoutingQueue.Count > 0 && totLayoutings++ < MAX_LAYOUTINGS_COUNT) {
 						LayoutingQueueItem lqi = LayoutingQueue.Dequeue ();
 						lqi.ProcessLayouting ();
+					}
+					if (totLayoutings == MAX_LAYOUTINGS_COUNT) {
+						DbgLogger.AddEvent(DbgEvtType.LayoutingLoopError);
 					}
 					LayoutingQueue = DiscardQueue;
 				} finally {
@@ -1259,6 +1246,16 @@ namespace Crow
 				}
 
 				if (lastDragImageBounds != DragImageBounds) {
+					/*ctx.LineWidth = 1;
+					ctx.SetSource(1,0,0,0.6);
+					ctx.Rectangle(DragImageBounds);
+					ctx.Stroke ();
+					ctx.SetSource(0,1,0,0.6);
+					ctx.Rectangle(lastDragImageBounds);
+					ctx.Stroke ();
+					ctx.Arc(lastDragImageBounds.X, lastDragImageBounds.Y, 5,0,Math.PI*2.0);
+					ctx.Fill ();*/
+
 					DirtyRect += lastDragImageBounds;
 					ctx.Save ();
 					ctx.ResetClip ();
@@ -1272,11 +1269,10 @@ namespace Crow
 
 #if DEBUG_CLIP_RECTANGLE
 				ctx.LineWidth = 1;
-				ctx.SetSource(1,1,0,0.5);
-				for (int i = 0; i < clipping.NumRectangles; i++)
-					ctx.Rectangle(clipping.GetRectangle(i));
+				ctx.SetSource(1,1,0,0.6);
+				for (int i = 0; i < clipping.NumRectangles; i++) 
+					ctx.Rectangle(clipping.GetRectangle(i).Inflated(-1,-1));
 				ctx.Stroke ();
-
 #endif
 
 				clipping.Reset ();
@@ -1284,8 +1280,6 @@ namespace Crow
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 				IsDirty = true;
 			}
-
-			drawTextCursor (ctx);
 
 			debugHighlightFocus (ctx);
 
@@ -1322,39 +1316,24 @@ namespace Crow
 		/// Text cursor blinking frequency.
 		/// </summary>
 		public static long TEXT_CURSOR_BLINK_FREQUENCY = 400;
-		internal Rectangle? textCursor = null;//last printed cursor, used to clear it.
-		public bool forceTextCursor = true;//when true, cursor is printed even if blinkingCursor.elapsed is not reached.
-		Stopwatch blinkingCursor = Stopwatch.StartNew ();
-		void drawTextCursor (IContext ctx) {
-			if (forceTextCursor) {
-				if (FocusedWidget is IEditableTextWidget lab) {
-					if (lab.DrawCursor (ctx, out Rectangle c)) {
-						if (textCursor != null && c != textCursor.Value)
-							RegisterChildClip (textCursor.Value);
-						textCursor = c;
-						//MainSurface.Flush ();
-					} else if (textCursor != null)
-						RegisterChildClip (textCursor.Value);
-				}
-				blinkingCursor.Restart ();
-				forceTextCursor = false;
-			} else if (textCursor != null && blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
-				RegisterChildClip (textCursor.Value);
-				textCursor = null;
-				blinkingCursor.Restart ();
-			} else if (FocusedWidget is IEditableTextWidget lab) {
-				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
-					if (lab.DrawCursor (ctx, out Rectangle c)) {
-						textCursor = c;
-						//MainSurface.Flush ();
-						blinkingCursor.Restart ();
-					}
-				}
+		
+		bool _drawTextCursor = true;
+		public bool drawTextCursor {
+			get => _drawTextCursor;
+			set {
+				if (_drawTextCursor == value)
+					return;
+				_drawTextCursor = value;
+				//Console.WriteLine($"draw cursor: {_drawTextCursor}");
 			}
 		}
+
+		public void forceTextCursor () {
+			drawTextCursor = true;
+			blinkingCursor.Restart();
+		}
+		Stopwatch blinkingCursor = Stopwatch.StartNew ();
 		#endregion
-		bool shouldDrawTextCursor => forceTextCursor || (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY &&
-			(FocusedWidget is IEditableTextWidget || textCursor != null));
 
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
@@ -1814,6 +1793,10 @@ namespace Crow
 				//			}
 
 				return true;
+			} catch (Exception e) {
+				Console.WriteLine(e.Message);
+				Console.WriteLine(e.StackTrace);
+				return true;
 			} finally {
 				Monitor.Exit (UpdateMutex);
 				DbgLogger.EndEvent (DbgEvtType.MouseUp);
@@ -1853,8 +1836,12 @@ namespace Crow
 		}
 		public virtual bool OnKeyDown (KeyEventArgs e)
 		{
+			if (e.Key == Key.F5) {
+				registerRefreshClientRectangle();
+				e.Handled = true;
+			}
 #if DEBUG_STATS
-			if (Shift && key == Key.F1) {
+			if (e.Modifiers == Modifier.Shift && e.Key == Key.F1) {
 				LoadIMLFragment (@"
 <Window Caption='Debug Statistick' Width='50%' Height='50%' Background='DarkGrey'>
 	<VerticalStack>

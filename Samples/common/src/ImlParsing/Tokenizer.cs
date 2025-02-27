@@ -30,7 +30,7 @@ namespace Crow
 
 		void skipWhiteSpaces (ref SpanCharReader reader) {
 			while(!reader.EndOfSpan) {
-				switch (reader.Peak) {
+				switch (reader.Peek) {
 					case '\x85':
 					case '\x2028':
 					case '\xA':
@@ -46,7 +46,7 @@ namespace Crow
 					case '\x20':
 					case '\x9':
 						char c = reader.Read();									
-						while (reader.TryPeak (c))
+						while (reader.TryPeek (c))
 							reader.Read();
 						addTok (ref reader, c == '\x20' ? TokenType.WhiteSpace : TokenType.Tabulation);
 						break;
@@ -58,10 +58,10 @@ namespace Crow
 		bool readName (ref SpanCharReader reader) {
 			if (reader.EndOfSpan)
 				return false;
-			char c = reader.Peak;					
+			char c = reader.Peek;					
 			if (char.IsLetter(c) || c == '_' || c == ':') {
 				reader.Advance ();
-				while (reader.TryPeak (ref c)) {									
+				while (reader.TryPeek (ref c)) {									
 					if (!(char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '\xB7'))
 						return true;
 					reader.Advance ();
@@ -92,25 +92,25 @@ namespace Crow
 				if (reader.EndOfSpan)
 					break;
 
-				switch (reader.Peak) {				
+				switch (reader.Peek) {				
 				case '<':
 					reader.Advance ();
-					if (reader.TryPeak ('?')) {								
+					if (reader.TryPeek ('?')) {								
 						reader.Advance ();
 						addTok (ref reader, TokenType.PI_Start);
 						readName (ref reader);
 						addTok (ref reader, TokenType.PI_Target);
 						curState = States.ProcessingInstrucitons;
-					} else if (reader.TryPeak ('!')) {
+					} else if (reader.TryPeek ('!')) {
 						reader.Advance ();
-						if (reader.TryPeak ("--")) {
+						if (reader.TryPeek ("--")) {
 							reader.Advance (2);
 							addTok (ref reader, TokenType.BlockCommentStart);										
 							if (reader.TryReadUntil ("-->")) {
 								addTok (ref reader, TokenType.BlockComment);
 								reader.Advance (3);											
 								addTok (ref reader, TokenType.BlockCommentEnd);
-							} else if (reader.TryPeak ("-->")) {
+							} else if (reader.TryPeek ("-->")) {
 								reader.Advance (3);											
 								addTok (ref reader, TokenType.BlockCommentEnd);
 							}
@@ -121,12 +121,12 @@ namespace Crow
 								curState = States.DTDObject;
 							}								
 						}								
-					} else if (reader.TryPeak('/')) {
+					} else if (reader.TryPeek('/')) {
 						reader.Advance ();
 						addTok (ref reader, TokenType.EndElementOpen);
 						if (readName (ref reader)) {
 							addTok (ref reader, TokenType.ElementName);
-							if (reader.TryPeak('>')) {
+							if (reader.TryPeek('>')) {
 								reader.Advance ();
 								addTok (ref reader, TokenType.ClosingSign);
 
@@ -146,7 +146,7 @@ namespace Crow
 					break;
 				case '?':
 					reader.Advance ();
-					if (reader.TryPeak ('>')){
+					if (reader.TryPeek ('>')){
 						reader.Advance ();
 						addTok (ref reader, TokenType.PI_End);
 					}else

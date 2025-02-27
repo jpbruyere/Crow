@@ -210,7 +210,7 @@ namespace Crow
 			il.Emit (OpCodes.Br, gotoEnd);
 
 			il.MarkLabel(gotoItemsContainerNotFound);
-			il.EmitWriteLine("ItemsContainer not found in ItemTemplate for " + host.ToString());
+			il.EmitWriteLine($"[{dm.Name}] ItemsContainer not found in ItemTemplate for {host.ToString()}");
 
 
 			il.MarkLabel(gotoEnd);

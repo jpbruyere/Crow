@@ -2,16 +2,22 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 using System;
-namespace Crow
+namespace Crow {
+/// <summary>
+/// Add this attribute to an assembly to have it search for Crow ressources (.style, images, templates,...)
+/// </summary>
+/// <remarks>
+/// By default, only the entry assembly and the crow assembly will be searched for resources.
+/// </remarks>
+[AttributeUsage (AttributeTargets.Assembly)]
+
+public class CrowAssemblyPriority : Attribute
 {
-	/// <summary>
-	/// Add this attribute to an assembly to have it search for Crow ressources (.style, images, templates,...)
-	/// </summary>
-	/// <remarks>
-	/// By default, only the entry assembly and the crow assembly will be searched for resources.
-	/// </remarks>
-	[AttributeUsage (AttributeTargets.Assembly)]
-	public class CrowAttribute : Attribute
-	{
+	public int Priority = 1000;
+	public CrowAssemblyPriority(string priority) {
+		if (int.TryParse(priority, out int pri)) {
+			Priority = pri;
+		}
 	}
+}
 }

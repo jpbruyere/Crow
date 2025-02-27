@@ -15,10 +15,15 @@
 								ContextCommands="{GetCommands}"
 								Selected="{Background=${ControlHighlight}}"
 								Unselected="{Background=Transparent}">
-							<HorizontalStack>
-								<Image Margin="1" Width="14" Height="14" Path="#Crow.Icons.file.svg"/>
-								<Label Text="{Name}" Width="Stretched"/>
-							</HorizontalStack>
+							<Border CornerRadius="2" Margin="0" Height="Fit"
+									Foreground="Transparent"
+									MouseEnter="{Foreground=DimGrey}"
+									MouseLeave="{Foreground=Transparent}">								
+								<HorizontalStack>
+									<Image Margin="1" Width="14" Height="14" Path="#Crow.Icons.file.svg"/>
+									<Label Text="{Name}" Width="Stretched"/>
+								</HorizontalStack>
+							</Border>
 						</ListItem>
 					</ItemTemplate>
 					<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfosOrdered">

@@ -8,6 +8,8 @@ using System.IO;
 using System.Collections.Generic;
 
 using Drawing2D;
+using System.Globalization;
+using Crow.DebugLogger;
 
 namespace Crow
 {
@@ -66,16 +68,70 @@ namespace Crow
 		}
 		#endregion
 
+		void init(Interface iFace, ref Rectangle rect, out float widthRatio, out float heightRatio) {
+			if (!IsLoaded)
+				load (iFace);
+
+			widthRatio = 1f;
+			heightRatio = 1f;
+
+			if (Scaled) {
+				widthRatio = (float)rect.Width / Dimensions.Width;
+				heightRatio = (float)rect.Height / Dimensions.Height;
+				if (KeepProportions) {
+					if (widthRatio < heightRatio)
+						heightRatio = widthRatio;
+					else
+						widthRatio = heightRatio;
+				}
+			}
+		}
+
 		/// <summary>
-		/// abstract method to paint the image in the rectangle given in arguments according
+		/// paint the picture in the rectangle given in arguments according
 		/// to the Scale and keepProportion parameters.
 		/// </summary>
 		/// <param name="gr">drawing Backend context</param>
-		/// <param name="rect">bounds of the target surface to paint</param>
-		/// <param name="subPart">used for svg only</param>
-		public abstract void Paint(Interface iFace, IContext ctx, Rectangle rect, string subPart = "");
+		/// <param name="bounds">bounds of the target surface to paint</param>
+		/// <param name="subPart">limit rendering to this coma separated list of svg part identified with their svg 'id' attribute.</param>
+		public void Paint (Interface iFace, IContext gr, Rectangle bounds, string subPart = "")
+		{
+			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"{Path}[Picture.Paint:]");
+
+			init(iFace, ref bounds, out float widthRatio, out float heightRatio);
+
+			gr.SaveTransformations ();
+
+			gr.Translate (bounds.Left,bounds.Top);
+			gr.Scale (widthRatio, heightRatio);
+			gr.Translate (((float)bounds.Width/widthRatio - Dimensions.Width)/2f, ((float)bounds.Height/heightRatio - Dimensions.Height)/2f);
+
+			Render(iFace, gr, subPart);
+
+			gr.RestoreTransformations ();
+		}
+		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle))
+		{
+			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"{Path} [Picture.SetAsSource]");
+
+			init(iFace, ref bounds, out float widthRatio, out float heightRatio);
+
+			using (ISurface tmp = iFace.Backend.CreateSurface (bounds.Width, bounds.Height)) {
+				using (IContext gr = iFace.Backend.CreateContext (tmp)) {
+					gr.Translate (bounds.Left, bounds.Top);
+					gr.Scale (widthRatio, heightRatio);
+					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
+
+					Render(iFace, gr);
+				}
+				ctx.SetSource (tmp);
+			}
+		}		
+		//final rendering on a scaled and configured context
+		protected abstract void Render(Interface iFace, IContext gr, string subPart = "");
 		public abstract bool IsLoaded { get; }
 		public abstract void load (Interface iface);
+		public abstract void LoadFromStream (Interface iface, Stream stream);
 		#region Operators
 		public static implicit operator Picture(string path) => Parse (path) as Picture;
 		public static implicit operator string(Picture _pic) => _pic == null ? null : _pic.Path;
@@ -87,6 +143,8 @@ namespace Crow
 				return null;
 
 			Picture _pic = null;
+
+			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"Picture.parse:{path}");
 
 			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture))
 				_pic = new SvgPicture (path);

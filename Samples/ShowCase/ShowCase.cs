@@ -20,9 +20,10 @@ namespace ShowCase
 {
 	class Showcase : SampleBaseForEditor
 	{
-		DbgEvtType[] logEvts = {
-			DbgEvtType.IFace,
-			DbgEvtType.Widget
+		static DbgEvtType[] logEvts = {
+			/*DbgEvtType.IFace,
+			DbgEvtType.Widget,*/
+			DbgEvtType.Ressources
 			/*DbgEvtType.MouseEnter,
 			DbgEvtType.MouseLeave,
 			DbgEvtType.WidgetMouseDown,
@@ -31,9 +32,12 @@ namespace ShowCase
 		};
 		static void Main ()
 		{
-			//Interface.PreferedBackendType = Drawing2D.BackendType.Egl;
+			DbgLogger.ConsoleOutput = true;
+			DbgLogger.IncludedEvents.Add(DbgEvtType.Ressources);			
 			
-			initDebugLog ();
+			//Configuration.Global.Set ("RecordedEvents", new DbgEvtType[] { DbgEvtType.Ressources});
+
+			//Interface.PreferedBackendType = Drawing2D.BackendType.Egl;
 
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 
@@ -81,7 +85,6 @@ namespace ShowCase
 
 			Terminate ();
 		}
-		public Container crowContainer;
 
 		Stopwatch reloadChrono = new Stopwatch ();
 
@@ -156,9 +159,6 @@ namespace ShowCase
 		void hideError () {
 			NotifyValueChanged ("ShowError", false);
 		}
-
-
-
 
 		protected override void OnInitialized () {
 			base.OnInitialized ();

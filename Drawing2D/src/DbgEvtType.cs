@@ -27,7 +27,8 @@ namespace Crow
 		Dispose		 					= 0x00100000,
 		Mouse		 					= 0x00200000,
 		DragNDrop	 					= 0x00400000,
-
+		Ressources	 					= 0x00800000,//image loading...
+		
 		Update							= IFace | 0x10000000,
 		ProcessLayouting				= IFace | Update | Lock | Layouting,
 		ClippingRegistration			= IFace | Update | Lock | Clipping,
@@ -107,6 +108,7 @@ namespace Crow
 		EndDrag							= Widget | DragNDrop | 0x05,
 		Drop							= Widget | DragNDrop | 0x06,
 
+		LayoutingLoopError				= Layouting | Error | 0x01,
 		All = 0x7FFFFF00
 	}
 }

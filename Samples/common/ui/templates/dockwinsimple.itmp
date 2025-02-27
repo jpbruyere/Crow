@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<VerticalStack CacheEnabled="false" Name="MoveHandle" Background="{./Background}">
+    <Label CacheEnabled="false" Background="Jet" Text="{./DockingPosition}"/>
+</VerticalStack>

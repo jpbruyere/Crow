@@ -828,11 +828,11 @@ namespace Crow.IML {
                 il.MarkLabel (cancel);
 				//#if DEBUG_BINDING
 				//TODO: try to print datasource type in the error message
-				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' NOT FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
+				il.EmitWriteLine ($"[{dm.Name}] Handler method '{bindingDef.TargetMember}' for '{sourceEvent.Name}' NOT FOUND in new dataSource");
 				//#endif
 				il.MarkLabel (finish);
 				#if DEBUG_BINDING
-				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
+				il.EmitWriteLine ($"[{dm.Name}] Handler method '{bindingDef.TargetMember}' for '{sourceEvent.Name}' FOUND in new dataSource");
 				#endif
 
 				il.Emit (OpCodes.Ret);
@@ -1525,7 +1525,9 @@ namespace Crow.IML {
 			foreach (string m in destMember.Split('.')) {
 				MemberInfo miDest = curType.GetMember (m).FirstOrDefault ();
 				if (miDest == null) {
-					Console.WriteLine ($"Member '{destMember}' not found in new DataSource '{dest}' of '{orig}'");
+#if DEBUG_BINDING
+					Console.WriteLine ($"[ITOR][dataSourceReverseBinding] {delName} Member '{destMember}' not found in new DataSource '{dest}' of '{orig}'");
+#endif					
 					return;
 				}
 				miDests.Add (miDest);

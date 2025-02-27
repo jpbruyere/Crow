@@ -48,6 +48,7 @@ namespace Drawing2D
 		public static SizeD operator / (SizeD s, double i) => new SizeD (s.Width / i, s.Height / i);
 		#endregion
 
+		public bool IsValid => Width > 0 && Height > 0;
 		public override int GetHashCode () => HashCode.Combine (Width, Height);
 		public override bool Equals (object obj) => obj is SizeD s ? Equals (s) : false;
 		public bool Equals(SizeD other) => Width == other.Width && Height == other.Height;

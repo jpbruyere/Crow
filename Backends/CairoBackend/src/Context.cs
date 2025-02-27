@@ -266,8 +266,12 @@ namespace Crow.CairoBackend
 			=> Rectangle (rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 		public void Rectangle (PointD p, double width, double height)
 			=> Rectangle (p.X, p.Y, width, height);
-		public void Rectangle (double x, double y, double width, double height)
-			=> NativeMethods.cairo_rectangle (handle, x, y, width, height);
+		public void Rectangle (double x, double y, double width, double height) {
+			if (width > 0 && height > 0)
+				NativeMethods.cairo_rectangle (handle, x, y, width, height);
+			else
+				System.Diagnostics.Debug.WriteLine("cairo: invalid rectangle");
+		}
 		public void ClosePath () => NativeMethods.cairo_close_path (handle);
 		public Path CopyPath () => new Path (NativeMethods.cairo_copy_path (handle));
 		public Path CopyPathFlat () => new Path (NativeMethods.cairo_copy_path_flat (handle));

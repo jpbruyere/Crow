@@ -60,7 +60,7 @@ namespace Drawing2D {
 		public PointD BottomRight => new PointD (Right, Bottom);
 		public PointD Center => new PointD (Left + Width / 2, Top + Height / 2);
 		public PointD CenterD => new PointD (Left + Width / 2.0, Top + Height / 2.0);
-
+		public bool IsValid => Width > 0 && Height > 0;
 		#endregion
 
 		#region FUNCTIONS

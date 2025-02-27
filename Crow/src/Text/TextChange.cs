@@ -14,7 +14,7 @@ namespace Crow.Text
         public readonly string ChangedText;
 
         public int End => Start + Length;
-        public int End2 => Start + (string.IsNullOrEmpty (ChangedText) ? 0 : CharDiff);
+        public int End2 => End + CharDiff;
 
 		public int CharDiff => string.IsNullOrEmpty (ChangedText) ? - Length : ChangedText.Length - Length;
         public TextChange (int position, int length, string changedText) {
@@ -22,8 +22,14 @@ namespace Crow.Text
             Length = length;
             ChangedText = changedText;
         }
-        public TextChange Inverse (string src)
+        public TextChange (int position, int length, ReadOnlySpan<char> changedText) {
+            Start = position;
+            Length = length;
+            ChangedText = changedText.ToString();
+        }
+        public TextChange Inverse (ReadOnlySpan<char> src)
             => new TextChange (Start, string.IsNullOrEmpty (ChangedText) ? 0 : ChangedText.Length,
-                Length == 0 ? "" : src.AsSpan (Start, Length).ToString ());
+                Length == 0 ? "" : src.Slice (Start, Length).ToString ());
+        public override string ToString() => $"{Start},{ChangedText}";
     }
 }

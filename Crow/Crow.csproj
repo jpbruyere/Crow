@@ -67,7 +67,7 @@
 		<EmbeddedResource Include="Cursors\*.*">
 			<LogicalName>Crow.Cursors.%(Filename)</LogicalName>
 		</EmbeddedResource>
-		<Compile Include="Properties\AssemblyInfo.cs" />
+		<!--<Compile Include="Properties\AssemblyInfo.cs" />-->
 		<Compile Remove="src\Widgets\ColorPicker2.cs" />
 	</ItemGroup>
 
@@ -76,5 +76,11 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Drawing2D\Drawing2D.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="Crow.CrowAssemblyPriority">
+			<_Parameter1>1000</_Parameter1>
+		</AssemblyAttribute>
 	</ItemGroup>
 </Project>

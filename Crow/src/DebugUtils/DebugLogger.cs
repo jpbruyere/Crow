@@ -171,12 +171,23 @@ lock (logMutex) {
 			if (!logevt (evtType))
 				return;
 
-			lock (logMutex) {
-				chrono.Stop ();
-				DbgEvent evt = addEventInternal (evtType, data);
-				evt.Message = message;
-				chrono.Start ();
-			}
+			Monitor.Enter (logMutex);
+			chrono.Stop ();
+			DbgEvent evt = addEventInternal (evtType, data);
+			evt.Message = message;
+			chrono.Start ();
+			Monitor.Exit(logMutex);
+
+			if (ConsoleOutput) {
+				if (evt.type.HasFlag (DbgEvtType.Error)) {
+					Console.ForegroundColor = ConsoleColor.Red;
+				}
+				if (evt is DbgWidgetEvent we) {
+					Console.WriteLine ($"{evt.Print()} {Widget.GraphicObjects[we.InstanceIndex]}");
+				} else
+					Console.WriteLine ($"{evt.Print()}");
+				Console.ResetColor ();
+			}			
 #endif
 		}
 
@@ -202,16 +213,7 @@ lock (logMutex) {
 			else
 				evt = new DbgEvent (chrono.ElapsedTicks, evtType);
 
-			if (ConsoleOutput) {
-				if (evt.type.HasFlag (DbgEvtType.Error)) {
-					Console.ForegroundColor = ConsoleColor.Red;
-				}
-				if (evt is DbgWidgetEvent we)
-					Console.WriteLine ($"{evt.Print()} {Widget.GraphicObjects[we.InstanceIndex]}");
-				else
-					Console.WriteLine ($"{evt.Print()}");
-				Console.ResetColor ();
-			} else
+			if (!ConsoleOutput)
 				curEventList.Add (evt);
 			return evt;
 		}
@@ -362,7 +364,6 @@ lock (logMutex) {
 						}*/
 					}
 					startedEvents.Pop();
-
 				}
 			}
 		}

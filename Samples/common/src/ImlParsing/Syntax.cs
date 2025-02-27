@@ -13,7 +13,8 @@ namespace Crow
 				: base (message, innerException) {
 			Token = token;
 		}
-	}
+        public override string ToString() => $"{Message}: {Token.ToString()}";
+    }
 	public class SyntaxAnalyser {
 		XmlSource source;
 		IEnumerable<Token> tokens => source.Tokens;

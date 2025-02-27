@@ -139,14 +139,20 @@ namespace Crow
 
 		public static ObservableList<T> Parse (string str) {
 			ObservableList<T> tmp = new ObservableList<T>();
-			Type t = typeof(T);
-			MethodInfo miParse = t.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public,
-							Type.DefaultBinder, new Type [] {typeof (string)}, null);
-			if (miParse == null)
-				throw new Exception ("no Parse method found for: " + t.FullName);
 			if (!string.IsNullOrEmpty (str)) {
-				foreach (string s in str.Split(';'))
-					tmp.Add((T)miParse.Invoke (null, new object[] {s}));				
+				Type t = typeof(T);
+				if (t.IsEnum) {
+					foreach (string s in str.Split(';'))
+						tmp.Add((T)Enum.Parse(t, s));
+				} else {
+					MethodInfo miParse = t.GetMethod ("Parse",
+						BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, new Type [] {typeof (string)}, null);
+					if (miParse == null)
+						throw new Exception ("no Parse method found for: " + t.FullName);
+
+					foreach (string s in str.Split(';'))
+						tmp.Add((T)miParse.Invoke (null, new object[] {s}));				
+				}
 			}
 			return tmp;
 		}

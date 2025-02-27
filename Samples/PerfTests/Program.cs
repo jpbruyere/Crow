@@ -14,6 +14,7 @@ namespace PerfTests
 {
 	class TestInterface : Interface
 	{
+		public bool shouldClose = false;
 		readonly int count = 10, updateCycles = 0;
 		readonly bool screenOutput = false;
 		readonly string inDirectory = null;//directory to test
@@ -61,6 +62,7 @@ namespace PerfTests
 			Console.WriteLine ("-u,--update:\n\tmeasure 'n' update cycle with elapsed ticks string notified. (default = 0)");
 			Console.WriteLine ("-s,--screen:\n\tenable output to screen.");
 			Console.WriteLine ("-h,--help:\n\tthis help message.");
+			shouldClose = true;
 		}
 
 		public TestInterface (string[] args, int width = 800, int height = 600)
@@ -113,15 +115,17 @@ namespace PerfTests
 					case "-h":
 					case "--help":
 					default:
-						throw new Exception ("none");
+						printHelp ();
+						return;
 					}
 				}
 				if (EndStage < StartStage)
 					throw new Exception ($"Ending stage (){EndStage} is before Starting stage ({StartStage})");
 
 			} catch (Exception e) {
+				Console.WriteLine($"Invalid command line parameters: {e.Message}");
 				printHelp ();
-				throw e;
+				return;
 			}
 
 			if (string.IsNullOrEmpty (outDir)) {
@@ -158,7 +162,7 @@ namespace PerfTests
         }
 		protected override void initBackend()
 		{
-			if (!tryFindBackendType (out Type backendType))
+			if (!tryFindBackend (out Type backendType))
 				throw new Exception ("No backend found.");
 			if (screenOutput)
 				backend = (Drawing2D.CrowBackend)Activator.CreateInstance (backendType, new object[] {clientRectangle.Width, clientRectangle.Height, hWin});
@@ -505,17 +509,17 @@ namespace PerfTests
 
 			try {
 				using (TestInterface iface = new TestInterface (args)) {
-					if (string.IsNullOrEmpty(iface.inDirectory))
-						iface.PerformUnitTests ();
-					else
-						iface.PerformTests ();
+					if (!iface.shouldClose) {
+						if (string.IsNullOrEmpty(iface.inDirectory))
+							iface.PerformUnitTests ();
+						else
+							iface.PerformTests ();
+					}
 				}
 			} catch (Exception e) {
-				if (e.Message != "none") {
-					Console.ForegroundColor = ConsoleColor.DarkRed;
-					Console.WriteLine (e);
-					Console.ResetColor ();
-				}
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.WriteLine (e);
+				Console.ResetColor ();
             }
 		}
 	}

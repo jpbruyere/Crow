@@ -238,6 +238,9 @@ namespace Crow
 			{
 				for (int i = 0; i < Children.Count; i++)
 					Children[i].Paint (gr);
+			} catch (Exception e) {
+				Console.WriteLine($"Erreur group {this} paint: {e.Message}");
+				Console.WriteLine(e.StackTrace);
 			} finally {
 				childrenRWLock.ExitReadLock ();
 			}

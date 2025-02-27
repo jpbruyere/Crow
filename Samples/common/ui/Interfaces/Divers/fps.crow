@@ -5,7 +5,7 @@
 			<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
 				<HorizontalStack Fit="true">
 					<Label Text="Update:" Width="50" TextAlignment="Right"/>
-					<Label Margin="5" Name="labUpdate" Text="{update}" Font="droid,12" Background="SeaGreen" Width="50" TextAlignment="Center"/>
+					<Label Margin="5" Name="labUpdate" Text="{update}" Font="mono,12" Background="SeaGreen" Width="50" TextAlignment="Center"/>
 				</HorizontalStack>
 				<HorizontalStack Fit="true">
 					<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>

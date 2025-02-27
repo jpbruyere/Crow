@@ -1,0 +1,18 @@
+﻿<VerticalStack>
+	<Label Text="{TestDbgEventSelect}"/>
+	<EnumSelector Caption="Device Events:" EnumValue="{²TestDbgEventSelect}" ItemStyle="CheckBox2" Width="Fit"  Background="Jet">
+		<Template>
+			<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
+				<HorizontalStack>
+					<Label Text="{./Caption}"/>
+					<Popper Caption="{./EnumValue}" PopDirection="Bottom" >
+						<Template>
+							<Label  Text="{./Caption}" Foreground="{./Foreground}" Width="200" />
+						</Template>
+						<Wrapper Width="Fit" Height="400" Name="Content" Background="Onyx" Margin="5" Orientation="Horizontal"/>
+					</Popper>
+				</HorizontalStack>
+			</Border>
+		</Template>
+	</EnumSelector>
+</VerticalStack>

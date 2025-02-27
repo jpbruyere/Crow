@@ -7,10 +7,10 @@ namespace Drawing2D
 {
 	public static class Extensions
     {
-        public static int ToUtf8 (this ReadOnlySpan<char> source, Span<byte> buff, int tabWidth = 4) {
+        public static int ToUtf8 (this ReadOnlySpan<char> source, Span<byte> buff, ref int encodedChar, int tabWidth = 4) {
             int c = 0;
             int encodedBytes = 0;
-            int encodedChar = 0;
+            
             while (c < source.Length) {
                 if (source[c] < 0xD800) {
                     if (source[c] == '\t') {
@@ -44,6 +44,10 @@ namespace Drawing2D
             }
 			buff[encodedBytes] = 0;
             return encodedBytes;
+        }        
+        public static int ToUtf8 (this ReadOnlySpan<char> source, Span<byte> buff, int tabWidth = 4) {
+            int encodedChar = 0;
+            return ToUtf8(source,buff,ref encodedChar, tabWidth);
         }
 
 

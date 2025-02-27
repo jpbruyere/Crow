@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Collections;
 
 using Drawing2D;
+using System.Diagnostics;
 
 namespace Crow
 {
@@ -49,20 +50,7 @@ namespace Crow
 		bool suggestionsActive => overlay != null && overlay.IsVisible;
 		Token currentToken;
 		SyntaxNode currentNode;
-		string[] allWidgetNames = typeof (Widget).Assembly.GetExportedTypes ().Where(t=>typeof(Widget).IsAssignableFrom (t))
-					.Select (s => s.Name).ToArray ();
 
-
-		IEnumerable<MemberInfo> getAllCrowTypeMembers (string crowTypeName) {
-			Type crowType = IFace.GetWidgetTypeFromName (crowTypeName);
-			return crowType.GetMembers (BindingFlags.Public | BindingFlags.Instance).
-				Where (m=>((m is PropertyInfo pi && pi.CanWrite) || (m is EventInfo)) &&
-						m.GetCustomAttribute<XmlIgnoreAttribute>() == null);
-		}
-		MemberInfo getCrowTypeMember (string crowTypeName, string memberName) {
-			Type crowType = IFace.GetWidgetTypeFromName (crowTypeName);
-			return crowType.GetMember (memberName, BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
-		}
 
 		public override void OnTextChanged(object sender, TextChangeEventArgs e)
 		{
@@ -76,6 +64,67 @@ namespace Crow
 
 			//Console.WriteLine ($"{pos}: {suggestionTok.AsString (_text)} {suggestionTok}");
 		}
+
+		void showOverlay () {
+			lock (IFace.UpdateMutex) {
+				if (overlay == null) {
+					overlay = IFace.LoadIMLFragment<ListBox>(@"
+						<ListBox Style='suggestionsListBox' Data='{Suggestions}' UseLoadingThread='False' >
+							<ItemTemplate>
+								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left'
+												Selected = '{Background=${ControlHighlight}}'
+												Unselected = '{Background=Transparent}'>
+									<Label Text='{}' HorizontalAlignment='Left' />
+								</ListItem>
+							</ItemTemplate>
+							<ItemTemplate DataType='System.Reflection.MemberInfo'>
+								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left'
+												Selected = '{Background=${ControlHighlight}}'
+												Unselected = '{Background=Transparent}'>
+									<HorizontalStack>
+										<Image Picture='{GetIcon}' Width='16' Height='16'/>
+										<Label Text='{Name}' HorizontalAlignment='Left' />
+									</HorizontalStack>
+								</ListItem>
+							</ItemTemplate>
+							<ItemTemplate DataType='Colors'>
+								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left'
+												Selected = '{Background=${ControlHighlight}}'
+												Unselected = '{Background=Transparent}'>
+									<HorizontalStack>
+										<Widget Background='{}' Width='20' Height='14'/>
+										<Label Text='{}' HorizontalAlignment='Left' />
+									</HorizontalStack>
+								</ListItem>
+							</ItemTemplate>
+						</ListBox>
+					");
+					overlay.DataSource = this;
+					overlay.Loaded += (sender, arg) => (sender as ListBox).SelectedIndex = 0;
+				} else
+					overlay.IsVisible = true;
+				overlay.RegisterForLayouting(LayoutingType.Sizing);
+			}
+		}
+		void hideOverlay () {
+			if (overlay == null)
+				return;
+			overlay.IsVisible = false;
+		}
+		
+		
+		string[] allWidgetNames = typeof (Widget).Assembly.GetExportedTypes ().Where(t=>typeof(Widget).IsAssignableFrom (t))
+					.Select (s => s.Name).ToArray ();
+		IEnumerable<MemberInfo> getAllCrowTypeMembers (string crowTypeName) {
+			Type crowType = IFace.GetWidgetTypeFromName (crowTypeName);
+			return crowType?.GetMembers (BindingFlags.Public | BindingFlags.Instance).
+				Where (m=>((m is PropertyInfo pi && pi.CanWrite) || (m is EventInfo)) &&
+						m.GetCustomAttribute<XmlIgnoreAttribute>() == null);
+		}
+		MemberInfo getCrowTypeMember (string crowTypeName, string memberName) {
+			Type crowType = IFace.GetWidgetTypeFromName (crowTypeName);
+			return crowType.GetMember (memberName, BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
+		}
 		void tryGetSuggestions () {
 			if (!currentLoc.HasValue)
 				return;
@@ -88,7 +137,15 @@ namespace Crow
 				Suggestions = new List<string> (allWidgetNames);
 			} else if (currentToken.Type == TokenType.ElementName) {
 				Suggestions = allWidgetNames.Where (s => s.StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
-			} else if (currentNode is AttributeSyntax attribNode) {
+			} else if (currentToken.Type == TokenType.EndElementOpen && currentNode is ElementEndTagSyntax eltEndTag) {
+				ElementSyntax es = eltEndTag.Parent as ElementSyntax;
+				if (es?.StartTag != null)
+					Suggestions = new List<string> (new string[] {es.StartTag.NameToken.Value.AsString(_text)});
+			} else if (currentToken.Type.HasFlag(TokenType.WhiteSpace) &&  typeof(ElementTagSyntax).IsAssignableFrom(currentNode?.GetType())) {
+				ElementTagSyntax ets = currentNode as ElementTagSyntax;
+				if (ets.NameToken.HasValue)
+					Suggestions = getAllCrowTypeMembers (ets.NameToken.Value.AsString (_text)).ToList ();
+			} else if (currentToken.Type != TokenType.AttributeValueClose && currentNode is AttributeSyntax attribNode) {
 				if (currentNode.Parent is ElementTagSyntax eltTag) {
 					if (eltTag.NameToken.HasValue) {
 						if (currentToken.Type == TokenType.AttributeName) {
@@ -153,71 +210,47 @@ namespace Crow
 					hideOverlay ();
 			}
 		}
-		void showOverlay () {
-			lock (IFace.UpdateMutex) {
-				if (overlay == null) {
-					overlay = IFace.LoadIMLFragment<ListBox>(@"
-						<ListBox Style='suggestionsListBox' Data='{Suggestions}' UseLoadingThread='False' >
-							<ItemTemplate>
-								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left'
-												Selected = '{Background=${ControlHighlight}}'
-												Unselected = '{Background=Transparent}'>
-									<Label Text='{}' HorizontalAlignment='Left' />
-								</ListItem>
-							</ItemTemplate>
-							<ItemTemplate DataType='System.Reflection.MemberInfo'>
-								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left'
-												Selected = '{Background=${ControlHighlight}}'
-												Unselected = '{Background=Transparent}'>
-									<HorizontalStack>
-										<Image Picture='{GetIcon}' Width='16' Height='16'/>
-										<Label Text='{Name}' HorizontalAlignment='Left' />
-									</HorizontalStack>
-								</ListItem>
-							</ItemTemplate>
-							<ItemTemplate DataType='Colors'>
-								<ListItem Height='Fit' Margin='0' Focusable='false' HorizontalAlignment='Left'
-												Selected = '{Background=${ControlHighlight}}'
-												Unselected = '{Background=Transparent}'>
-									<HorizontalStack>
-										<Widget Background='{}' Width='20' Height='14'/>
-										<Label Text='{}' HorizontalAlignment='Left' />
-									</HorizontalStack>
-								</ListItem>
-							</ItemTemplate>
-						</ListBox>
-					");
-					overlay.DataSource = this;
-					overlay.Loaded += (sender, arg) => (sender as ListBox).SelectedIndex = 0;
-				} else
-					overlay.IsVisible = true;
-				overlay.RegisterForLayouting(LayoutingType.Sizing);
-			}
-		}
-		void hideOverlay () {
-			if (overlay == null)
-				return;
-			overlay.IsVisible = false;
-		}
-		void completeToken () {
-			string selectedSugg = overlay.SelectedItem is MemberInfo mi ?
-				mi.Name : overlay.SelectedItem?.ToString ();
-			if (selectedSugg == null)
-				return;
-			if (currentToken.Type == TokenType.ElementOpen ||
-				currentToken.Type == TokenType.WhiteSpace ||
-				currentToken.Type == TokenType.AttributeValueOpen)
-				update (new TextChange (currentToken.End, 0, selectedSugg));
-			else if (currentToken.Type == TokenType.AttributeName && currentNode is AttributeSyntax attrib) {
+		void completeToken (string selectedSugg) {
+			if (currentToken.Type.HasFlag(TokenType.WhiteSpace)) {
+				if (typeof(ElementTagSyntax).IsAssignableFrom(currentNode?.GetType())) {
+					ElementTagSyntax ets = currentNode as ElementTagSyntax;
+					if (ets.NameToken.HasValue)
+						update (new TextChange (currentToken.End, 0, selectedSugg + "=\"\""),-1);
+					else
+						update (new TextChange (currentToken.End, 0, selectedSugg + " "));
+				} else {
+					update (new TextChange (currentToken.End, 0, selectedSugg));
+				}
+			} else if (currentToken.Type == TokenType.EndElementOpen) {
+				update (new TextChange (currentToken.End, 0, selectedSugg + ">"));
+			} else if (currentToken.Type == TokenType.ElementName) {
+				if (currentNode is ElementEndTagSyntax)
+					update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg + ">"));
+				else
+					update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg + ">"), -1);
+			} else if (currentNode is AttributeSyntax attrib) {
+				if (currentToken.Type == TokenType.AttributeName) {
 					if (attrib.ValueToken.HasValue) {
 						TextChange tc = new TextChange (currentToken.Start, currentToken.Length, selectedSugg);
 						update (tc);
 						SelectionStart = lines.GetLocation (attrib.ValueToken.Value.Start + tc.CharDiff + 1);
 						CurrentLoc = lines.GetLocation (attrib.ValueToken.Value.End + tc.CharDiff - 1);
 					} else {
-						update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg + "=\"\""));
-						MoveLeft ();
+						update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg + "=\"\""), -1);
 					}
+				} else {
+					int offset = 1;
+					if (!attrib.ValueCloseToken.HasValue) {
+						selectedSugg += attrib.ValueCloseToken.Value.AsString(_text);
+						offset = 0;
+					}
+					if (currentToken.Type == TokenType.AttributeValueOpen)
+						update (new TextChange (currentToken.End, 0, selectedSugg), offset);
+					else if (currentToken.Type == TokenType.AttributeValue)
+						update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg), offset);
+				}
+			} else if (currentToken.Type == TokenType.ElementOpen) {
+				update (new TextChange (currentToken.End, 0, selectedSugg + " "));
 			} else
 				update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg));
 			hideOverlay ();
@@ -255,7 +288,11 @@ namespace Crow
 					case Key.Tab:
 					case Key.Enter:
 					case Key.KeypadEnter:
-						completeToken ();
+						string selectedSugg = overlay.SelectedItem is MemberInfo mi ?
+							mi.Name : overlay.SelectedItem?.ToString ();
+						if (selectedSugg == null)
+							break;
+						completeToken (selectedSugg);
 						return;
 					}
 				} else if (e.Key == Key.Space && IFace.Ctrl) {
@@ -346,8 +383,7 @@ namespace Crow
 								selStart = SelectionStart.Value;
 								selEnd = CurrentLoc.Value;
 							}
-						} else
-							IFace.forceTextCursor = true;
+						}
 					//}
 
 					double spacePixelWidth = gr.TextExtents (" ").XAdvance;
@@ -409,7 +445,7 @@ namespace Crow
 
 							int size = buff.Length * 4 + 1;
 							if (bytes.Length < size)
-								bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+								bytes = new byte[size];
 
 							int encodedBytes = buff.ToUtf8 (bytes);
 
@@ -454,7 +490,7 @@ namespace Crow
 								buff = sourceBytes.Slice(lines[i].Start, lines[i].Length);
 								int size = buff.Length * 4 + 1;
 								if (bytes.Length < size)
-									bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+									bytes = new byte[size];
 
 								int encodedBytes = buff.ToUtf8 (bytes);
 

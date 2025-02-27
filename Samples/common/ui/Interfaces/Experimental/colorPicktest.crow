@@ -12,7 +12,7 @@
 					Unselected="{Background=Transparent}">
 					<HorizontalStack Height="Fit" Spacing="10" >
 						<Widget Width="60" Height="40" Background="{}" CornerRadius="3"/>
-						<Label Text="{}" Width="Stretched" Font="Mono, 20" />
+						<Label Text="{}" Width="Stretched" Font="Mono, 12" />
 					</HorizontalStack>
 				</ListItem>
 			</ItemTemplate>

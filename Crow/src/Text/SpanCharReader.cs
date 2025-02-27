@@ -12,17 +12,26 @@ namespace Crow.Text
         int curPos;
         ReadOnlySpan<char> buffer;
 
+		[Obsolete]
         public SpanCharReader (string text) {
             buffer = text.AsSpan ();
             curPos = 0;
         }
+        public SpanCharReader (ReadOnlySpan<char> text) {
+            buffer = text;
+            curPos = 0;
+        }
 
         public int CurrentPosition => curPos;
+		/// <summary>
+        /// Current reader position is further the end of the buffer.
+        /// </summary>
+		public bool EndOfSpan => curPos >= buffer.Length;
 
         public void Seek (int position) => curPos = position;
 
-        public Char Peak => buffer[curPos];
-        public Char Read () => buffer[curPos++];
+        public char Peek => buffer[curPos];
+        public char Read () => buffer[curPos++];
 		public bool TryRead (out char c) {
 			if (EndOfSpan) {
 				c = default;
@@ -38,6 +47,24 @@ namespace Crow.Text
 		public bool TryAdvance (int increment = 1) {
 			curPos += increment;
 			return curPos < buffer.Length;
+		}
+		/// <summary>
+		/// Retrieve a span of that buffer from provided starting position to the current reader position.
+		/// </summary>
+		/// <param name="fromPosition"></param>
+		/// <returns></returns>
+        public ReadOnlySpan<char> Get (int fromPosition) => buffer.Slice (fromPosition, curPos - fromPosition);
+		public bool TryPeek (char c) => !EndOfSpan && Peek == c;
+		/// <summary>
+		/// Try peak one char, return false if end of span, true otherwise.
+		/// </summary>
+		/// <param name="c"></param>
+		/// <returns></returns>
+		public bool TryPeek (ref char c) {
+			if (EndOfSpan)
+				return false;
+			c = buffer[curPos];
+			return true;
 		}
 
 		public bool TryReadUntil (ReadOnlySpan<char> str, StringComparison comparison = StringComparison.Ordinal) {
@@ -79,32 +106,10 @@ namespace Crow.Text
 			curPos += expectedString.Length;
 			return res;
 		}
-		public bool TryPeak (ReadOnlySpan<char> expectedString, StringComparison comparison = StringComparison.Ordinal) =>
+		public bool TryPeek (ReadOnlySpan<char> expectedString, StringComparison comparison = StringComparison.Ordinal) =>
 			 (buffer.Length < curPos + expectedString.Length)? false :
 						buffer.Slice(curPos, expectedString.Length).Equals (expectedString, comparison);
 
-		/// <summary>
-		/// Retrieve a span of that buffer from provided starting position to the current reader position.
-		/// </summary>
-		/// <param name="fromPosition"></param>
-		/// <returns></returns>
-        public ReadOnlySpan<char> Get (int fromPosition) => buffer.Slice (fromPosition, curPos - fromPosition);
-        /// <summary>
-        /// Current reader position is further the end of the buffer.
-        /// </summary>
-		public bool EndOfSpan => curPos >= buffer.Length;
-		public bool TryPeak (char c) => !EndOfSpan && Peak == c;
-		/// <summary>
-		/// Try peak one char, return false if end of span, true otherwise.
-		/// </summary>
-		/// <param name="c"></param>
-		/// <returns></returns>
-		public bool TryPeak (ref char c) {
-			if (EndOfSpan)
-				return false;
-			c = buffer[curPos];
-			return true;
-		}
 		/// <summary>
 		/// test if next char is one of the provided one as parameter
 		/// </summary>
@@ -121,7 +126,7 @@ namespace Crow.Text
 		/// </summary>
 		public void AdvanceUntilEol () {
 			while(!EndOfSpan) {
-				switch (Peak) {
+				switch (Peek) {
 					case '\x85':
 					case '\x2028':
 					case '\xA':
@@ -140,8 +145,8 @@ namespace Crow.Text
 		/// </summary>
 		/// <returns></returns>
 		public bool Eol () {
-			return Peak == '\x85' || Peak == '\x2028' || Peak == '\xA' || curPos + 1 == buffer.Length ||
-				(Peak == '\xD' && (buffer [curPos + 1]  == '\xA' || buffer [curPos + 1]  == '\x85'));
+			return Peek == '\x85' || Peek == '\x2028' || Peek == '\xA' || curPos + 1 == buffer.Length ||
+				(Peek == '\xD' && (buffer [curPos + 1]  == '\xA' || buffer [curPos + 1]  == '\x85'));
 
 		}
 		/// <summary>

@@ -18,10 +18,11 @@ namespace Samples
 {
 	public class SampleBase : Interface
 	{
-		public SampleBase(IntPtr hWin) : base(800, 600, hWin) { }
-		public SampleBase() : base (800, 600, false) { }
+		public SampleBase(IntPtr hWin) : base(Configuration.Global.Get<int>("MainWinWidth", 800), Configuration.Global.Get<int>("MainWinHeight", 600), hWin) { }
+		public SampleBase() : base (Configuration.Global.Get<int>("MainWinWidth", 800), Configuration.Global.Get<int>("MainWinHeight", 600), true) { }
 
 		public Version CrowVersion => Assembly.GetAssembly(typeof(Widget)).GetName().Version;
+		public Container crowContainer;
 
 		static void showMsgBox (object sender) {
 			Widget w = sender as Widget;
@@ -60,9 +61,11 @@ namespace Samples
 				new KeyBinding (Key.F1, Modifier.Super),
 				new Binding<bool> ("CanExecute"));
 			Commands = new CommandGroup("commands msg boxes",
-				new ActionCommand("Action 1", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")),
-				new ActionCommand("Action two", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked"), null, false),
-				new ActionCommand("Action three", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked"))
+				new ActionCommand("Action 1", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked"), "#Icons.gavel.svg" ),
+				new ActionCommand("Action two", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked"), "#Icons.compile.svg", false),
+				new ActionCommand("Action three", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked"), "#Icons.calendar.svg"),
+				CMDToggleBoolVal,
+				CMDHosted
 			);
 			AllCommands = new CommandGroup ("All Commands",
 				FileCommands,
@@ -70,6 +73,19 @@ namespace Samples
 				new CommandGroup ("Combined commands", FileCommands, EditCommands),
 				new ActionCommand("Action A", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu A clicked"))
 			);
+		
+			CMDObsListAdd = new ActionCommand ("Add",
+				() => {
+					ObservableTestList.Add(obsListNewItem);
+					ObsListNewItem = null;
+				},null, !string.IsNullOrEmpty(obsListNewItem));
+			CMDObsListRemove= new ActionCommand ("Remove",
+				() => {
+					ListBox lb = crowContainer.FindByName("lb") as ListBox;
+					string selItem = lb?.SelectedItem as string;
+					if (!string.IsNullOrEmpty(selItem))
+						ObservableTestList.Remove(lb.SelectedItem as string);
+				},null, true);
 		}
 		DeviceEventType deviceEventTypeEnum;
 		public DeviceEventType DeviceEventTypeEnum {
@@ -316,10 +332,26 @@ namespace Samples
 			}
 		}
 
+		public ActionCommand CMDObsListAdd,CMDObsListRemove;
+		string obsListNewItem = "new item";
+		public string ObsListNewItem {
+			get => obsListNewItem;
+			set {
+				if (string.Equals(obsListNewItem, value))
+					return;
+				obsListNewItem = value;
+				NotifyValueChanged(obsListNewItem);
+				CMDObsListAdd.CanExecute = !string.IsNullOrEmpty(obsListNewItem);
+			}
+		}
+		public ObservableList<string> ObservableTestList = new ObservableList<string>(new string[]{"string1", "string2"});
+
 
 		IList<Colors> testList = (IList<Colors>)EnumsNET.Enums.GetValues<Colors>().ToList();//.ColorDic.Values//.OrderBy(c=>c.Hue)
 																									  //.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
 																									  //.ToList ();
+		public IList<DbgEvtType> AvailaibleDbgEvents => EnumsNET.Enums.GetValues<DbgEvtType>().ToList();
+		public DbgEvtType TestDbgEventSelect;
 		public IList<Colors> TestList
 		{
 			set
@@ -332,6 +364,74 @@ namespace Samples
 		void OnClear(object sender, MouseButtonEventArgs e) => TestList = null;
 		void OnLoadList(object sender, MouseButtonEventArgs e) => TestList = (IList<Colors>)EnumsNET.Enums.GetValues<Colors>().ToList();
 
+		#region logging tetsts
+		[Flags]
+		public enum LogType {
+			None		= 0,
+			Low			= 0x0001,
+			Normal		= 0x0002,
+			High		= 0x0004,
+			Message		= Low | Normal | High,
+			Debug		= 0x0008,
+			Warning		= 0x0010,
+			Error		= 0x0020,
+			WarnErr		= Warning | Error,
+			Custom1		= 0x0040,
+			Custom2		= 0x0080,
+			Custom3		= 0x0100,
+			code		= 0x1000,
+			crowEdit	= 0x2000,
+			Plugin		= 0x4000,
+
+			
+			Custom		= Custom1 | Custom2 | Custom3,
+			all			= 0xffff
+		}
+		public class LogEntry {
+			public LogType Type;
+			public string msg;
+			public LogEntry (LogType type, string message) {
+				Type = type;
+				msg = message;
+			}
+			public override string ToString() => msg;
+		}
+
+		public class LogItem {
+			public string Name;
+			public ObservableList<LogEntry> log;
+			public LogItem(string name) {
+				Name = name;
+				log = new ObservableList<LogEntry>();
+			}
+			public void Add(LogType type, string message) {
+				lock (log)
+					log.Add (new LogEntry(type, message));
+			}
+			public void ResetLog () {
+				lock (log)
+					log.Clear ();
+			}
+
+		}
+		public ObservableList<LogItem> Logs = new ObservableList<LogItem>(new LogItem[]{new LogItem("CrowEdit")});
+		public LogItem MainLog => Logs[0];
+		[Obsolete]public void Log(LogType type, string message) {
+			MainLog.Add (type, message);
+		}
+		[Obsolete]public void ResetLog () {
+			MainLog.ResetLog();
+		}
+		public LogItem GetLog(string name) {
+			LogItem li = Logs.FirstOrDefault(l=>string.Equals(l.Name,name,StringComparison.OrdinalIgnoreCase));
+			if (li == null) {
+				li = new LogItem(name);
+				lock (Logs)
+					Logs.Add(li);
+			}
+			return li;
+		}		
+		#endregion
 
 		string curSources = "";
 		public bool boolVal = true, canExecute;
@@ -384,13 +484,24 @@ namespace Samples
 		protected override void OnInitialized()
 		{
 			initCommands();
+			Log(LogType.Message, "test log");
+			Log(LogType.Message, "test log2");
+			Log(LogType.Message, "test log3");
+			LogItem li = GetLog("new log");
+			li.Add(LogType.Error, "smlkqjsflmkdsf");
+			li.Add(LogType.Error, "smlkqj");
 			base.OnInitialized();
 		}
 		protected override void processDrawing(IContext ctx)
 		{
 			base.processDrawing(ctx);
 		}
-
+		public override void ProcessResize(Rectangle bounds)
+		{
+			base.ProcessResize(bounds);
+			Configuration.Global.Set ("MainWinWidth", clientRectangle.Width);
+			Configuration.Global.Set ("MainWinHeight", clientRectangle.Height);
+		}
 		public override bool OnKeyDown(KeyEventArgs e)
 		{
 

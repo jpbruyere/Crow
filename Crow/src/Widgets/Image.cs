@@ -8,6 +8,13 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 using Drawing2D;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using System.IO;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Crow
 {
@@ -69,16 +76,14 @@ namespace Crow
 				try {
 					if (string.IsNullOrEmpty(value))
 						Picture = null;
-					else {
-						//lock(IFace.LayoutMutex){
-							LoadImage (value);
-						//}
-					}
+					else
+						LoadImage (value);
 				} catch (Exception ex) {
 					Debug.WriteLine (ex.Message);
 					_pic = null;
 				}
 				NotifyValueChangedAuto (Path);
+				RegisterForGraphicUpdate();
 			}
 		}
 		/// <summary>
@@ -140,14 +145,63 @@ namespace Crow
 		#endregion
 
 		#region Image Loading
+		static HttpClient http = new HttpClient();
+		static int HTTP_DOWNLOAD_TIMEOUT_MS = 5000;
+		void downloadThread(Uri uri) {
+			Picture pic = null;				
+			var getcontenttype = http.GetAsync(uri);
+			var task = http.GetStreamAsync(uri);
+			if (getcontenttype.Wait(HTTP_DOWNLOAD_TIMEOUT_MS) && getcontenttype.IsCompletedSuccessfully) {
+				if (!getcontenttype.Result.Content.Headers.TryGetValues("content-Type", out IEnumerable<string> contents))
+					return;
+				string[] type = contents.FirstOrDefault().Split('/');				
+				if (!string.Equals(type[0], "image", StringComparison.Ordinal))
+					return;
+				if (string.Equals(type[1], "svg", StringComparison.Ordinal))
+					pic = new SvgPicture(uri.AbsoluteUri);
+				else if (string.Equals(type[1], "png", StringComparison.Ordinal))
+					pic = new BmpPicture(uri.AbsoluteUri);
+				else {
+					Debug.WriteLine($"Unsupported image format for download: {type[1]}");
+					return;
+				}
+
+				if (task.Wait(HTTP_DOWNLOAD_TIMEOUT_MS) && task.IsCompletedSuccessfully) {
+					MemoryStream dataCopy = new MemoryStream();
+					task.Result.CopyTo(dataCopy);
+					dataCopy.Position = 0;
+					pic.LoadFromStream(IFace, dataCopy);
+					pic.Scaled = scaled;
+					pic.KeepProportions = keepProps;
+					lock(IFace.UpdateMutex)
+						Picture = pic;
+				}
+			}
+
+		}
+
 		public void LoadImage (string path)
 		{
 			Picture pic;
+			if (path.StartsWith("url:", StringComparison.OrdinalIgnoreCase)) {
+				/*if (IFace.sharedPictures.ContainsKey (Path)) {
+					sharedPicture sp = IFace.sharedPictures [Path];
+					if (sp.Data is ISvgHandle svgHandle) {
+						pic = new SvgPicture()
+					}
+				}*/
+				Uri uri = new Uri(path.Substring (4));
+				if (string.IsNullOrEmpty(uri.AbsolutePath))
+					return;
+				Thread download = new Thread(()=>downloadThread(uri));
+				download.Start();
+				return;
+			}
+			
 			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture))
 				pic = new SvgPicture (path);
 			else
 				pic = new BmpPicture (path);
-
 
 			pic.Scaled = scaled;
 			pic.KeepProportions = keepProps;

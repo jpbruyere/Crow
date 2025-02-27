@@ -131,8 +131,6 @@ namespace Crow
 			dockParentParent = false;
 			Rectangle r = default;
 
-			Console.WriteLine ($"onDrag target={IFace.DragAndDropOperation.DropTarget}");
-
 			if (IFace.DragAndDropOperation.DropTarget is DockStack ds) {
 				ds.onDragMouseMove (this, e);
 				r = ds.ScreenCoordinates (ds.LastPaintedSlot);
@@ -149,7 +147,6 @@ namespace Crow
 					dwCb.Inflate (-4,-4);
 
 					if (tryGetTargetDockStack (dw, out DockStack targetStack)) {
-						Console.WriteLine ($"exterior: {!dwCb.ContainsOrIsEqual (m)} targetStack.Parent: {targetStack.Parent.GetType()}");
 						if (dwCb.ContainsOrIsEqual (m)) {
 							r = dw.ScreenCoordinates (dw.LastPaintedSlot);
 						} else if (targetStack.Parent is DockStack) {
@@ -197,9 +194,11 @@ namespace Crow
 					r.Width /= 4;
 					break;
 				case Alignment.Center:
-					r.Inflate (r.Width / -3, r.Height / -3);
+					r.Inflate (r.Width / -4, r.Height / -4);
+					Console.WriteLine(r);
 					break;
 				}
+				r.Inflate(-2,-2);
 	            ISurface dragImg = IFace.Backend.CreateSurface (r.Width, r.Height);
 				using (IContext gr = IFace.Backend.CreateContext (dragImg)) {
 					gr.LineWidth = 1;
@@ -293,9 +292,6 @@ namespace Crow
 			}
 		}
 		bool checkUndock (Point mousePos) {
-			//if (DockingPosition == Alignment.Center)
-			//	return false;
-			System.Diagnostics.Debug.WriteLine ($"{mousePos.X},{mousePos.Y}");
 			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
 			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
 				return false;

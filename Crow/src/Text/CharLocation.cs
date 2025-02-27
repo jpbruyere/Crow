@@ -11,14 +11,20 @@ namespace Crow.Text
 	{
 		public readonly int Line;
 		/// <summary>
-		/// Character position in current line. If equals '-1', the visualX must contains the on screen position.
-		///
+		/// Character position in current line.
+		/// If Column value is '-1', the visualX must contains the on screen position, and column will be computed from it.
 		/// </summary>
 		public int Column;
+		/// <summary>
+		/// The column as presented to the user, counting spaces in tabulations.
+		/// Its value is set during computations.
+		/// </summary>
+		public int TabulatedColumn;
 		public double VisualCharXPosition;
 		public CharLocation (int line, int column, double visualX = -1) {
 			Line = line;
 			Column = column;
+			TabulatedColumn = -1;
 			VisualCharXPosition = visualX;
 		}
 		public bool HasVisualX => Column >= 0 && VisualCharXPosition >= 0;

@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0"?>
-
-	<!--<Widget Background="hgradient|0:Black|0.5:Blue|1:Red" Margin="100" />-->
-	<VerticalStack>
-		<Image Path="#Crow.Icons.checkbox.svg" SvgSub="True" Height="200"/>
-		<CheckBox/>
-
-	</VerticalStack>
-	<!--<ColorPicker/>-->
+<VerticalStack>
+<TextBox Margin="10"/>
+</VerticalStack>
+<!--<Group CacheEnabled="false" Name="dockRoot" Margin="20" Focusable="true" Width="Stretched" Height="Stretched">
+	<DockStack ClipToClientRect="false" CacheEnabled="false" Name="mainDock" Focusable="false" Width="50%" Background="0.1,0.1,0.1,0.8"/>
+	<DockWindow Name="win1" Style="SimpleDockWin" Top="10" Left="10" Background="Red" Width="200" Height="200"/> 
+	<DockWindow Name="win2" Style="SimpleDockWin" Top="30" Left="30" Background="Green" Width="200" Height="200"/>
+	<DockWindow Name="win3" Style="SimpleDockWin" Top="50" Left="50" Background="Pink" Width="200" Height="200"/>
+	<DockWindow Name="win4" Style="SimpleDockWin" Top="70" Left="70" Background="RoyalBlue" Width="200" Height="200"/> 
+</Group>-->

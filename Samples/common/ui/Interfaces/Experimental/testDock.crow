@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0"?>
-<DockStack Name="mainDock" Background="Jet" Margin="0">
-	<DockWindow Resizable = "true" Top="100" Left="100" Caption="View 1" Width="300" Height="300"/>
+<Group>
+<DockWindow Style="DockWinSimple" Top="100" Left="100" Caption="View 1" Width="300" Height="300"/>
+<DockStack Width="50%" Name="mainDock" Background="Jet" Margin="0">
+	
 </DockStack>
-
+</Group>
 <!---		
 		<DockWindow Left="450" Top="450" Width="150" Height="150" Background="Yellow"/>-->
 	

@@ -13,11 +13,16 @@ using System.Diagnostics;
 using Crow.Text;
 using System.Collections.Generic;
 using Encoding = System.Text.Encoding;
+using System.Linq;
 
 namespace Samples
 {
 	public class SampleBaseForEditor : SampleBase
 	{
+		static SampleBaseForEditor() {
+			//DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));
+			//RecordedEvents = Configuration.Global.Get<ObservableList<DbgEvtType>> ("RecordedEvents");	
+		}
 		public static SampleBaseForEditor CurrentProgramInstance;
 
 		protected override void OnInitialized () {
@@ -32,7 +37,6 @@ namespace Samples
 		protected const string _defaultFileName = "unnamed.txt";
 		protected string source = "", origSource;
 		protected Editor editor;
-		bool debugLogRecording;
 
 
 		public string CurrentDir {
@@ -64,36 +68,23 @@ namespace Samples
 				NotifyValueChanged ("IsDirty", IsDirty);
 			}
 		}
+
+		#region DebugLog		
+		bool debugLogRecording;
 		public bool DebugLoggingEnabled => DbgLogger.IsEnabled;
 
-		/*public DbgEvtType RecordedEvents {
-			get => Configuration.Global.Get<DbgEvtType> (nameof (RecordedEvents));
-			set {
-				if (RecordedEvents == value)
-					return;
-				Configuration.Global.Set (nameof (RecordedEvents), value);
-				if (DebugLogRecording)
-					DbgLogger.IncludeEvents = RecordedEvents;
-				NotifyValueChanged(RecordedEvents);
-			}
-		}
-		public DbgEvtType DiscardedEvents {
-			get => Configuration.Global.Get<DbgEvtType> (nameof (DiscardedEvents));
-			set {
-				if (DiscardedEvents == value)
-					return;
-				Configuration.Global.Set (nameof (DiscardedEvents), value);
-				if (DebugLogRecording)
-					DbgLogger.DiscardEvents = DiscardedEvents;
-				NotifyValueChanged(DiscardedEvents);
-			}
-		}*/
+		static ObservableList<DbgEvtType> RecordedEvents;
 		public bool DebugLogRecording {
 			get => debugLogRecording;
 			set {
 				if (debugLogRecording == value)
 					return;
 				debugLogRecording = value;
+				if (debugLogRecording) {
+					DbgLogger.IncludedEvents = new List<DbgEvtType>(RecordedEvents);
+				} else {
+					DbgLogger.IncludedEvents = null;
+				}
 				NotifyValueChanged(debugLogRecording);
 			}
 		}
@@ -116,10 +107,7 @@ namespace Samples
 				NotifyValueChanged (DebugLogFilePath);
 			}
 		}
-
-		protected static void initDebugLog () {
-			DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));
-		}
+		#endregion
 
 
 		public new bool IsDirty => source != origSource;
@@ -274,7 +262,7 @@ namespace Samples
 			resetUndoRedo ();
 		}
 		protected bool disableTextChangedEvent = false;
-		protected void apply (TextChange change) {
+		protected void apply (TextChange change, bool updateEditorPosition = true) {
 			Span<char> tmp = stackalloc char[source.Length + (change.ChangedText.Length - change.Length)];
 			ReadOnlySpan<char> src = source.AsSpan ();
 			src.Slice (0, change.Start).CopyTo (tmp);
@@ -284,17 +272,18 @@ namespace Samples
 			disableTextChangedEvent = true;
 			Source = tmp.ToString ();
 			disableTextChangedEvent = false;
-			editor.SelectionStart = null;
-			editor.SetCursorPosition (change.Start + change.ChangedText.Length);
-
-			forceTextCursor = true;
+			if (updateEditorPosition) {
+				editor.SelectionStart = null;
+				editor.SetCursorPosition (change.Start + change.ChangedText.Length);
+				forceTextCursor();
+			}
 		}
-		protected void applyChange (TextChange change) {
+		protected void applyChange (TextChange change, bool updateEditorPosition = true) {
 			undoStack.Push (change.Inverse (source));
 			redoStack.Clear ();
 			CMDUndo.CanExecute = true;
 			CMDRedo.CanExecute = false;
-			apply (change);
+			apply (change, updateEditorPosition);
 		}
 		public void goUpDirClick (object sender, MouseButtonEventArgs e)
 		{
@@ -326,7 +315,7 @@ namespace Samples
 		protected void onTextChanged (object sender, TextChangeEventArgs e) {
 			if (disableTextChangedEvent)
 				return;
-			applyChange (e.Change);
+			applyChange (e.Change, false);
 		}
 		protected void textView_KeyDown (object sender, Crow.KeyEventArgs e) {
 			if (Ctrl) {

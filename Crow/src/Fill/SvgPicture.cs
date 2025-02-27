@@ -31,6 +31,7 @@ namespace Crow
 
 		public override void load (Interface iFace)
 		{
+			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"SVGPicture.load:{Path}");
 			if (iFace.sharedPictures.ContainsKey (Path)) {
 				sharedPicture sp = iFace.sharedPictures [Path];
 				hSVG = (ISvgHandle)sp.Data;
@@ -42,8 +43,14 @@ namespace Crow
 			Dimensions = hSVG.Dimensions;
 			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);
 		}
-
+		public override void LoadFromStream (Interface iFace, Stream stream) {
+			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"SVGPicture.LoadFromStream:{Path}");
+			hSVG = iFace.Backend.LoadSvg (stream);
+			Dimensions = hSVG.Dimensions;
+			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);			
+		}
 		public void LoadSvgFragment (Interface iface, string fragment) {
+			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"SVGPicture.LoadSvgFragment:{fragment}");
 			hSVG = iface.Backend.LoadSvg (fragment);
 			Dimensions = hSVG.Dimensions;
 		}
@@ -52,7 +59,7 @@ namespace Crow
 		public override bool IsLoaded => hSVG != null;
 		public override void SetAsSource (Interface iFace, IContext ctx, Rectangle bounds = default(Rectangle))
 		{
-			if (hSVG == null)
+			if (!IsLoaded)
 				load (iFace);
 
 			float widthRatio = 1f;
@@ -82,38 +89,9 @@ namespace Crow
 		}
 		#endregion
 
-		/// <summary>
-		/// paint the image in the rectangle given in arguments according
-		/// to the Scale and keepProportion parameters.
-		/// </summary>
-		/// <param name="gr">drawing Backend context</param>
-		/// <param name="rect">bounds of the target surface to paint</param>
-		/// <param name="subPart">limit rendering to this coma separated list of svg part identified with their svg 'id' attribute.</param>
-		public override void Paint (Interface iFace, IContext gr, Rectangle rect, string subPart = "")
-		{
-			if (hSVG == null)
-				load (iFace);
 
-			float widthRatio = 1f;
-			float heightRatio = 1f;
-
-			if (Scaled) {
-				widthRatio = (float)rect.Width / Dimensions.Width;
-				heightRatio = (float)rect.Height / Dimensions.Height;
-			}
-			if (KeepProportions) {
-				if (widthRatio < heightRatio)
-					heightRatio = widthRatio;
-				else
-					widthRatio = heightRatio;
-			}
-
-			gr.Save ();
-
-			gr.Translate (rect.Left,rect.Top);
-			gr.Scale (widthRatio, heightRatio);
-			gr.Translate (((float)rect.Width/widthRatio - Dimensions.Width)/2f, ((float)rect.Height/heightRatio - Dimensions.Height)/2f);
-
+        protected override void Render(Interface iFace, IContext gr, string subPart = "")
+        {
 			if (string.IsNullOrEmpty (subPart))
 				hSVG.Render (gr);
 			else {
@@ -121,9 +99,8 @@ namespace Crow
                 foreach (string p in parts)
 					hSVG.Render (gr, "#" + subPart);
 			}
-
-			gr.Restore ();
-		}
-	}
+            
+        }
+    }
 }
 

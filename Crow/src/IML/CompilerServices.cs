@@ -392,7 +392,7 @@ namespace Crow.IML
 					if (knownExtMethods.ContainsKey (key))
 						return knownExtMethods [key];
 
-					//System.Diagnostics.Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+					DbgLogger.AddEvent (DbgEvtType.Binding, $"[CompilerServices.SearchExtMethod] search extension method: {t};{methodName} => key={key}");
 
 					MethodInfo mi = null;
 					if (!TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
@@ -411,7 +411,7 @@ namespace Crow.IML
 					return mi;
 				}
 			} catch (Exception e) {//added this catch for CrowEdit, ext method should be search with appropriate LoadContext.
-				Debug.WriteLine ($"[CompilerServices.SearchExtMethod]{e}");
+				DbgLogger.AddEvent (DbgEvtType.Binding | DbgEvtType.Error,  $"[CompilerServices.SearchExtMethod]{e}");
 			}
 			return null;
 		}
@@ -421,17 +421,31 @@ namespace Crow.IML
 			foundMI = null;
 			if (assembly == null)
 				return false;
+			DbgLogger.AddEvent (DbgEvtType.Binding, $"[CompilerServices.TryGetExtensionMethods] search in {assembly.FullName}");
 			foreach (Type t in assembly.GetExportedTypes().Where
 					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
+				DbgLogger.AddEvent (DbgEvtType.Binding, $"[CompilerServices.TryGetExtensionMethods] search in type: {t.FullName}");
 				foreach (MethodInfo mi in t.GetMethods
 					(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
 						(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
 						 m.GetParameters ().Length > 0)) {
+					DbgLogger.AddEvent (DbgEvtType.Binding, $"[CompilerServices.TryGetExtensionMethods] testing method: {mi.Name} extendedType:{extendedType}");
 					Type curType = extendedType;
 					while (curType != null) {
-						if (mi.GetParameters () [0].ParameterType == curType) {
+						Type firstParamType = mi.GetParameters () [0].ParameterType;
+						if (firstParamType == curType) {
+							DbgLogger.AddEvent (DbgEvtType.Binding, $"[CompilerServices.TryGetExtensionMethods] Found for {curType}");
 							foundMI = mi;
 							return true;
+						}
+						if (firstParamType.IsInterface) {
+							foreach (Type ifaceType in curType.GetInterfaces()) {
+								if (firstParamType == ifaceType) {
+									DbgLogger.AddEvent (DbgEvtType.Binding, $"[CompilerServices.TryGetExtensionMethods] Found interface {ifaceType} in {curType}");
+									foundMI = mi;
+									return true;
+								}
+							}
 						}
 						curType = curType.BaseType;
 					}

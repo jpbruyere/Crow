@@ -1,0 +1,6 @@
+﻿<Border Foreground="White" Fit="true">
+	<VerticalStack>
+		<Label Text='Hello World' Background='MediumSeaGreen' Margin='0'/>
+		<Label Text='Hello World' Background='MediumSeaGreen' Margin='0'/>
+	</VerticalStack>
+</Border>

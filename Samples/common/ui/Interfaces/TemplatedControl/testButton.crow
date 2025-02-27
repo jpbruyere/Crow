@@ -3,8 +3,8 @@
 	<HorizontalStack Fit="True">
 		<Button Caption="but" MouseClick="onButClick"/>
 		<Button Caption="but" MouseClick="onButClick" Fit="true"/>
-		<Button Width="60" Height="40" MouseClick="onButClick"/>
+		<Button  MouseClick="onButClick"/>
 		<Button Caption="Long text button" MouseClick="onButClick"/>
-		<Button Font="droid, 20" Caption="Button"/>
+		<Button Font="mono, 12" Caption="Button"/>
 	</HorizontalStack>
 </VerticalStack>

@@ -50,7 +50,7 @@ namespace Drawing2D
 		public static Size operator * (Size s, double i) => new Size ((int)(s.Width * i), (int)(s.Height * i));
 		#endregion
 
-
+		public bool IsValid => Width > 0 && Height > 0;
 		public bool Equals (Size other) => Width == other.Width && Height == other.Height;
 		public bool Equals (int other) => Width == other && Height == other;
 

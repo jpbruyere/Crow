@@ -1,0 +1,31 @@
+﻿<TabView Orientation="Horizontal" Data="{Logs}">
+	<Template>
+		<GenericStack Orientation="{./OppositeOrientation}" Spacing="0" Background="{./Background}"> 
+			<ListBox  Data="{./Items}" Fit="true" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedItem="{²./SelectedItem}"> 
+				<Template>
+					<GenericStack Orientation="{../../../Orientation}" Name="ItemsContainer" />
+				</Template>
+				<ItemTemplate>
+					<ListItem Fit="true" Background="${InactiveTabItem}" IsSelected="{IsVisible}" Margin="5"
+							Selected="{.DataSource.Visible='true'};{Background=.DataSource.Background}"
+							Unselected="{.DataSource.Visible='false'};{Background=${InactiveTabItem}}"> 
+						<Label Text="{Name}" />
+					</ListItem>
+				</ItemTemplate> 
+			</ListBox>
+			<Group Name="ItemsContainer" />
+		</GenericStack>
+	</Template>
+	<ItemTemplate>
+		<ListItem IsVisible='{IsSelected}' IsSelected='{²IsSelected}'> 
+			<VerticalStack>
+				<Label Text="{Name}"/>
+				<ListBox Data="{log}">
+					<ItemTemplate>
+						<Label Text="{msg}"/>
+					</ItemTemplate> 
+				</ListBox> 
+			</VerticalStack>
+		</ListItem>
+	</ItemTemplate>
+</TabView>
