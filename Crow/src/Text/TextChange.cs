@@ -11,12 +11,13 @@ namespace Crow.Text
     {
         public readonly int Start;
         public readonly int Length;
-        public readonly string ChangedText;
+        public string ChangedText;
 
         public int End => Start + Length;
         public int End2 => End + CharDiff;
 
 		public int CharDiff => string.IsNullOrEmpty (ChangedText) ? - Length : ChangedText.Length - Length;
+        public bool IsEmpty => string.IsNullOrEmpty (ChangedText) && Length == 0;
         public TextChange (int position, int length, string changedText) {
             Start = position;
             Length = length;
