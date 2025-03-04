@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Margin="50">
-	<CheckBox Name="inverted" Background="DarkSlateGrey" Caption="Inverted" Width="Fit" Foreground="Black"/>
 
 	<VerticalStack Spacing="10" Width="50%">
 		<Slider Background="DarkGrey" Height="20" Width="Stretched" Inverted="{../../inverted.IsChecked}"/>
@@ -31,6 +30,8 @@
 		
 		<Slider ClipToClientRect='false' Background="DarkGrey" CursorSize="50" Height="12" CornerRadius="5" Inverted="{../../inverted.IsChecked}" />
 		<Slider ClipToClientRect='false' CacheEnabled='false' Background="Transparent" CursorSize="20" Height="12" Width="Stretched" Inverted="{../../inverted.IsChecked}" />
+
+		<CheckBox Name="inverted" Background="DarkSlateGrey" Caption="Inverted" Width="Fit" Foreground="Black"/>
 	</VerticalStack>
 	
 	<HorizontalStack Spacing="10" >

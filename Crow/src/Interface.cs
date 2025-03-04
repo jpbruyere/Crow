@@ -675,6 +675,7 @@ namespace Crow
 		public long TotalWidgetCreated => Widget.TotalWidgetCreated;
 		public long TotalWidgetDisposed => Widget.TotalWidgetDisposed;
 		public long TotalWidgetActive => Widget.TotalWidgetCreated - Widget.TotalWidgetDisposed;
+		public long TotalWidgetPainted => Widget.TotalWidgetPainted;
 		public long TotalWidgetInGraphicTree {
 			get {
 				lock(UpdateMutex) {
@@ -685,6 +686,7 @@ namespace Crow
 				}
 			}
 		}
+		public long CanceledChildPaintCount => GroupBase.CanceledChildPaintCount;
 #endif
 
 		#region DragAndDrop
@@ -1858,8 +1860,16 @@ namespace Crow
 			<Label Text='{TotalWidgetActive}' TextAlignment='Right'/>
 		</HorizontalStack>
 		<HorizontalStack Height='Fit'>
+			<Label Text='TotalWidgetPainted:' Width='50%'/>
+			<Label Text='{TotalWidgetPainted}' TextAlignment='Right'/>
+		</HorizontalStack>
+		<HorizontalStack Height='Fit'>
 			<Label Text='TotalWidgetInGraphicTree:' Width='50%'/>
 			<Label Text='{TotalWidgetInGraphicTree}' TextAlignment='Right'/>
+		</HorizontalStack>
+		<HorizontalStack Height='Fit'>
+			<Label Text='Total Canceled Child Paint in Groups:' Width='50%'/>
+			<Label Text='{CanceledChildPaintCount}' TextAlignment='Right'/>
 		</HorizontalStack>
 	</VerticalStack>
 </Window>

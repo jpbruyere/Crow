@@ -18,8 +18,8 @@ namespace Crow {
 
 		#region protected fields
 		protected double actualValue, minValue, maxValue;
-		Orientation orientation;
-		bool inverted;
+		protected Orientation orientation;
+		protected bool inverted;
 		#endregion
 
 		#region public properties

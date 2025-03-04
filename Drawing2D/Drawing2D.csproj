@@ -10,6 +10,7 @@
 		<Title>Drawing 2D Library</Title>
 		<Description>
 		2d shapes and drawing interfaces used in C.R.O.W and Vke.net.
+		Contains also most used crow basic object for sharing across load contexts.
 		</Description>
 		<License>MIT</License>
 		<Authors>Jean-Philippe Bruyère</Authors>

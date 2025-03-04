@@ -41,6 +41,7 @@ namespace Crow
 #if DEBUG_STATS
 		public static long TotalWidgetCreated;
 		public static long TotalWidgetDisposed;
+		public static long TotalWidgetPainted;
 		public virtual long ChildCount => 0;
 #endif
 #if DESIGN_MODE
@@ -450,7 +451,8 @@ namespace Crow
 				return
 					Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 			} catch (Exception ex) {
-				Debug.WriteLine (ex);
+				Debug.WriteLine (ex.Message);
+				Debug.WriteLine (ex.StackTrace);
 				return default(Rectangle);
 			}
 		}
@@ -2043,6 +2045,9 @@ namespace Crow
 				LastPaintedSlot = Slot;
 			//}
 			Painted.Raise (this, null);
+#if DEBUG_STATS			
+			TotalWidgetPainted++;
+#endif
 
 			DbgLogger.EndEvent (DbgEvtType.GOPaint);
 			return true;

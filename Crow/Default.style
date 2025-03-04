@@ -280,11 +280,16 @@ ArrowBut {
 	Foreground="Grey";
 	Background="Transparent";
 
-	MouseEnter="{Foreground=${ControlHighlight}}";
+	MouseEnter="{Foreground=WhiteSmoke}";
 	MouseLeave="{Foreground=Grey}";
 
-	Margin="2";
+	Margin="1";
 	KeepProportions="true";
+}
+ScrollBarCursor {
+	Background="Grey";
+	MouseEnter="{Background=WhiteSmoke}";
+	MouseLeave="{Background=Grey}";
 }
 
 ScrollBar {
@@ -318,12 +323,15 @@ labColor {
 }
 labColorV {
 	Margin="1";
-	Width="Fit";
+	Width="50";
+	TextAlignment="Right";
 }
 ColorSlider {
 	Focusable="true";
-	Height="12";
+	Height="36";
 	Margin="0";
+	Maximum="255";
+	Decimals="0";
 }
 ColorPicker {
 	Height="Fit";

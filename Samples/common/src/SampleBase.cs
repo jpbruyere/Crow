@@ -86,6 +86,10 @@ namespace Samples
 					if (!string.IsNullOrEmpty(selItem))
 						ObservableTestList.Remove(lb.SelectedItem as string);
 				},null, true);
+			CMDObsListRemove2 = new ActionCommand ("Remove2",
+				() => {
+					ObservableTestList.Remove(observableTestListSelectedItem);
+				},null, false);
 		}
 		DeviceEventType deviceEventTypeEnum;
 		public DeviceEventType DeviceEventTypeEnum {
@@ -332,7 +336,7 @@ namespace Samples
 			}
 		}
 
-		public ActionCommand CMDObsListAdd,CMDObsListRemove;
+		public ActionCommand CMDObsListAdd,CMDObsListRemove,CMDObsListRemove2;
 		string obsListNewItem = "new item";
 		public string ObsListNewItem {
 			get => obsListNewItem;
@@ -345,8 +349,17 @@ namespace Samples
 			}
 		}
 		public ObservableList<string> ObservableTestList = new ObservableList<string>(new string[]{"string1", "string2"});
-
-
+		string observableTestListSelectedItem = null;
+		public string ObservableTestListSelectedItem {
+			get => observableTestListSelectedItem;
+			set {
+				if (value == observableTestListSelectedItem)
+					return;
+				observableTestListSelectedItem = value;
+				NotifyValueChanged(ObservableTestListSelectedItem);
+				CMDObsListRemove2.CanExecute = !string.IsNullOrEmpty(observableTestListSelectedItem);
+			}
+		}
 		IList<Colors> testList = (IList<Colors>)EnumsNET.Enums.GetValues<Colors>().ToList();//.ColorDic.Values//.OrderBy(c=>c.Hue)
 																									  //.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
 																									  //.ToList ();
@@ -466,6 +479,16 @@ namespace Samples
 			}
 		}
 		public Color AllWidgetBackground {
+			get => Configuration.Global.Get<Color> (nameof(AllWidgetBackground));
+			set {
+				if (value == AllWidgetBackground)
+					return;
+				Configuration.Global.Set (nameof(AllWidgetBackground), value);
+				NotifyValueChanged (value);
+			}
+		}
+
+		public Fill TestColor {
 			get => Configuration.Global.Get<Color> (nameof(AllWidgetBackground));
 			set {
 				if (value == AllWidgetBackground)

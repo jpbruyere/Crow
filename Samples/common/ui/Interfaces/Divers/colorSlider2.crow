@@ -1,0 +1,78 @@
+﻿<VerticalStack Margin="50" Spacing="20" Background="DimGrey">
+	<Label Text="{../slider1.Value}"/>
+	<Slider Background="Onyx" Height="30" Width="400"  >
+		<Template>
+			<Group Background="{./Background}">
+				<ColorGauge Component="Red" Height="Stretched" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}" Margin="11"
+					Inverted="{./Inverted}"/>
+				<Border Name="Cursor" Foreground="White" CornerRadius="7" BorderWidth="2">
+					<Label Text="{./Value}" Foreground="WhiteSmoke"/>
+				</Border>
+			</Group>
+		</Template>	
+	</Slider>
+	<Slider Background="Onyx" Height="30" Width="400" CursorSize="20"  >
+		<Template>
+			<Group Background="{./Background}" ClipToClientRect="false">
+				<ColorGauge Component="Red" Height="Stretched" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}" Margin="10" ClipToClientRect="false"
+					Inverted="{./Inverted}"/>
+				<Shape Height="Stretched" Name="Cursor" Size="30,30" Path="M 0,30 L 15,0 L 30,30  Z G" StrokeWidth="1" ClipToClientRect="false" Scaled="false" />
+			</Group>
+		</Template>	
+	</Slider>
+	<ColorPicker>
+		<Template>
+			<Border Background="{./Background}"	Foreground="{./Foreground}" Width="Stretched"
+					CornerRadius="{./CornerRadius}" BorderWidth="1">		
+				<VerticalStack Margin="2">
+					<Widget Width="50" Height="30" CornerRadius="10" Background="{./CurrentColor}"/>
+					<Slider Background="Onyx" Height="Fit" Width="Stretched" Foreground="{²./CurrentColor}" Maximum="255" Value="{².cg.Value}">
+						<Template>
+							<Group Background="{./Background}">
+								<ColorGauge Name="cg" Component="Red" Height="Stretched" Value="{²./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}" Margin="0" CurrentColor="{²./Foreground}"/>
+								<Border Name="Cursor" Foreground="White" CornerRadius="7" BorderWidth="2">
+									<Label Text="{./Value}" Foreground="WhiteSmoke"/>
+								</Border>
+							</Group>
+						</Template>	
+					</Slider>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="R:"/>
+						<ColorSlider Name="cs" Component="Red" CurrentColor="{²./CurrentColor}"/>			
+						<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="G:"/>
+						<ColorSlider Name="cs" Component="Green" CurrentColor="{²./CurrentColor}"/>
+						<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="B:"/>
+						<ColorSlider Name="cs" Component="Blue" CurrentColor="{²./CurrentColor}"/>
+						<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="A:"/>
+						<ColorSlider Name="cs" Component="Alpha" CurrentColor="{²./CurrentColor}"/>
+						<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="H:"/>
+						<ColorSlider Name="cs" Component="Hue" CurrentColor="{²./CurrentColor}"/>
+						<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="S:"/>
+						<ColorSlider Name="cs" Component="Saturation" CurrentColor="{²./CurrentColor}"/>
+						<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="V:"/>
+						<ColorSlider Name="cs" Component="Value" CurrentColor="{²./CurrentColor}"/>
+						<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+					</HorizontalStack>
+				</VerticalStack>			
+			</Border>
+		</Template>
+	</ColorPicker>
+</VerticalStack>

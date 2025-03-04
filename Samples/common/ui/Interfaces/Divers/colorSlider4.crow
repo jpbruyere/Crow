@@ -1,0 +1,13 @@
+﻿<ColorSlider Width="400" Component="Red" Background="Grey" Height="34" CursorSize="24" >
+<Template>
+	<Group Background="{./Background}" >
+		<ColorGauge Component="{./Component}" CurrentColor="{./CurrentColor}" Orientation="{./Orientation}" Margin="10" Height="Stretched" CornerRadius="10"/>
+		<Border Name="Cursor" Foreground="White" CornerRadius="15" BorderWidth="2">
+			<Group Fit="true">
+				<Label Left="2" Top="2" Text="{./Value}" Foreground="Black" Font="mono bold, 10"/>
+				<Label Text="{./Value}" Foreground="WhiteSmoke" Font="mono bold, 10"/>
+			</Group>
+		</Border>
+	</Group>
+</Template>
+</ColorSlider>

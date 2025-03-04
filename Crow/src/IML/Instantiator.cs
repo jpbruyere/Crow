@@ -1608,41 +1608,6 @@ namespace Crow.IML {
 			orig.ValueChanged += tmp;
 		}
 		#endregion
-
-		/// <summary>
-		/// search for graphic object type in crow assembly, if not found,
-		/// search for type independently of namespace in all the loaded assemblies
-		/// </summary>
-		/// <remarks>
-		/// </remarks>
-		/// <returns>the corresponding type object</returns>
-		/// <param name="typeName">graphic object type name without its namespace</param>
-		public static Type GetWidgetTypeFromName (string typeName){
-			if (knownGOTypes.ContainsKey (typeName))
-				return knownGOTypes [typeName];
-			Type t = Type.GetType ("Crow." + typeName);
-			if (t != null) {
-				knownGOTypes.Add (typeName, t);
-				return t;
-			}
-
-			foreach (Type expT in Assembly.GetEntryAssembly ().GetExportedTypes ()) {
-				if (expT.Name != typeName)
-					continue;
-				knownGOTypes.Add (typeName, expT);
-				return expT;
-			}
-
-			foreach (Assembly a in Interface.crowAssemblies) {
-				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name != typeName)
-						continue;
-					knownGOTypes.Add (typeName, expT);
-					return expT;
-				}
-			}
-			return null;
-		}
 	}
 }
 

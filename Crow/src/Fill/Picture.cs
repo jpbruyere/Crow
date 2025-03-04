@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Drawing2D;
 using System.Globalization;
 using Crow.DebugLogger;
+using System.Diagnostics;
 
 namespace Crow
 {
@@ -68,9 +69,15 @@ namespace Crow
 		}
 		#endregion
 
-		void init(Interface iFace, ref Rectangle rect, out float widthRatio, out float heightRatio) {
-			if (!IsLoaded)
-				load (iFace);
+		bool init(Interface iFace, ref Rectangle rect, out float widthRatio, out float heightRatio) {
+			if (!IsLoaded) {
+				try {
+					load (iFace);
+				} catch (Exception e) {
+					Debug.WriteLine($"Picture loading failed ({this.Path}): {e.Message}");
+				}
+			}
+				
 
 			widthRatio = 1f;
 			heightRatio = 1f;
@@ -85,6 +92,7 @@ namespace Crow
 						widthRatio = heightRatio;
 				}
 			}
+			return IsLoaded;
 		}
 
 		/// <summary>
@@ -98,7 +106,8 @@ namespace Crow
 		{
 			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"{Path}[Picture.Paint:]");
 
-			init(iFace, ref bounds, out float widthRatio, out float heightRatio);
+			if (!init(iFace, ref bounds, out float widthRatio, out float heightRatio))
+				return;
 
 			gr.SaveTransformations ();
 
@@ -114,7 +123,8 @@ namespace Crow
 		{
 			DbgLogger.AddEventWithMsg(DbgEvtType.Ressources, $"{Path} [Picture.SetAsSource]");
 
-			init(iFace, ref bounds, out float widthRatio, out float heightRatio);
+			if (!init(iFace, ref bounds, out float widthRatio, out float heightRatio))
+				return;
 
 			using (ISurface tmp = iFace.Backend.CreateSurface (bounds.Width, bounds.Height)) {
 				using (IContext gr = iFace.Backend.CreateContext (tmp)) {

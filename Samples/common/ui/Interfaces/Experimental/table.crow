@@ -1,11 +1,11 @@
 ﻿<Table Columns="test,Fit;test,Fit;test,Stretched;test,Fit" Margin="10" 
-	ColumnSpacing="5" Spacing="5" 
+	ColumnSpacing="15" Spacing="5" Height="Fit"
 	Foreground="Grey"
-	RowsMargin="0"
-	BorderLineWidth="0"
-	VerticalLineWidth="1"
+	RowsMargin="5"
+	BorderLineWidth="1"
+	VerticalLineWidth="2"
 	HorizontalLineWidth="1"
-	Background="DarkGrey" >   	
+	Background="Jet" >   	
 	<TableRow Height="Fit" >
 		<Label Text="firstlkjdqsfmlkjqsl" Background="1,0,0,0.5" HorizontalAlignment="Left" Height="Stretched"/>
 		<Label Text="second" Background="0,1,0,0.5" Height="Stretched"/>

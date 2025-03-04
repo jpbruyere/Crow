@@ -148,15 +148,15 @@ namespace Crow
 			if (_orientation == Orientation.Horizontal) {
 				unity = (r.Width - cursorSize) / (Maximum - Minimum);
 				if (inverted)
-					cursor.Left = r.Right - cursorSize - (int)((Value - Minimum) * unity);
+					cursor.Left = r.Width - cursorSize - (int)((Value - Minimum) * unity);
 				else
-					cursor.Left = r.Left + (int)((Value - Minimum) * unity);
+					cursor.Left = (int)((Value - Minimum) * unity);
 			} else {
 				unity = (r.Height - cursorSize) / (Maximum - Minimum);
 				if (inverted)
-					cursor.Top = r.Bottom - cursorSize - (int)((Value - Minimum) * unity);
+					cursor.Top = r.Height - cursorSize - (int)((Value - Minimum) * unity);
 				else
-					cursor.Top = r.Top + (int)((Value - Minimum) * unity);
+					cursor.Top = (int)((Value - Minimum) * unity);
 			}
         }
 		Point mouseDownInit;
@@ -231,18 +231,20 @@ namespace Crow
 		/// </summary>
 		/// <param name="sender">event sender</param>
 		/// <param name="e">event argument</param>
-		public void OnDecrease (object sender, EventArgs e)
+		public void OnDecrease (object sender, MouseEventArgs e)
 		{
 			Value -= SmallIncrement;
+			e.Handled = true;
 		}
 		/// <summary>
 		/// Handler to increase current value by `SmallIncrement`
 		/// </summary>
 		/// <param name="sender">event sender</param>
 		/// <param name="e">event argument</param>
-		public void OnIncrease (object sender, EventArgs e)
+		public void OnIncrease (object sender, MouseEventArgs e)
 		{
 			Value += SmallIncrement;
+			e.Handled = true;
 		}
 
 		protected override void Dispose(bool disposing)

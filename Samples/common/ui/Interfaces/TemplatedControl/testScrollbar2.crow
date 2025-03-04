@@ -1,0 +1,20 @@
+﻿<HorizontalStack>
+	<Container Width="50%">
+		<Label Text="{../../sb.Value}" />
+	</Container>
+	<ScrollBar Name="sb" Maximum="200" CursorRatio="0.3" Width="16" LargeIncrement="20" SmallIncrement="1">
+		<Template>
+			<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}">
+				<GenericStack Orientation="{./Orientation}" Spacing="0">
+					<Shape Style="ArrowBut" MouseDown="./OnDecrease" Height="{./Width}" Margin="0"
+			    		Size="10,10" Path="M 4.5,0.5 L 9.5,9.5 L 0.5,9.5 Z F"/>
+					<Container Margin="1">
+						<Widget Style="ScrollBarCursor" Name="Cursor" CornerRadius="{./CornerRadius}"/>
+					</Container>
+					<Shape Style="ArrowBut" MouseDown="./OnIncrease" Height="{./Width}" Margin="0"
+						Size="10,10" Path="M 0.5,0.5 L 9.5,0.5 L 4.5,9.5 Z F"/>
+				</GenericStack>
+			</Border>
+		</Template>
+	</ScrollBar>
+</HorizontalStack>

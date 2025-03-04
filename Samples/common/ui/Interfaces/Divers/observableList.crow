@@ -4,8 +4,9 @@
 	<HorizontalStack Height="Fit">
 	<Button Command="{CMDObsListAdd}" />
 	<Button Command="{CMDObsListRemove}" IsEnabled="{../lb.SelectionIsEmpty}" />
+	<Button Command="{CMDObsListRemove2}"/>
 	</HorizontalStack>
-	<ListBox Name="lb" Data="{ObservableTestList}" >
+	<ListBox Name="lb" Data="{ObservableTestList}" SelectedItem="{²ObservableTestListSelectedItem}" >
 		<Template>
 			<Border Style="ControlBorder" MinimumSize="10,10" Background="{./Background}" CornerRadius="{./CornerRadius}">
 				<Scroller  Name="scroller1" >

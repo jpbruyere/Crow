@@ -18,7 +18,12 @@ namespace Crow.Text
 
 		public int CharDiff => string.IsNullOrEmpty (ChangedText) ? - Length : ChangedText.Length - Length;
         public bool IsEmpty => string.IsNullOrEmpty (ChangedText) && Length == 0;
-        public TextChange (int position, int length, string changedText) {
+        public bool HasNewText => !string.IsNullOrEmpty (ChangedText);
+        
+        public bool HasNoEffect(ReadOnlySpan<char> src)
+            => src.Slice(Start, Length).Equals(ChangedText, StringComparison.Ordinal);
+
+        public TextChange (int position, int length, string changedText = null) {
             Start = position;
             Length = length;
             ChangedText = changedText;

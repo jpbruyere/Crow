@@ -15,6 +15,9 @@ namespace Crow
 {
 	public abstract class GroupBase : Widget
     {
+		#if DEBUG_STATS
+		public static long CanceledChildPaintCount = 0;
+		#endif
 		#if DESIGN_MODE
 		public override bool FindByDesignID(string designID, out Widget go){
 			go = null;
@@ -236,8 +239,16 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 			try
 			{
-				for (int i = 0; i < Children.Count; i++)
-					Children[i].Paint (gr);
+				Rectangle cb = ClientRectangle;
+				for (int i = 0; i < Children.Count; i++) {
+					if (cb.Intersect(Children[i].ContextCoordinates(Children[i].ClientRectangle)))
+						Children[i].Paint (gr);
+#if DEBUG_STATS
+					else
+						CanceledChildPaintCount++;
+#endif
+				}
+					
 			} catch (Exception e) {
 				Console.WriteLine($"Erreur group {this} paint: {e.Message}");
 				Console.WriteLine(e.StackTrace);

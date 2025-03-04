@@ -6,6 +6,10 @@ using System;
 
 namespace Crow
 {
+	public class XmlIgnoreAttribute : Attribute
+	{ 
+	}
+
 	public class DesignIgnore : Attribute
 	{		
 	}

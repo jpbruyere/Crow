@@ -289,12 +289,17 @@ namespace Crow {
 		void Ol_ListRemove (object sender, ListChangedEventArg e)
 		{
 			cancelLoadingThread ();
+			
+			if (selectedItemContainer == itemsContainer.Children[e.Index])
+				SelectedItem = null;
+
 			if (this.isPaged) {
 				int p = e.Index / itemPerPage;
 				int i = e.Index % itemPerPage;
 				(itemsContainer.Children [p] as Group).DeleteChild (i);
 			} else
 				itemsContainer.DeleteChild (e.Index);
+			
 		}
 
 		void Ol_ListAdd (object sender, ListChangedEventArg e)

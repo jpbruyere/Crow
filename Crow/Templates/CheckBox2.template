@@ -1,4 +1,4 @@
-﻿<Label Font="{./Font}" Text="{./Caption}" CornerRadius="{./CornerRadius}" Width="Stretched"
+﻿<Label Font="{./Font}" Text="{./Caption}" CornerRadius="{./CornerRadius}" Width="Stretched" Focusable="{./Focusable}"
 	Margin="3"
 	Background="{./Background}"
 	Foreground="{./Foreground}"
