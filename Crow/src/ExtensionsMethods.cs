@@ -179,32 +179,14 @@ namespace Crow
 			}
 			return Alignment.Center;
 		}
-		public static void Raise(this EventHandler handler, object sender, EventArgs e)
-		{
-			handler?.Invoke (sender, e);
-		}
-		public static void Raise<T>(this EventHandler<T> handler, object sender, T e)
-		{
-			handler?.Invoke (sender, e);
-		}
-		public static byte[] GetBytes(this string str)
-		{
-			byte[] bytes = new byte[str.Length * sizeof(char)];
-			System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-			return bytes;
-		}
-		public static bool IsWhiteSpaceOrNewLine (this char c)
-		{
-			return c == '\t' || c.IsAnyLineBreakCharacter() || char.IsWhiteSpace (c);
-		}
-		public static object GetDefaultValue(this object obj)
+		/*public static object GetDefaultValue(this object obj)
 		{
 			Type t = obj.GetType ();
 			if (t.IsValueType)
 				return Activator.CreateInstance (t);
 
 			return null;
-		}
+		}*/
 
 		public static FileSystemInfo [] GetFileSystemInfosOrdered (this DirectoryInfo di) {
 			try {
@@ -212,17 +194,6 @@ namespace Crow
 			} catch {
 				return null;
 			}
-		}
-
-		internal static bool IsAnyLineBreakCharacter (this char c)
-			=> c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
-
-		public static bool TryGetResource (this Assembly a, string resId, out Stream stream) {
-			stream = null;
-			if (a == null)
-				return false;
-			stream = a.GetManifestResourceStream (resId);
-			return stream != null;
 		}
 	}
 }

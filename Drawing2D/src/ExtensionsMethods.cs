@@ -1,12 +1,40 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-using System;
 
-namespace Crow.Text
+using Crow.Text;
+using System;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
+using Drawing2D;
+
+namespace Crow
 {
-    public static class Extensions
-    {
+	public static class ExtensionsMethods
+	{
+		public static void Raise(this EventHandler handler, object sender, EventArgs e)
+		{
+			handler?.Invoke (sender, e);
+		}
+		public static void Raise<T>(this EventHandler<T> handler, object sender, T e)
+		{
+			handler?.Invoke (sender, e);
+		}
+		public static byte[] GetBytes(this string str)
+		{
+			byte[] bytes = new byte[str.Length * sizeof(char)];
+			System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+			return bytes;
+		}
+		public static bool IsWhiteSpaceOrNewLine (this char c)
+		{
+			return c == '\t' || c.IsAnyLineBreakCharacter() || char.IsWhiteSpace (c);
+		}
+		internal static bool IsAnyLineBreakCharacter (this char c)
+			=> c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
 		public static ReadOnlySpan<char> GetLine (this ReadOnlySpan<char> str, TextLine ls) {
 			if (ls.Start >= str.Length)
 				return "".AsSpan ();
@@ -47,6 +75,6 @@ namespace Crow.Text
 				return "\r\n".AsSpan ();
 			}
 		}
-
 	}
 }
+
