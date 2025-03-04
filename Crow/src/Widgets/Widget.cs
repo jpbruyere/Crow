@@ -1719,7 +1719,7 @@ namespace Crow
 					//apply constraints depending on parent type
 					Parent.ChildrenLayoutingConstraints (this, ref layoutType);
 
-	//				//prevent queueing same LayoutingType for this
+					//prevent queueing same LayoutingType for this
 					layoutType &= (~RegisteredLayoutings);
 
 					if (layoutType == LayoutingType.None)

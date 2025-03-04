@@ -19,7 +19,7 @@ namespace CrowEditBase
 		public bool mixedLineBreak = false;
 		public string lineBreak = null;
 
-		internal LineCollection GetLineListCopy() => new LineCollection(lines.ToArray());
+		public LineCollection GetLineListCopy() => new LineCollection(lines.ToArray());
 		public Span<char> Span => buffer.Span.Slice(0, length);
 		public ReadOnlySpan<char> ReadOnlySpan => buffer.Span.Slice(0, length);
 		public bool IsEmpty => length == 0;
