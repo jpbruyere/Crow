@@ -6,6 +6,8 @@ using System;
 
 namespace Crow
 {
+	/// <summary> Test func on data, return yes if there's children </summary>
+	public delegate bool BooleanTestOnInstance(object instance);
 	public class XmlIgnoreAttribute : Attribute
 	{ 
 	}

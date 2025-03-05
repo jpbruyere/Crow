@@ -20,9 +20,6 @@ using System.Collections;
 //at the root level of the item template if the dataTest is 'typeOf'...
 namespace Crow
 {
-	/// <summary> Test func on data, return yes if there's children </summary>
-	public delegate bool BooleanTestOnInstance(object instance);
-
 	/// <summary>
 	/// Derived from Instantiator with sub data fetching facilities for hierarchical data access.
 	///

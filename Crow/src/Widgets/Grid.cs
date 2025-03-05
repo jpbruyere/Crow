@@ -1,35 +1,7 @@
-﻿//
-// Grid.cs
+﻿// Copyright (c) 2013-2025  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
 using System.ComponentModel;
 
 namespace Crow
@@ -44,59 +16,57 @@ namespace Crow
 	{
 		#region CTOR
 		protected Grid () : base(){}
-		public Grid(Interface iface) : base(iface)
-		{
-		}
+		public Grid(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region Private fields
-		int _spacing;
-		int _columnCount;
-		int _rowCount;
+		int spacing;
+		int columnCount;
+		int rowCount;
 		#endregion
 
 		#region Public Properties
-		[DefaultValue(2)]
-		public int Spacing
-		{
-			get { return _spacing; }
-			set { _spacing = value; }
+		[DefaultValue (2)]
+		public int Spacing {
+			get => spacing;
+			set {
+				if (spacing == value)
+					return;
+				spacing = value;
+				NotifyValueChangedAuto (spacing);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
 		}
 		[DefaultValue(2)]
 		public virtual int ColumnCount
 		{
-			get { return _columnCount; }
+			get { return columnCount; }
 			set {
-				if (_columnCount == value)
+				if (columnCount == value)
 					return;
 
-				_columnCount = value;
+				columnCount = value;
 
 				NotifyValueChangedAuto (ColumnCount);
-				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}
 		[DefaultValue(2)]
 		public virtual int RowCount
 		{
-			get { return _rowCount; }
+			get { return rowCount; }
 			set {
-				if (_rowCount == value)
+				if (rowCount == value)
 					return;
 
-				_rowCount = value;
+				rowCount = value;
 
 				NotifyValueChangedAuto (RowCount);
-				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}
-		public virtual int CaseWidth {
-			get => (Slot.Width - (ColumnCount - 1) * Spacing) / ColumnCount;
-		}
-		public virtual int CaseHeight {
-			get => (Slot.Height - (RowCount - 1) * Spacing) / RowCount;
-		}
-
+		public virtual int CaseWidth => (Slot.Width - (ColumnCount - 1) * Spacing) / ColumnCount;
+		public virtual int CaseHeight => (Slot.Height - (RowCount - 1) * Spacing) / RowCount;
 		#endregion
 
 		#region Widget Overrides
@@ -119,9 +89,9 @@ namespace Crow
 		public override void ChildrenLayoutingConstraints (ILayoutable layoutable, ref LayoutingType layoutType)
 		{
 			//Prevent child repositionning
-			layoutType &= (~LayoutingType.Positioning);
+			layoutType &= (~LayoutingType.Sizing);
 		}
-		public override bool ArrangeChildren { get { return true; } }
+		public override bool ArrangeChildren => true;
 		public virtual void ComputeChildrenPositions()
 		{
 			int slotWidth = CaseWidth;
@@ -134,31 +104,43 @@ namespace Crow
 					Widget c = Children [idx];
 					if (!c.IsVisible)
 						continue;
-					c.Slot.X = curX * (slotWidth + Spacing);
-					c.Slot.Y = curY * (slotHeight + Spacing);
-					//c.Slot.Width = slotWidth;
-					//c.Slot.Height = slotHeight;
+					int x = curX * (slotWidth + Spacing);
+					if (c.Slot.X != x) {
+						c.Slot.X = x;
+						c.OnLayoutChanges (LayoutingType.X);
+						c.LastSlots.X = c.Slot.X;
+						IsDirty = true;
+					}
+					int y = curY * (slotHeight + Spacing);
+					if (c.Slot.Y != y) {
+						c.Slot.Y = y;
+						c.OnLayoutChanges (LayoutingType.Y);
+						c.LastSlots.Y = c.Slot.Y;
+						IsDirty = true;
+					}
 				}
 			}
 			IsDirty = true;
 		}
-		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
-		{
-			//base.OnChildLayoutChanges (sender, arg);
-		}
+        public override void RegisterForLayouting(LayoutingType layoutType)
+        {
+            base.RegisterForLayouting(layoutType);
+        }
+        public override void OnLayoutChanges(LayoutingType layoutType)
+        {
+            base.OnLayoutChanges(layoutType);
+        }
+        public override void OnChildLayoutChanges(object sender, LayoutingEventArgs arg)
+        {
+            base.OnChildLayoutChanges(sender, arg);
+        }
 
-		public override bool UpdateLayout (LayoutingType layoutType)
+        public override bool UpdateLayout (LayoutingType layoutType)
 		{
-			RegisteredLayoutings &= (~layoutType);
-
 			if (layoutType == LayoutingType.ArrangeChildren) {
+				RegisteredLayoutings &= (~layoutType);
 
 				ComputeChildrenPositions ();
-
-				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					IFace.EnqueueForRepaint (this);
-
 				return true;
 			}
 

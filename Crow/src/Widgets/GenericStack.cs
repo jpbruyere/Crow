@@ -109,9 +109,8 @@ namespace Crow {
 		}
 		Widget stretchedGO = null;
 		public override bool UpdateLayout (LayoutingType layoutType) {
-			RegisteredLayoutings &= (~layoutType);
-
 			if (layoutType == LayoutingType.ArrangeChildren) {
+				RegisteredLayoutings &= (~layoutType);
 				//allow 1 child to have stretched size,
 				//this child will occupy remaining space
 				//if stack size policy is Fit, no child may have stretch enabled

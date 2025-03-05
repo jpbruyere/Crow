@@ -2,6 +2,7 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 using static Crow.Logger;
+
 namespace Crow
 {
 	/// <summary>
@@ -180,9 +181,8 @@ namespace Crow
 
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
-			RegisteredLayoutings &= (~layoutType);
-
 			if (layoutType == LayoutingType.ArrangeChildren) {
+				RegisteredLayoutings &= (~layoutType);
 				if ((RequiredLayoutings & LayoutingType.Sizing) != 0)
 					return false;
 

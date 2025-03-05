@@ -1,6 +1,6 @@
-﻿<Grid ColumnCount="2" RowCount="2">
-	<Label/>
-	<Label/>
-	<Label/>
-	<Label/>
+﻿<Grid ColumnCount="3" RowCount="3" Width="Stretched" Height="Stretched" Background="Green">
+	<Label HorizontalAlignment="Right"/>
+	<Label HorizontalAlignment="Right"/>
+	<Label VerticalAlignment="Top"/>
+	<Label Background="RebeccaPurple"/>
 </Grid>
