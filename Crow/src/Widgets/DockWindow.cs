@@ -28,10 +28,10 @@ namespace Crow
 		int undockThreshold = 10;
 		bool isDocked = false;
 		Alignment docking = Alignment.Undefined;
-
 		Point undockingMousePosOrig; //mouse pos when docking was donne, use for undocking on mouse move
 		internal Rectangle savedSlot;	//last undocked slot recalled when view is undocked
 		internal bool wasResizable, freezeDockState;
+		CommandGroup additionalCommands;
 
 		public bool IsDocked {
 			get { return isDocked; }
@@ -51,6 +51,15 @@ namespace Crow
 
 		public ActionCommand CMDFreezeDockState, CMDUnfreezeDockState;
 		public CommandGroup DockCommands => new CommandGroup (CMDFreezeDockState, CMDUnfreezeDockState);
+		public CommandGroup AdditionalCommands {
+			get => additionalCommands;
+			set {
+				if (additionalCommands == value)
+					return;
+				additionalCommands = value;
+				NotifyValueChangedAuto (additionalCommands);
+			}
+		}
 		void initCommands () {
 			CMDFreezeDockState = new ActionCommand ("Freeze Dock State", () => FreezeDockState = true, "#Crow.Icons.unpin.svg", !FreezeDockState);
 			CMDUnfreezeDockState = new ActionCommand ("Unfreeze Dock State", () => FreezeDockState = false, "#Crow.Icons.pin.svg", FreezeDockState);

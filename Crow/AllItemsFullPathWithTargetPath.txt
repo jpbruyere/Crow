@@ -1,0 +1,19 @@
+/mnt/sdata/devel/crow/Crow/Crow.csproj -> AllItemsFullPathWithTargetPath
+	/home/jp/.nuget/packages/glfw-sharp/0.2.15/content/glfw-sharp.dll.config
+		CopyToOutputDirectory                              = PreserveNewest
+		TargetPath                                         = glfw-sharp.dll.config
+		FullPath                                           = /home/jp/.nuget/packages/glfw-sharp/0.2.15/content/glfw-sharp.dll.config
+		RootDir                                            = /
+		Filename                                           = glfw-sharp.dll
+		Extension                                          = .config
+		RelativeDir                                        = /home/jp/.nuget/packages/glfw-sharp/0.2.15/content/
+		Directory                                          = home/jp/.nuget/packages/glfw-sharp/0.2.15/content/
+		RecursiveDir                                       = 
+		Identity                                           = /home/jp/.nuget/packages/glfw-sharp/0.2.15/content/glfw-sharp.dll.config
+		ModifiedTime                                       = 2024-07-10 07:28:58.0000000
+		CreatedTime                                        = 2024-07-10 07:28:58.0000000
+		AccessedTime                                       = 2025-03-04 12:31:37.7520082
+		DefiningProjectFullPath                            = /usr/share/dotnet/sdk/9.0.200/Microsoft.Common.CurrentVersion.targets
+		DefiningProjectDirectory                           = /usr/share/dotnet/sdk/9.0.200/
+		DefiningProjectName                                = Microsoft.Common.CurrentVersion
+		DefiningProjectExtension                           = .targets

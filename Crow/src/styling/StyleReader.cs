@@ -30,8 +30,8 @@ namespace Crow
 		enum States { classNames, members, value, endOfStatement }
 
 		States curState = States.classNames;
-		int column = 1;
-		int line = 1;
+		int column;
+		int line;
 
 		#region Character ValidityCheck
 		/*static Regex rxValidChar = new Regex (@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
@@ -79,8 +79,8 @@ namespace Crow
 		/// </summary>
 		public void Parse (Dictionary<string, string> StylingConstants, Dictionary<string, Style> Styling, string resId)
 		{
-			column = 1;
-			line = 1;
+			column = 0;
+			line = 0;
 			curState = States.classNames;
 
 			//string styleKey = resId.Substring (0, resId.Length - 6);
@@ -98,12 +98,17 @@ namespace Crow
 				switch (Peek ()) {
 				case '/':
 					ReadChar ();
-					if (PeekChar () == '/')
+					if (PeekChar () == '/') {
 						ReadLine ();
-					else if (PeekChar () == '*'){
+						line++;
+						column = 0;
+					} else if (PeekChar () == '*'){
 						while (!EndOfStream) {
 							char c = ReadChar ();
-							if (c == '*' && PeekChar () == '/') {
+							if (c.IsWhiteSpaceOrNewLine()) {
+								line++;
+								column = 0;
+							} else if (c == '*' && PeekChar () == '/') {
 								ReadChar();
 								break;
 							}

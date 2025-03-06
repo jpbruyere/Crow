@@ -1,0 +1,17 @@
+/mnt/sdata/devel/crow/Crow/Crow.csproj -> TargetPath
+	/mnt/sdata/devel/crow/build/netcoreapp3.1/Crow.dll
+		FullPath                                           = /mnt/sdata/devel/crow/build/netcoreapp3.1/Crow.dll
+		RootDir                                            = /
+		Filename                                           = Crow
+		Extension                                          = .dll
+		RelativeDir                                        = /mnt/sdata/devel/crow/build/netcoreapp3.1/
+		Directory                                          = mnt/sdata/devel/crow/build/netcoreapp3.1/
+		RecursiveDir                                       = 
+		Identity                                           = /mnt/sdata/devel/crow/build/netcoreapp3.1/Crow.dll
+		ModifiedTime                                       = 2025-03-05 09:59:49.3241116
+		CreatedTime                                        = 2025-03-05 09:59:49.3241116
+		AccessedTime                                       = 2025-03-05 09:59:49.5161116
+		DefiningProjectFullPath                            = /mnt/sdata/devel/CrowEdit/build/plugins/CERoslynPlugin/CERoslynPlugin.targets
+		DefiningProjectDirectory                           = /mnt/sdata/devel/CrowEdit/build/plugins/CERoslynPlugin/
+		DefiningProjectName                                = CERoslynPlugin
+		DefiningProjectExtension                           = .targets

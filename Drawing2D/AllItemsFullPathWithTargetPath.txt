@@ -1,0 +1,1 @@
+/mnt/sdata/devel/crow/Drawing2D/Drawing2D.csproj -> AllItemsFullPathWithTargetPath
