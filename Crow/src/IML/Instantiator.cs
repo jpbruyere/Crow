@@ -56,7 +56,7 @@ namespace Crow.IML {
 		public static int NextInstantiatorID = 0;
 		public int currentInstantiatorID = 0;
 		int currentDesignID = 0;
-		internal string NextDesignID { get { return string.Format ("{0}_{1}",currentInstantiatorID, currentDesignID++); }}
+		internal string NextDesignID => string.Format ("{0}_{1}",currentInstantiatorID, currentDesignID++);
 #endif
 
 		#region CTOR

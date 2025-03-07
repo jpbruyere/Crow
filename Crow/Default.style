@@ -368,3 +368,11 @@ MessageBox, Popper, Slider, Spinner, TextInheritBox, NumericControl {
 TemplatedControl, GenericStack, Image {
 	CacheEnabled="true";
 }
+Label2 {
+	Height = "Fit";
+	Width = "Fit";
+	Margin = "0";
+	ClipToClientRect = "false";
+	MouseEnter = "{Background=Blue}";
+	MouseLeave = "{Background=Transparent}";
+}

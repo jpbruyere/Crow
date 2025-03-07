@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Crow.Text;
 using Crow;
 
-namespace CrowEditBase
+namespace Crow.Text
 {
 	public class TextBuffer {
 		static int bufferExpension = 100;
@@ -94,6 +94,27 @@ namespace CrowEditBase
 		public ReadOnlySpan<char> GetText (TextSpan textSpan) => buffer.Span.Slice(textSpan.Start, textSpan.Length);
 		public int GetAbsolutePosition (CharLocation loc) => lines.GetAbsolutePosition (loc);
 		public CharLocation EndLocation => new CharLocation (lines.Count - 1, lines[lines.Count - 1].Length);
+		public virtual CharLocation GetWordStart (CharLocation loc) {
+			int pos = GetAbsolutePosition (loc);
+			//skip white spaces
+			ReadOnlySpan<char> txt = ReadOnlySpan;
+			while (pos > 0 && !char.IsLetterOrDigit (txt[pos-1]))
+				pos--;
+			while (pos > 0 && char.IsLetterOrDigit (txt[pos-1]))
+				pos--;
+			return GetLocation (pos);
+		}
+		public virtual CharLocation GetWordEnd (CharLocation loc) {
+			int pos = GetAbsolutePosition (loc);
+			//skip white spaces
+			ReadOnlySpan<char> txt = ReadOnlySpan;
+			while (pos < Length - 1 && !char.IsLetterOrDigit (txt[pos]))
+				pos++;
+			while (pos < Length - 1 && char.IsLetterOrDigit (txt[pos]))
+				pos++;
+			return GetLocation (pos);
+		}
+
         public override string ToString() => ReadOnlySpan.ToString();
     }
 }

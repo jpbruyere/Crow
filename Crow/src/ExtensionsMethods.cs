@@ -10,6 +10,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 using Drawing2D;
+using System.Reflection.PortableExecutable;
+using Glfw;
 
 namespace Crow
 {
@@ -194,6 +196,16 @@ namespace Crow
 			} catch {
 				return null;
 			}
+		}
+		public static int Count(this ReadOnlySpan<char> chars, char c) {
+			int count = 0, pos = 0;
+
+			while(pos < chars.Length) {
+				if (chars[pos] == c)
+					count++;
+				pos++;
+			}
+			return count;
 		}
 	}
 }
