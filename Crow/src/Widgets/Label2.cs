@@ -16,30 +16,27 @@ namespace Crow
     /// <summary>
     /// Simple label widget possibly multiline but without tabulation handling.
     /// </summary>
-    public class Label2 : ScrollingObject, IEditableTextWidget
+    public class Label2 : ScrollingObject
     {
 		#region CTOR
-		protected Label2 () {
-			initCommands ();			
-		}
+		protected Label2 () { }
 		public Label2(Interface iface, string style = null) : base (iface, style) { }
         #endregion
-        protected override void onInitialized(object sender, EventArgs e)
+        
+		protected override void onInitialized(object sender, EventArgs e)
         {
-			
+			initCommands ();
             base.onInitialized(sender, e);
         }
 
-		TextBuffer buffer = new TextBuffer("");
+		protected TextBuffer buffer = new TextBuffer("");
 		protected bool disableTextChangedEvent;
 
-		public Command CMDCut, CMDCopy, CMDPaste;
-		void initCommands () {
-			CMDCut = new ActionCommand ("Cut", Cut, "#icons.scissors.svg",  false);
+		public Command CMDCopy;
+		protected virtual void initCommands () {
 			CMDCopy = new ActionCommand ("Copy", Copy, "#icons.copy-file.svg",  false);
-			CMDPaste = new ActionCommand ("Paste", Paste, "#icons.paste-on-document.svg",  true);
 
-			ContextCommands = new CommandGroup (CMDCut, CMDCopy, CMDPaste);
+			ContextCommands = new CommandGroup (CMDCopy);
 		}
 
 		public event EventHandler<TextChangeEventArgs> TextChanged;
@@ -53,7 +50,6 @@ namespace Crow
 			SelectionChanged.Raise (this, e);
 		}
 
-		#region Label
 		[DefaultValue("label")]
         public string Text
         {
@@ -67,8 +63,8 @@ namespace Crow
 				NotifyValueChanged ("Text", Text);
             }
         }
+		
 		double targetColumn = -1;//handle line changes with long->short->long line length sequence.
-
 		protected CharLocation? hoverLoc = null;
 		protected CharLocation? currentLoc = null;
 		protected CharLocation? selectionStart = null;  //selection start (row,column)
@@ -83,10 +79,10 @@ namespace Crow
 				NotifyValueChanged ("CurrentColumn", CurrentColumn);
 				NotifyValueChanged ("TabulatedColumn", TabulatedColumn);
 
-				CMDCopy.CanExecute = CMDCut.CanExecute = !SelectionIsEmpty;
+				CMDCopy.CanExecute = !SelectionIsEmpty;
 			}
 		}
-		public int CurrentLine {
+		public virtual int CurrentLine {
 			get => currentLoc.HasValue ? currentLoc.Value.Line : 0;
 			set {
 				if (currentLoc?.Line == value)
@@ -94,10 +90,10 @@ namespace Crow
 				currentLoc = new CharLocation (value, currentLoc.Value.Column, currentLoc.Value.VisualCharXPosition);
 				NotifyValueChanged ("CurrentLine", CurrentLine);
 
-				CMDCopy.CanExecute = CMDCut.CanExecute = !SelectionIsEmpty;
+				CMDCopy.CanExecute = !SelectionIsEmpty;
 			}
 		}
-		public int CurrentColumn {
+		public virtual int CurrentColumn {
 			get => currentLoc.HasValue ? currentLoc.Value.Column < 0 ? 0 : currentLoc.Value.Column : 0;
 			set {
 				if (CurrentColumn == value)
@@ -105,7 +101,7 @@ namespace Crow
 				currentLoc = new CharLocation (currentLoc.Value.Line, value);
 				NotifyValueChanged ("CurrentColumn", CurrentColumn);
 
-				CMDCopy.CanExecute = CMDCut.CanExecute = !SelectionIsEmpty;
+				CMDCopy.CanExecute = !SelectionIsEmpty;
 			}
 		}
 		public int TabulatedColumn {
@@ -377,7 +373,7 @@ namespace Crow
 			//document.EnterReadLock();
 			
 			try {
-				//if (HasFocus) {
+				if (HasFocus) {
 					if (currentLoc?.Column < 0) {
 						updateLocation (gr, ref currentLoc);
 					} else
@@ -402,7 +398,7 @@ namespace Crow
 							selEnd = CurrentLoc.Value;
 						}
 					}
-				//}
+				}
 
 				if (buffer.Length > 0) {
 					int skippedLines = (int)Math.Floor(ScrollY / lineHeight);
@@ -513,46 +509,6 @@ namespace Crow
 			updateLocation (ref newLoc);
 			hoverLoc = newLoc;
 		}
-		RectangleD? textCursor = null;
-
-		public virtual bool DrawCursor (IContext ctx, out Rectangle rect) {
-			if (CurrentLoc == null) {
-				rect = default;
-				return false;
-			}
-			CharLocation loc = currentLoc.Value;
-
-			if (!loc.HasVisualX) {
-				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-				ctx.SetFontSize (Font.Size);
-
-				if (currentLoc?.Column < 0) {
-					updateLocation (ctx, ref loc);
-					//update is locked, should not notify while updating graphics
-					//NotifyValueChanged ("CurrentColumn", CurrentColumn);
-				} else
-					updateLocation (ctx, ref loc);
-
-				textCursor = null;
-			}
-			currentLoc = loc;
-
-			textCursor = computeTextCursor (new RectangleD (loc.VisualCharXPosition, lineHeight * visualCurrentLine, 1.0, lineHeight));
-
-			if (textCursor == null) {
-				rect = default;
-				return false;
-			}
-
-			Rectangle c = ContextCoordinates (textCursor.Value + Slot.Position + ClientRectangle.Position);
-			Foreground.SetAsSource (IFace, ctx, c);
-			ctx.LineWidth = 1.0;
-			ctx.MoveTo (0.5 + c.X, c.Y);
-			ctx.LineTo (0.5 + c.X, c.Bottom);
-			ctx.Stroke ();
-			rect = c;
-			return true;
-		}
 		protected void updateLocation(ref CharLocation loc) {
 			if (loc.HasVisualX)
 				return;
@@ -620,60 +576,6 @@ namespace Crow
 				loc.TabulatedColumn = totChar;
 			}
 		}
-		/*protected void updateLocation (IContext gr, int clientWidth, ref CharLocation? location) {
-			if (location == null)
-				return;
-			CharLocation loc = location.Value;
-			//Console.WriteLine ($"updateLocation: {loc} text:{_text.Length}");
-			if (loc.HasVisualX)
-				return;
-			if (loc.Column == 0) {
-				loc.VisualCharXPosition = 0;
-			} else {
-
-				TextLine ls = document.GetLine (loc.Line);
-				ReadOnlySpan<char> curLine = document.GetText (ls);			
-				double cPos = 0;
-
-				if (loc.Column >= 0) {
-					//int encodedBytes = Crow.Text.Encoding2.ToUtf8 (curLine.Slice (0, loc.Column), bytes);
-	#if DEBUG
-					if (loc.Column > curLine.Length) {
-						System.Diagnostics.Debug.WriteLine ($"loc.Column: {loc.Column} curLine.Length:{curLine.Length}");
-						loc.Column = curLine.Length;
-					}
-	#endif
-					Span<byte> bytes = stackalloc byte[loc.Column*4+10];
-					int encodedBytes = curLine.Slice (0,loc.Column).ToUtf8 (bytes, 4);
-					bytes[encodedBytes++] = 0;
-					gr.TextExtents (bytes, out TextExtents te);
-					loc.VisualCharXPosition = te.XAdvance;
-				} else {
-					TextExtents te;
-					Span<byte> bytes = stackalloc byte[5];//utf8 single char buffer + '\0'
-
-					for (int i = 0; i < ls.Length; i++) {
-						int encodedBytes = curLine.Slice (i, 1).ToUtf8 (bytes);
-						bytes[encodedBytes] = 0;
-
-						gr.TextExtents (bytes, out te);
-						double halfWidth = te.XAdvance / 2;
-
-						if (loc.VisualCharXPosition <= cPos + halfWidth) {
-							loc.Column = i;
-							loc.VisualCharXPosition = cPos;
-							location = loc;
-							return;
-						}
-
-						cPos += te.XAdvance;
-					}
-					loc.Column = ls.Length;
-					loc.VisualCharXPosition = cPos;
-				}
-			}
-			location = loc;
-		}*/
 
 		protected void checkShift (KeyEventArgs e) {
 			if (e.Modifiers.HasFlag (Modifier.Shift)) {
@@ -683,23 +585,10 @@ namespace Crow
 				SelectionStart = null;
 		}
 
-		#region GraphicObject overrides
 		public override void OnLayoutChanges (LayoutingType layoutType) {
 			base.OnLayoutChanges (layoutType);
 			updateMaxScrolls (layoutType);
 		}
-		/*public override bool UpdateLayout (LayoutingType layoutType) {
-			if ((LayoutingType.Sizing | layoutType) != LayoutingType.None) {
-				if (!System.Threading.Monitor.TryEnter (linesMutex))
-					return false;
-			}
-			try {
-				bool result = base.UpdateLayout (layoutType);
-				return result;
-			} finally {
-				System.Threading.Monitor.Exit (linesMutex);
-			}
-		}*/
 		public override int measureRawSize(LayoutingType lt)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this, lt);
@@ -738,15 +627,7 @@ namespace Crow
 			if (ClipToClientRect)
 				gr.Restore ();
 		}
-        public override bool Paint(IContext ctx)
-        {
-            bool painted = base.Paint(ctx);
-			if (HasFocus && painted && IFace.drawTextCursor) {
-				DrawCursor(ctx, out Rectangle r);
-			}
-			return painted;
-        }
-		#endregion
+		
 
 		#region Mouse handling
 		protected override void onFocused (object sender, EventArgs e)
@@ -760,11 +641,20 @@ namespace Crow
 		}
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e) {
 			base.onMouseEnter (sender, e);
-			if (!Focusable)
-				return;
-			IFace.MouseCursor = MouseCursor.ibeam;
+			if (Focusable) {
+				HasFocus = true;
+				IFace.MouseCursor = MouseCursor.ibeam;
+			}
 		}
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+        public override void onMouseLeave(object sender, MouseMoveEventArgs e)
+        {
+            base.onMouseLeave(sender, e);
+			if (Focusable && HasFocus) {
+				HasFocus = false;
+				CurrentLoc = null;
+			}
+        }
+        public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 			mouseMove (e);
@@ -823,23 +713,6 @@ namespace Crow
 		}
 		#endregion
 
-		#region Keyboard handling
-		public override void onKeyPress (object sender, KeyPressEventArgs e) {
-			base.onKeyPress (sender, e);
-
-			if (!e.Handled) {
-				TextSpan selection = Selection;
-				update (new TextChange (selection.Start, selection.Length, e.KeyChar.ToString ()));
-
-				e.Handled = true;
-			}
-			/*Insert (e.KeyChar.ToString());
-
-			SelRelease = -1;
-			SelBegin = new Point(CurrentColumn, SelBegin.Y);
-
-			RegisterForGraphicUpdate();*/
-		}
 		public override void onKeyDown (object sender, KeyEventArgs e) {
 			Key key = e.Key;
 			TextSpan selection = Selection;
@@ -847,42 +720,6 @@ namespace Crow
 			/*document.EnterReadLock();
 			try {*/
 				switch (key) {
-				case Key.Backspace:
-					if (selection.IsEmpty) {
-						if (selection.Start == 0)
-							return;
-						if (CurrentLoc.Value.Column == 0) {
-							int lbLength = buffer.GetLine (CurrentLoc.Value.Line - 1).LineBreakLength;
-							update (new TextChange (selection.Start - lbLength, lbLength, ""));
-						}else
-							update (new TextChange (selection.Start - 1, 1, ""));
-					} else
-						update (new TextChange (selection.Start, selection.Length, ""));
-					break;
-				case Key.Delete:
-					if (selection.IsEmpty) {
-						if (selection.Start == buffer.Length)
-							return;
-						if (CurrentLoc.Value.Column >= buffer.GetLine (CurrentLoc.Value.Line).Length)
-							update (new TextChange (selection.Start, buffer.GetLine (CurrentLoc.Value.Line).LineBreakLength, ""));
-						else
-							update (new TextChange (selection.Start, 1, ""));
-					} else {
-						if (e.Modifiers == Modifier.Shift)
-							IFace.Clipboard = SelectedText;
-						update (new TextChange (selection.Start, selection.Length, ""));
-					}
-					break;
-				case Key.Insert:
-					if (e.Modifiers.HasFlag (Modifier.Shift))
-						Paste ();
-					else if (e.Modifiers.HasFlag (Modifier.Control))
-						Copy ();
-					break;
-				case Key.KeypadEnter:
-				case Key.Enter:
-					update (new TextChange (selection.Start, selection.Length, buffer.GetLineBreak ()));
-					break;
 				case Key.Escape:
 					SelectionStart = null;
 					CurrentLoc = buffer.GetLocation (selection.Start);
@@ -953,47 +790,14 @@ namespace Crow
 					return;
 				}
 				autoAdjustScroll = true;
-				IFace.forceTextCursor();
 				e.Handled = true;
 			/*} finally {
 				document.ExitReadLock ();
 			}*/
 		}
-		#endregion
-		#endregion
 
 
-		#region textBox
 		protected bool autoAdjustScroll = false;//if scrollXY is changed directly, dont try adjust scroll to cursor
-		protected virtual RectangleD? computeTextCursor (Rectangle cursor) {
-			Rectangle cb = ClientRectangle;
-			cursor -= new Point (ScrollX, ScrollY);
-
-			if (autoAdjustScroll) {
-				autoAdjustScroll = false;
-				int goodMsrs = 0;
-				if (cursor.Left < 0)
-					ScrollX += cursor.Left;
-				else if (cursor.X > cb.Width)
-					ScrollX += cursor.X - cb.Width + 5;
-				else
-					goodMsrs++;
-
-				if (cursor.Y < 0)
-					ScrollY += cursor.Y;
-				else if (cursor.Bottom > cb.Height)
-					ScrollY += cursor.Bottom - cb.Height;
-				else
-					goodMsrs++;
-
-				if (goodMsrs < 2)
-					return null;
-			} else if (cursor.Right < 0 || cursor.X > cb.Width || cursor.Y < 0 || cursor.Bottom > cb.Height)
-				return null;
-
-			return cursor;
-		}
-
 		protected virtual void updateMaxScrolls (LayoutingType layout) {
 			Rectangle cb = ClientRectangle;
 			if (layout == LayoutingType.Width) {
@@ -1021,29 +825,17 @@ namespace Crow
 				return;
 			IFace.Clipboard = SelectedText;
 		}
-		public virtual void Paste () {
-			TextSpan selection = Selection;
-			update (new TextChange (selection.Start, selection.Length, IFace.Clipboard));
-		}
 
 		protected virtual void update (TextChange change) {
 			buffer.Update(change);
 			if (!disableTextChangedEvent)
 				OnTextChanged (this, new TextChangeEventArgs (change));
-			if (HasFocus) {
-				SelectionStart = null;
-				CharLocation newLoc = change.ChangedText == null ?
-					buffer.GetLocation (change.Start)	: buffer.GetLocation (change.Start + change.ChangedText.Length);
-				updateLocation(ref newLoc);//ensure tabulated column is uptodate on each changes
-				CurrentLoc = newLoc;
-			}
+			CurrentLoc = null;
 			textMeasureIsUpToDate = false;
 			IFace.forceTextCursor();
 			autoAdjustScroll = true;
-
 			RegisterForGraphicUpdate ();
 		}
 
-		#endregion
 	}
 }

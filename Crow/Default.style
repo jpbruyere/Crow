@@ -104,6 +104,22 @@ Label {
 	Margin = "0";
 	ClipToClientRect = "false";
 }
+TextBox2 {
+	Height = "Fit";
+	Width = "Fit";
+	Margin = "1";
+	Background = "WhiteSmoke";
+	Foreground = "Jet";
+	Focusable = "True";
+	ClipToClientRect = "false";
+}
+Label2 {
+	Height = "Fit";
+	Width = "Fit";
+	Margin = "0";
+	ClipToClientRect = "false";
+}
+
 OldLabel {
 	Height = "Fit";
 	Width = "Fit";
@@ -367,12 +383,4 @@ MessageBox, Popper, Slider, Spinner, TextInheritBox, NumericControl {
 }
 TemplatedControl, GenericStack, Image {
 	CacheEnabled="true";
-}
-Label2 {
-	Height = "Fit";
-	Width = "Fit";
-	Margin = "0";
-	ClipToClientRect = "false";
-	MouseEnter = "{Background=Blue}";
-	MouseLeave = "{Background=Transparent}";
 }
