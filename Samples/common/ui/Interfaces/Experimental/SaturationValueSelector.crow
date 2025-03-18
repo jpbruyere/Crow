@@ -1,0 +1,15 @@
+﻿<ColorPicker Height="Fit" Width="Fit">
+	<Template>
+		<VerticalStack >
+			<HorizontalStack Height="Fit" Margin="0">
+				<Label2 Text="{../svs.V}" Foreground="White"/>
+				<Label2 Text="{../svs.S}" Foreground="White"/>
+			</HorizontalStack>
+			<HorizontalStack Height="200" Margin="0">
+				<SaturationValueSelector Name="svs" V="10"  S="0"  Width="200" Height="200" Margin="0"
+Foreground="RebeccaPurple" Background="Transparent"/>
+				<HueSelector Orientation="Vertical" Width="20" Margin="0"/> 
+			</HorizontalStack>
+		</VerticalStack>
+	</Template>
+</ColorPicker>

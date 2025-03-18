@@ -45,8 +45,10 @@ namespace Crow
 
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-			IsChecked = !IsChecked;
-			e.Handled = true;
+			if (Focusable) {
+				IsChecked = !IsChecked;
+				e.Handled = true;
+			}
 			base.onMouseClick (sender, e);
 		}
 	}

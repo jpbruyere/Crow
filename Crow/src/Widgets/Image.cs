@@ -25,6 +25,7 @@ namespace Crow
 	/// </remarks>
 	public class Image : Scalable
 	{
+		static readonly byte[] pngMagic = new byte[] {0x89, 0x50 ,0x4e ,0x47 ,0x0d ,0x0a};
 		Picture _pic;
 		string _svgSub;
 
@@ -139,9 +140,7 @@ namespace Crow
 		/// Initializes a new instance of the <see cref="Crow.Image"/> class from code
 		/// </summary>
 		/// <param name="iface">interface to bound to</param>
-		public Image (Interface iface) : base(iface)
-		{
-		}
+		public Image (Interface iface, string style = null) : base(iface, style) { }
 		#endregion
 
 		#region Image Loading
@@ -154,8 +153,27 @@ namespace Crow
 			if (getcontenttype.Wait(HTTP_DOWNLOAD_TIMEOUT_MS) && getcontenttype.IsCompletedSuccessfully) {
 				if (!getcontenttype.Result.Content.Headers.TryGetValues("content-Type", out IEnumerable<string> contents))
 					return;
-				string[] type = contents.FirstOrDefault().Split('/');				
-				if (!string.Equals(type[0], "image", StringComparison.Ordinal))
+				string[] type = contents.FirstOrDefault().Split('/');
+				if (string.Equals(contents.FirstOrDefault(), "application/octet-stream")) {
+					if (task.Wait(HTTP_DOWNLOAD_TIMEOUT_MS) && task.IsCompletedSuccessfully) {
+						MemoryStream dataCopy = new MemoryStream();
+						task.Result.CopyTo(dataCopy);
+						dataCopy.Position = 0;
+						Span<byte> magic = stackalloc byte[6];
+						dataCopy.Read(magic);
+						if (magic.SequenceEqual(pngMagic)) {
+							dataCopy.Position = 0;
+							pic = new BmpPicture(uri.AbsoluteUri);
+						} else
+							return;
+						pic.LoadFromStream(IFace, dataCopy);
+						pic.Scaled = scaled;
+						pic.KeepProportions = keepProps;
+						lock(IFace.UpdateMutex)
+							Picture = pic;
+					}
+					return;
+				} else	if (!string.Equals(type[0], "image", StringComparison.Ordinal))
 					return;
 				if (string.Equals(type[1], "svg", StringComparison.Ordinal))
 					pic = new SvgPicture(uri.AbsoluteUri);
@@ -176,6 +194,8 @@ namespace Crow
 					lock(IFace.UpdateMutex)
 						Picture = pic;
 				}
+			} else {
+				Debug.WriteLine("image downloadThread: get content failed");
 			}
 
 		}

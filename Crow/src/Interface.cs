@@ -531,7 +531,7 @@ namespace Crow
 				windows [window].OnKeyDown (new KeyEventArgs (key, scanCode, modifiers));
 		};
 		static CharDelegate HandleCharDelegate = (IntPtr window, CodePoint codepoint) => {
-			Console.WriteLine ($"Char: cp:{codepoint.Value} -> '{codepoint}'");
+			//Console.WriteLine ($"Char: cp:{codepoint.Value} -> '{codepoint}'");
 			windows [window].OnKeyPress (codepoint.ToChar());
 		};
 		static WindowSizeDelegate HandleWindowSizeDelegate = (IntPtr window, int Width, int Height) => {
@@ -1112,13 +1112,13 @@ namespace Crow
 		/// </summary>
 		public void Update(IContext ctx = null){
 
-			CrowThread[] tmpThreads;
+			/*CrowThread[] tmpThreads;
 			lock (CrowThreads) {
 				tmpThreads = new CrowThread[CrowThreads.Count];
 				Array.Copy (CrowThreads.ToArray (), tmpThreads, CrowThreads.Count);
 			}
 			for (int i = 0; i < tmpThreads.Length; i++)
-				tmpThreads [i].CheckState ();
+				tmpThreads [i].CheckState ();*/
 
 			if (lastMouseDownEvent != null) {
 				if (mouseRepeatTimer.ElapsedMilliseconds > DEVICE_REPEAT_INTERVAL) {
@@ -1935,7 +1935,7 @@ namespace Crow
 		}
 		void resetTooltip ()
 		{
-			lock (tooltipMutex) {
+			lock (tooltipMutex) {//TODO:deadlock
 				if (tooltipVisible) {
 					ToolTipContainer.LayoutChanged -= ToolTipContainer_LayoutChanged;
 					ToolTipContainer.DataSource = null;

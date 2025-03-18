@@ -19,7 +19,7 @@
 			</HorizontalStack>
 		</Template>
 	</CheckBox>
-	<CheckBox Background="Jet" Height="30" Width="60"	
+	<CheckBox Background="Jet" Height="30" Width="60" IsChecked="{²BoolVal}"
 						Checked="{sh.HorizontalAlignment=Right};{Background=SeaGreen}"
 						Unchecked="{sh.HorizontalAlignment=Left};{Background=Jet}">
 		<Template>
@@ -28,5 +28,11 @@
 			</Group>
 		</Template>
 	</CheckBox>
-	
+	<CheckBox Caption="Ok" Background="Transparent" Height="30" Width="30" IsChecked="{²BoolVal}" CornerRadius="10"
+						Checked="{Background=SeaGreen}"
+						Unchecked="{Background=Red}">
+		<Template>
+			<Label2 Background="{./Background}" Text="{./Caption}" Margin="5" CornerRadius="{./CornerRadius}"/>
+		</Template>
+	</CheckBox>	
 </VerticalStack>

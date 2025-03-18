@@ -49,6 +49,8 @@ namespace Crow
 
 			Rectangle r = ClientRectangle;
 
+			gr.Operator = Operator.Over;
+
 			if (Foreground != null) {//TODO:test if null should be removed
 				Foreground.SetAsSource (IFace, gr, r);
 				CairoHelpers.CairoRectangle (gr, r, CornerRadius);
