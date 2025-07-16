@@ -7,7 +7,7 @@
 			<Button />
 			<CheckBox />
 			<RadioButton/>
-			<Spinner/>			
+			<Spinner/>
 			<Slider />
 			<Popper />
 			<Expandable />

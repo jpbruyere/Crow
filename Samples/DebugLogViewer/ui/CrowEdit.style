@@ -1,0 +1,141 @@
+﻿SmallUIFont = "sans, 12";
+SmallFont = "consolas, 12";
+InactiveTabBackground = "DarkGrey";
+SelectedTabBackground = "Onyx";
+InactiveTabForeground = "Grey";
+SelectedTabForeground = "White";
+MenuIconSize = "22";
+
+ControlForeground = "LightGrey";
+ControlCaptionHoverColor = "White";
+
+ControlHighlight = "RoyalBlue";
+ControlIdle = "Jet";
+
+DockWindowBackground = "DarkGrey";
+
+TreeItemBorderCornerRadius	= "0";
+TreeItemBorderFG			= "Transparent";
+TreeItemBorderHighlightFG	= "DimGrey";
+TreeItemBackground			= "Transparent";
+//TreeItemHighlight			= "
+
+TxtInFileDialog {
+	Margin = "2";
+	Font = "mono, 14";
+}
+
+Editor {
+	Focusable="true";
+	Height="Stretched";
+	Width="Stretched";
+	Background="White";
+	Foreground="Black";
+	MouseWheelSpeed = "20";
+	BubbleEvents ="None";
+	ClipToClientRect = "true";
+	MouseCursor = "ibeam";
+	CacheEnabled = "true";
+}
+
+icon {
+	Width="14";
+	Height="14";
+}
+MemberViewLabel {
+	Margin="1";
+	Height="Fit";
+	Width="50%";
+	Background="White";
+}
+MemberViewHStack {
+	Focusable="true";
+	Height="Fit";
+	Spacing="1";
+	MouseEnter="{Background=SteelBlue}";
+	MouseLeave="{Background=Transparent}";
+}
+
+IcoBut {
+	Template = "#ui.IcoBut.template";
+	MinimumSize = "10,10";
+	Width = "32";
+	Height = "32";
+}
+Spinner {
+	Template = "#ui.spinner.template";
+}
+TreeIcon {
+	Width="16";
+	Height="16";
+}
+TreeIconSmall {
+	Width="12";
+	Height="12";
+}
+TreeLabel {
+	Foreground="White";
+	Margin = "1";
+}
+TreeLabel2 {
+	Foreground="Black";
+	Background="LightGrey";
+	Margin = "1";
+	Font = "sans, 9";
+}
+
+Splitter {
+	Thickness="1";
+	Background="Transparent";
+	Hover="{Background=White}";
+	Unhover="{Background=Transparent}";
+}
+
+MenuItem {
+	Template = "#ui.MenuItem.template";
+}
+
+MenuIcon {
+	Margin = "1";
+	Width = "${MenuIconSize}";
+	Height = "${MenuIconSize}";
+}
+
+EnumSelector {
+	Template = "#ui.EnumSelector.template";
+	ItemStyle = "CheckBoxEvtType";
+}
+CheckBox {
+	Template= "#Crow.CheckBox2.template";
+	Width = "Stretched";
+	Height = "Fit";
+	CornerRadius = "2";
+	Background = "${ControlIdle}";
+	Foreground = "${ControlForeground}";
+	Checked = "{Background=${ControlHighlight}}";
+	Unchecked = "{Background=${ControlIdle}}";
+	MouseEnter = "{Foreground=${ControlCaptionHoverColor}}";
+	MouseLeave = "{Foreground=${ControlForeground}}";
+}
+StateBox {
+	Template= "#Crow.CheckBox2.template";
+	Width = "Stretched";
+	Height = "Fit";
+	CornerRadius = "2";
+	Background = "${ControlIdle}";
+	Foreground = "${ControlForeground}";
+	Checked = "{Background=Green}";
+	Unchecked = "{Background=DarkRed}";
+	Focusable = "false";
+}
+StateBoxSmall {
+	Template= "#ui.SimpleStatus.template";
+	Checked = "{Background=Green}";
+	Unchecked = "{Background=DarkRed}";
+	Focusable = "false";
+	Background = "DarkRed";
+	Foreground = "${ControlForeground}";
+	Width = "Fit";
+	Height = "Fit";
+}
+

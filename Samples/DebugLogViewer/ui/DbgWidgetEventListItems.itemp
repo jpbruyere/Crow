@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ListItem Height="Fit"
+	Selected="{Background=${ControlHighlight}}"
+	Unselected="{Background=Transparent}">
+		<HorizontalStack Spacing="2" >
+			<Label Text="{BeginMS}" Width="70" TextAlignment="Right" Background="DimGrey"/>
+			<Label Text="{type}" Width="160" Background="{Color}" Foreground="Black"/>
+			<Label Text="{Message}" Width="Stretched" />
+			<Label Text="{DurationMS}" Width="70" TextAlignment="Right" Background="DimGrey"/>
+		</HorizontalStack>
+</ListItem>

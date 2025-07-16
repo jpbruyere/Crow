@@ -1,0 +1,52 @@
+﻿ControlBackground = "Transparent";
+ControlForeground = "Grey";
+ControlHighlight = "RoyalBlue";
+ControlBorderColor = "DimGrey";
+ControlBorderWidth = "1";
+ControlCaptionHoverColor = "White";
+ControlCornerRadius = "0";
+ControlInsideMargin = "1";
+ControlIdle = "Jet";
+
+smallLabCaption {
+	Font="mono, 10";
+	Foreground="Grey";
+}
+smallLabValue {
+	Font="mono, 10";
+	Foreground="White";
+}
+DbgLogViewer {
+	MouseWheelSpeed="3";
+	Font="mono, 8";
+	Background="Onyx";
+	CacheEnabled = "true";	
+}
+DbgEventView {
+	Height="Fit";
+	Width="150";
+}
+labWidgetRecordList {
+	Font="mono, 11";
+	Background="Grey";
+	Foreground="Jet";
+	Margin="0";
+	Width="24";
+	TextAlignment="Right";
+}
+
+DbgEventWidget {
+	CacheEnabled = "true";
+}
+CheckBoxEvtType {
+	Template= "#Crow.CheckBox2.template";
+	Width = "160";
+	Height = "Fit";
+	CornerRadius = "2";
+	Background = "${ControlIdle}";
+	Foreground = "${ControlForeground}";
+	Checked = "{Background=${ControlHighlight}}";
+	Unchecked = "{Background=${ControlIdle}}";
+	MouseEnter = "{Foreground=${ControlCaptionHoverColor}}";
+	MouseLeave = "{Foreground=${ControlForeground}}";
+}

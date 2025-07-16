@@ -15,7 +15,7 @@
 						<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
 							 MouseClick="onQuitPress"/>
 					</Border>
-					</HorizontalStack>
+				</HorizontalStack>
 			</ListItem>
 		</ItemTemplate>
 	</ListBox>

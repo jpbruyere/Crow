@@ -1,9 +1,7 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2025  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,10 +104,11 @@ namespace Crow
 
 		public IList<Colors> AvailableColors => //Enum.GetValues (typeof (Color)).ToList<Color> ();// Colors. ColorDic.Values.OrderBy (c => c.Hue).ToList ();
 			EnumsNET.Enums.GetValues<Colors> ().ToList<Colors> ();
+			//EnumsNET.Enums.GetValues<Colors> ().OrderBy(c=>(((Color)c).Value << 8) + (((Color)c).Hue << 16) + (((Color)c).Saturation)).ToList<Colors> ();
 
 		public void onSelectedItemChanged(object sender, SelectionChangeEventArgs e) {
 			CurrentColor = (Color)(Colors)e.NewValue;
 		}
-	}
+    }
 }
 

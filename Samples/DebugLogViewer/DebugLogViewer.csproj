@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<EmbeddedResource Include="ui\*.*">
+			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="icons\**\*.*">
+			<LogicalName>icons.%(Filename)%(Extension)</LogicalName>
+		</EmbeddedResource>		
+		<!--<AssemblyAttribute Include="Crow.CrowAssemblyPriority">
+			<_Parameter1>0</_Parameter1>
+		</AssemblyAttribute>-->
+	</ItemGroup>
+</Project>

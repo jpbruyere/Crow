@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<Window Caption="Debug Log" Background="0.05,0.05,0.1,0.9" Width="95%" Height="95%">
+	<VerticalStack RootDataLevel="true">
+		<TabView>
+			<VerticalStack Name="LogGraph" Background="DarkGrey">
+				<EnumSelector RadioButtonStyle="CheckBox2" Template="#ui.EnumSelector.template"
+						Caption="Discarded Events" EnumValue="{²../dbv.Filter}" BitFieldExcludeMask="255" />
+				<HorizontalStack>
+					<DbgLogViewer Visible="true" Name="dbv" Events="{Events}" Widgets="{Widgets}" 
+											 CurrentEvent="{²CurrentEvent}" CurrentWidget="{²CurrentWidget}" />
+					<ScrollBar Maximum="{../dbv.MaxScrollY}" Value="{²../dbv.ScrollY}" SmallIncrement="1" LargeIncrement="10"
+											CursorRatio="{../dbv.ChildHeightRatio}"/>
+				</HorizontalStack>
+				<ScrollBar Style="HScrollBar"  Maximum="{../dbv.MaxScrollX}" Value="{²../dbv.ScrollX}" SmallIncrement="1" LargeIncrement="10"
+					CursorRatio="{../dbv.ChildWidthRatio}"/>
+				<HorizontalStack Height="Fit" DataSource="{CurrentWidget}" Spacing="3">
+					<Label Style="smallLabValue" Text="{name}"/>
+					<Label Style="smallLabValue" Text="{listIndex}" Tooltip="List index"/>
+					<Label Style="smallLabValue" Text="{treeIndex}" Tooltip="tree index"/>
+					<Label Style="smallLabValue" Text="{yIndex}" Tooltip="yIndex"/>
+					<Label Style="smallLabValue" Text="{xLevel}" Tooltip="xLevel"/>
+					<Label Style="smallLabCaption" Text="Width:"/>
+					<Label Style="smallLabValue" Text="{Width}"/>
+					<Label Style="smallLabCaption" Text="Height:" />
+					<Label Style="smallLabValue" Text="{Height}"/>
+					<Label Style="smallLabCaption" Text="ScrollX:" />
+					<Label Style="smallLabValue" Text="{../../dbv.ScrollX}"/>
+					<Label Style="smallLabCaption" Text="MaxScrollX:" />
+					<Label Style="smallLabValue" Text="{../../dbv.MaxScrollX}"/>
+					<Label Style="smallLabValue" Tooltip="XScale" Text="{../../dbv.XScale}"/>
+					<Label Style="smallLabValue" Tooltip="VisibleTicks" Text="{../../dbv.VisibleTicks}"/>				
+				</HorizontalStack>
+			</VerticalStack>
+			<VerticalStack Name="AllEvents" Width="Stretched" IsVisible="false" RootDataLevel="true">
+				<TreeView Height="Stretched" Name="dbgTV" Data="{Events}" SelectedItem="{²CurrentEvent}" Background="DarkGrey"							
+							ItemTemplate="#ui.DbgEventTreeItems.itemp"/> 
+			</VerticalStack>
+			<VerticalStack Name="CurWidgetEvents" Width="Stretched" IsVisible="false" RootDataLevel="true">
+				<ListBox  Data="{CurrentWidgetEvents}" Background="Black" SelectedItem="{²CurrentEvent}">
+					<ItemTemplate>
+						<ListItem Margin="0" Height="16" IsSelected="{²IsSelected}" Width="Fit"
+									Selected="{Background=${ControlHighlight}}" Template="Crow.ScrollingListBox.template"
+									Unselected="{Background=Transparent}">
+							<DbgEventWidget Height="10" Width="Fit" Event="{}" Tooltip="#ui.DbgEvtTooltip.crow" TicksPerPixel="1000" VerticalAlignment="Center"/>
+						</ListItem>
+					</ItemTemplate>
+					<Template>
+						<Wrapper Name="ItemsContainer" Spacing="1" Background="{./Background}"/>
+					</Template>
+				</ListBox>
+			</VerticalStack>
+		</TabView>
+		<Splitter/>
+		<HorizontalStack Height="30%">
+			<ListBox Data="{Widgets}" Width="200" SelectedItem="{²CurrentWidget}"
+				ItemTemplate="#ui.WidgetRecord.itemp">
+			</ListBox>
+			<ListBox Data="{CurWidgetProperties}" Width="25%" >
+				<ItemTemplate>
+					<ListItem Height="Fit" Margin="1" Focusable="true" HorizontalAlignment="Left" 
+									Selected = "{Background=${ControlHighlight}}"
+									Unselected = "{Background=Transparent}">
+						<HorizontalStack>
+							<Label Text="{Key}" Width="140"/>
+							<Label Text="{Value}" Width="Stretched" Background="White" Foreground="Black" TextAlignment="Left"/>
+						</HorizontalStack>
+					</ListItem>
+				</ItemTemplate>
+			</ListBox>
+			<Splitter/>
+			<VerticalStack>
+				<HorizontalStack Height="Fit" Background="Onyx" Spacing="5">
+					<Label Text="{CurrentWidget}"/>
+					<Label Text="events"/>
+				</HorizontalStack>
+				<ListBox Height="Stretched" Data="{CurrentWidgetEvents}" SelectedItem="{²CurrentEvent}" Background="DarkGrey"
+							ItemTemplate="#ui.DbgWidgetEventListItems.itemp"/>
+			</VerticalStack>
+			<Splitter/>
+			<DbgEventView Template="#ui.DbgEventView.template" Event="{../../dbv.HoverEvent}"/>
+			<Splitter/>
+			<DbgEventView Template="#ui.DbgEventView.template" Event="{CurrentEvent}"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit" Background="Onyx" Margin="1">
+			<HorizontalStack Height="Fit" DataSource="{CurrentEvent}">
+				<Label Foreground="Black" Text="Current Event:" Background="{Color}" Margin="2" />
+				<DbgEventWidget Height="14" Width="Stretched" Event="{}" Tooltip="#ui.DbgEvtTooltip.crow" />
+			</HorizontalStack>
+			<ListBox Data="{EventCommands}" Fit="true">
+				<Template>
+					<HorizontalStack Name="ItemsContainer" />
+				</Template>
+				<ItemTemplate Path="#ui.IconCommand.itmp"/>
+			</ListBox>
+			<Popper Caption="Search...">
+				<VerticalStack Fit="true" Background="Onyx" Margin="10">
+					<ComboBox Caption="Event Type" Data="{AllEventTypes}" SelectedItem="{²SearchEventType}"/>
+					<ComboBox Caption="Widget" Data="{Widgets}" SelectedItem="{²SearchWidget}"/>
+				</VerticalStack>
+			</Popper>
+		</HorizontalStack>
+	</VerticalStack>
+</Window>

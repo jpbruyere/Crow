@@ -3,8 +3,8 @@ InactiveTabBackground = "DarkGrey";
 SelectedTabBackground = "Onyx";
 InactiveTabForeground = "Grey";
 SelectedTabForeground = "White";
-SmallUIFont = "sans, 12";
-SmallFont = "consolas, 12";
+SmallUIFont = "sans, 20";
+SmallFont = "mono, 20";
 
 FpsLabel {
 	Width = "30";
@@ -69,7 +69,7 @@ DockStack {
 	//EndDrag="{Background=Jet}";
 }
 SimpleDockWin {
-	Template= "#ui.dockwinsimple.itmp";
+	//Template= "#ui.dockwinsimple.itmp";
 	Background = "Yellow";
 	Width="200";
 	Height="200";
@@ -91,7 +91,7 @@ valignStyle2 {
 	//Initialized="{Background=Blue}";
 }
 smallLabel {
-	Font="consolas, 8";
+	Font="mono, 8";
 }
 suggestionsListBox {
 	Template = "#ui.Suggestions.template";

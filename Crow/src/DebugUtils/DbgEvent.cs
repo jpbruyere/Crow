@@ -97,7 +97,7 @@ namespace Crow.DebugLogger
 		public virtual string Print ()
 			=> $"{begin,10}:{threadId,-2}:{type,-20}:{Message}";
 		public override string ToString ()
-			=> $"{begin};{end};{threadId};{type};{Message}";
+			=> $"{begin};{end};{threadId};{type};{Message?.Replace("\n", @"\n")}";
 		public virtual Color Color {
 			get {
 				switch (type) {

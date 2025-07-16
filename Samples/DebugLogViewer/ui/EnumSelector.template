@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--<Popper >
+	<Template>
+		<HorizontalStack Background="{../../Background}" Margin="5" Spacing="10">
+			<Label Text="{../../../Caption}" Width="Stretched"/>
+			<Label Background="SeaGreen" Text="{../../../EnumValue}" Margin="3" Width="Stretched"/>
+		</HorizontalStack>
+	</Template>	
+	<Wrapper Name="Content" Height="300" Width="Fit" Background="Jet" Orientation="Horizontal" />	
+</Popper>-->
+<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
+	<HorizontalStack>
+		<Label Text="{./Caption}"/>
+		<Popper Caption="{./EnumValue}"  >
+			<Template>
+				<Label Style="ControlCaption" Text="{./Caption}" Foreground="{./Foreground}" MinimumSize="80,1" TextAlignment="Center"/>
+			</Template>
+			<Wrapper Name="Content" Background="Onyx" Width="60%" Height="Fit" Margin="5" Orientation="Vertical"/>
+		</Popper>
+	</HorizontalStack>
+</Border>

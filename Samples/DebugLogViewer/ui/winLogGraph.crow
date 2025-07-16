@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<DockWindow Caption="Debug Log Graph"  Width="90%" Height="90%">
+	<VerticalStack Name="LogGraph" >
+		<EnumSelector RadioButtonStyle="CheckBox2" Template="#ui.EnumSelector.template"
+				Caption="Discarded Events" EnumValue="{²../dbv.Filter}" BitFieldExcludeMask="255" />					
+		<HorizontalStack>
+			<DbgLogViewer Visible="true" Name="dbv" Events="{Events}" Widgets="{Widgets}" 
+									 CurrentEvent="{²CurrentEvent}" CurrentWidget="{²CurrentWidget}" />
+			<ScrollBar Maximum="{../dbv.MaxScrollY}" Value="{²../dbv.ScrollY}" SmallIncrement="1" LargeIncrement="10"
+									CursorRatio="{../dbv.ChildHeightRatio}"/>
+		</HorizontalStack>
+		<ScrollBar Style="HScrollBar"  Maximum="{../dbv.MaxScrollX}" Value="{²../dbv.ScrollX}" SmallIncrement="1" LargeIncrement="10"
+			CursorRatio="{../dbv.ChildWidthRatio}"/>
+		<HorizontalStack Height="Fit" DataSource="{CurrentWidget}" Spacing="3">
+			<Label Style="smallLabValue" Text="{name}"/>
+			<Label Style="smallLabValue" Text="{listIndex}" Tooltip="List index"/>
+			<Label Style="smallLabValue" Text="{treeIndex}" Tooltip="tree index"/>
+			<Label Style="smallLabValue" Text="{yIndex}" Tooltip="yIndex"/>
+			<Label Style="smallLabValue" Text="{xLevel}" Tooltip="xLevel"/>
+			<Label Style="smallLabCaption" Text="ScrollX:" />
+			<Label Style="smallLabValue" Text="{../../dbv.ScrollX}"/>
+			<Label Style="smallLabCaption" Text="MaxScrollX:" />
+			<Label Style="smallLabValue" Text="{../../dbv.MaxScrollX}"/>
+			<Label Style="smallLabValue" Tooltip="XScale" Text="{../../dbv.XScale}"/>
+			<Label Style="smallLabValue" Tooltip="VisibleTicks" Text="{../../dbv.VisibleTicks}"/>				
+		</HorizontalStack>
+	</VerticalStack>
+</DockWindow>
+
+

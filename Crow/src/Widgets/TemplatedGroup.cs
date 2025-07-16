@@ -12,6 +12,7 @@ using System.Threading;
 using Drawing2D;
 
 using Crow.IML;
+using System.Diagnostics;
 
 namespace Crow {
 	public abstract class TemplatedGroup : TemplatedControl
@@ -289,7 +290,7 @@ namespace Crow {
 		void Ol_ListRemove (object sender, ListChangedEventArg e)
 		{
 			cancelLoadingThread ();
-			
+			Debug.WriteLine($"{e.Index}");
 			if (selectedItemContainer == itemsContainer.Children[e.Index])
 				SelectedItem = null;
 

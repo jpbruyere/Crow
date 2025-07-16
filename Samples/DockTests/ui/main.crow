@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<HorizontalStack Height="Fit" Width="Stretched" Background="Yellow">
+		<Label Text="Hover:" Width="50" Foreground="Grey"/>
+		<Label Width="Stretched" Text="{HoverWidget}" Font="mono, 10" Foreground="Black"/>
+	</HorizontalStack  >
+	<HorizontalStack Height="Fit" Width="Stretched">
+		<Label  Text="Focus:" Width="50" Foreground="Grey"/>
+		<Label Width="Stretched" Text="{FocusedWidget}" Font="mono, 10"/>
+	</HorizontalStack  >
+	<HorizontalStack Height="Fit">
+		<Label  Text="Active:" Width="50" Foreground="Grey"/>
+		<Label Width="Stretched" Text="{ActiveWidget}" Font="mono, 10"/>
+	</HorizontalStack>
+	<Group Width="200" Height="200" Background="Yellow">
+		<Border Top="20" Left="20" Width="70" Height="70" Foreground="Purple" Background="Blue"/>
+		<Border Top="40" Left="40" Width="70" Height="70" Foreground="Purple" Background="Red"/>
+	</Group>
+	<Button Command="{CMDNewDockWin}"/>
+	<Group Name="dockRoot" Margin="20" Focusable="true" Width="Stretched" Height="Stretched">
+		<DockStack CacheEnabled="false"  Name="mainDock" Focusable="false" Width="90%" Spacing="10" Background="0.1,0.1,0.1,0.8"/>
+		<!--<DockWindow Name="win1" Style="SimpleDockWin" Top="10" Left="10" Background="Red" Width="200" Height="200"/> 
+		<DockWindow Name="win2" Style="SimpleDockWin" Top="30" Left="30" Background="Green" Width="200" Height="200"/>
+		<DockWindow Name="win3" Style="SimpleDockWin" Top="50" Left="50" Background="Pink" Width="200" Height="200"/>
+		<DockWindow Name="win4" Style="SimpleDockWin" Top="70" Left="70" Background="RoyalBlue" Width="200" Height="200"/> -->
+	</Group>
+</VerticalStack>

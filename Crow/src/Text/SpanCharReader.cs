@@ -40,7 +40,12 @@ namespace Crow.Text
 			c = Read();
 			return true;
 		}
-		public bool TryRead (char c) => EndOfSpan ? false : Read() == c;
+		public bool TryRead (char c) {
+			if (!TryPeek(c))
+				return false;
+			Read();
+			return true;
+		} 
 
 		public ReadOnlySpan<char> Read (int length) => buffer.Slice (curPos += length, length);
 		public void Advance (int increment = 1) => curPos += increment;
@@ -145,8 +150,8 @@ namespace Crow.Text
 		/// </summary>
 		/// <returns></returns>
 		public bool Eol () {
-			return Peek == '\x85' || Peek == '\x2028' || Peek == '\xA' || curPos + 1 == buffer.Length ||
-				(Peek == '\xD' && (buffer [curPos + 1]  == '\xA' || buffer [curPos + 1]  == '\x85'));
+			return Peek == '\x85' || Peek == '\x2028' || Peek == '\xA' || Peek == '\xD' |
+				(curPos < buffer.Length - 1 && Peek == '\xD' && (buffer [curPos + 1]  == '\xA' || buffer [curPos + 1]  == '\x85'));
 
 		}
 		/// <summary>

@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2013-2022  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2025  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-
 using Drawing2D;
 
-using static Crow.Logger;
+
 namespace Crow
 {
 	/// <summary>

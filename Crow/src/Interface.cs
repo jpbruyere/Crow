@@ -88,7 +88,7 @@ namespace Crow
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
 		/// <summary> Disable caching for a widget if this threshold is reached </summary>
-		public const int MaxCacheSize = 2048;
+		public const int MaxCacheSize = 4096;
 		/// <summary> Above this count, the layouting is discard from the current
 		/// update cycle and requeued for the next</summary>
 		public static int MaxLayoutingTries = 30;
@@ -589,9 +589,6 @@ namespace Crow
 		}
 		protected virtual void OnInitialized ()
 		{
-			/*try {
-				Load ("#main.crow").DataSource = this;
-			} catch { }*/
 			Initialized.Raise (this, null);
 		}
 		/// <summary>
@@ -1248,7 +1245,7 @@ namespace Crow
 				}
 
 				if (lastDragImageBounds != DragImageBounds) {
-					/*ctx.LineWidth = 1;
+					ctx.LineWidth = 1;
 					ctx.SetSource(1,0,0,0.6);
 					ctx.Rectangle(DragImageBounds);
 					ctx.Stroke ();
@@ -1256,7 +1253,7 @@ namespace Crow
 					ctx.Rectangle(lastDragImageBounds);
 					ctx.Stroke ();
 					ctx.Arc(lastDragImageBounds.X, lastDragImageBounds.Y, 5,0,Math.PI*2.0);
-					ctx.Fill ();*/
+					ctx.Fill ();
 
 					DirtyRect += lastDragImageBounds;
 					ctx.Save ();
@@ -1911,8 +1908,8 @@ namespace Crow
 							Widget g = _hoverWidget;
 							while (g != null) {
 								if (!string.IsNullOrEmpty (g.Tooltip)) {
-									if (g.Tooltip.StartsWith("#", StringComparison.Ordinal)) {
-										//custom tooltip container
+									if (g.Tooltip.StartsWith("#", StringComparison.Ordinal) && g.Tooltip.Length > 1) {
+										//custom tooltip container 
 										ToolTipContainer = CreateInstance (g.Tooltip);
 									} else
 										ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");

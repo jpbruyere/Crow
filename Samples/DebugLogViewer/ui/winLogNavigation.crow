@@ -1,0 +1,45 @@
+﻿<?xml version="1.0"?>
+<DockWindow Caption="Debug Log Navigation"  Width="90%" Height="Fit">
+	<VerticalStack Name="LogGraph" >
+		<ListBox Name="lbAllEvents" Data="{Events}" Height="Fit" >
+			<ItemTemplate>
+				<ListItem Margin="0" Height="16" Width="Fit"
+							Selected="{Background=Yellow}"
+							Unselected="{Background=Transparent}">
+					<DbgEventWidget CacheEnabled="true" Height="10" Width="Fit" Event="{}" Tooltip="#ui.DbgEvtTooltip.crow" TicksPerPixel="3000" VerticalAlignment="Center"/>
+				</ListItem>
+			</ItemTemplate>
+			<Template>
+				<VerticalStack Width="Stretched" >
+					<Scroller Name="scroller"   >
+						<HorizontalStack Name="ItemsContainer"  Width="Fit" HorizontalAlignment="Left"/>
+					</Scroller>
+					<ScrollBar Style="HScrollBar" Name="scrollbar1" Value="{²../scroller.ScrollX}"
+						LargeIncrement="{../scroller.PageWidth}" SmallIncrement="30" CursorRatio="{../scroller.ChildWidthRatio}"
+						Maximum="{../scroller.MaxScrollX}" Height="12" />
+				</VerticalStack>
+			</Template>
+		</ListBox>
+		<ListBox DataSource="{../lbAllEvents.SelectedItem}" Data="{Events}" Height="Fit" >
+			<ItemTemplate>
+				<ListItem Margin="0" Height="16" Width="Fit"
+							Selected="{Background=Yellow}"
+							Unselected="{Background=Transparent}">
+					<DbgEventWidget CacheEnabled="true" Height="10" Width="Fit" Event="{}" Tooltip="#ui.DbgEvtTooltip.crow" TicksPerPixel="3000" VerticalAlignment="Center"/>
+				</ListItem>
+			</ItemTemplate>
+			<Template>
+				<VerticalStack Width="Stretched" >
+					<Scroller Name="scroller"   >
+						<HorizontalStack Name="ItemsContainer"  Width="Fit" HorizontalAlignment="Left"/>
+					</Scroller>
+					<ScrollBar Style="HScrollBar" Name="scrollbar1" Value="{²../scroller.ScrollX}"
+						LargeIncrement="{../scroller.PageWidth}" SmallIncrement="30" CursorRatio="{../scroller.ChildWidthRatio}"
+						Maximum="{../scroller.MaxScrollX}" Height="12" />
+				</VerticalStack>
+			</Template>
+		</ListBox>
+	</VerticalStack>
+</DockWindow>
+
+

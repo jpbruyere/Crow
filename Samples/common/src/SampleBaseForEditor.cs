@@ -5,15 +5,11 @@
 using System;
 using Crow;
 using System.IO;
-using System.Text;
-using Crow.IML;
-using System.Runtime.CompilerServices;
 using Glfw;
-using System.Diagnostics;
 using Crow.Text;
 using System.Collections.Generic;
 using Encoding = System.Text.Encoding;
-using System.Linq;
+using Crow.DebugLogger;
 
 namespace Samples
 {
@@ -69,9 +65,10 @@ namespace Samples
 			}
 		}
 
-		#region DebugLog		
+		#region DebugLog
 		bool debugLogRecording;
 		public bool DebugLoggingEnabled => DbgLogger.IsEnabled;
+		public IEnumerable<DbgEvent> DebugEvents => DbgLogger.Events;
 
 		static ObservableList<DbgEvtType> RecordedEvents;
 		public bool DebugLogRecording {
@@ -80,11 +77,6 @@ namespace Samples
 				if (debugLogRecording == value)
 					return;
 				debugLogRecording = value;
-				if (debugLogRecording) {
-					DbgLogger.IncludedEvents = new List<DbgEvtType>(RecordedEvents);
-				} else {
-					DbgLogger.IncludedEvents = null;
-				}
 				NotifyValueChanged(debugLogRecording);
 			}
 		}
@@ -107,6 +99,9 @@ namespace Samples
 				NotifyValueChanged (DebugLogFilePath);
 			}
 		}
+		
+		
+		
 		#endregion
 
 

@@ -67,6 +67,7 @@ namespace Crow
 		public Table ()  {}
 		public Table (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
+
 		int columnSpacing, borderLineWidth, verticalLineWidth, horizontalLineWidth, rowsMargin;
 		ObservableList<Column> columns;
 		HorizontalStack HeaderRow;

@@ -1,28 +1,26 @@
-﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2025  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using Crow;
 using System.IO;
-using System.Text;
 using Crow.IML;
-using System.Runtime.CompilerServices;
 using Glfw;
 using System.Diagnostics;
-using Crow.Text;
 using System.Collections.Generic;
 using Encoding = System.Text.Encoding;
 using Samples;
 using System.Threading;
+using System.Linq;
 
 namespace ShowCase
 {
 	class Showcase : SampleBaseForEditor
 	{
 		static DbgEvtType[] logEvts = {
-			/*DbgEvtType.IFace,
-			DbgEvtType.Widget,*/
+			DbgEvtType.IFace,
+			DbgEvtType.Widget,
 			DbgEvtType.Ressources
 			/*DbgEvtType.MouseEnter,
 			DbgEvtType.MouseLeave,
@@ -32,8 +30,8 @@ namespace ShowCase
 		};
 		static void Main ()
 		{
-			DbgLogger.ConsoleOutput = true;
-			DbgLogger.IncludedEvents.Add(DbgEvtType.Ressources);			
+			//DbgLogger.ConsoleOutput = true;
+			//DbgLogger.IncludedEvents.Add(DbgEvtType.Ressources);
 			
 			//Configuration.Global.Set ("RecordedEvents", new DbgEvtType[] { DbgEvtType.Ressources});
 
@@ -113,7 +111,7 @@ namespace ShowCase
 			}
 		}
 		public string TemplateContainerSource {
-			get => Configuration.Global.Get<string> ("TemplateContainerSource", "<Button/>");
+			get => Configuration.Global.Get<string> ("TemplateContainerSource", "<Button>");
 			set {
 				if (TemplateContainerSource == value)
 					return;
@@ -135,8 +133,13 @@ namespace ShowCase
 					Instantiator inst = null;
 					string src = source;
 					if (EncloseInTemplatedControl) {
+						if (!string.IsNullOrEmpty(src) && src.StartsWith("<?xml")) {
+							int pos = src.IndexOf('>');
+							if (pos > 0)
+								src = src.Substring(pos + 1);
+						}
 						string tmpControl = TemplateContainerSource.Split (' ', StringSplitOptions.RemoveEmptyEntries)[0].Replace ("<","").Replace (">","");
-						src = $"{TemplateContainerSource}\n<Template>\n{source}\n</Template>\n</{tmpControl}>";
+						src = $"{TemplateContainerSource}<Template>{src}</Template></{tmpControl}>";
 					}
 					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (src)))
 						inst = new Instantiator (this, ms);
@@ -187,7 +190,6 @@ namespace ShowCase
 			reloadChrono.Reset ();
 		}
 
-
         public override bool OnKeyDown (KeyEventArgs e) {
 
             switch (e.Key) {
@@ -196,12 +198,15 @@ namespace ShowCase
                 return true;
             case Key.F6:
 				if (DebugLogRecording) {
-					DbgLogger.IncludedEvents.Clear();
 					if (DebugLogToFile && !string.IsNullOrEmpty(DebugLogFilePath))
 	                	DbgLogger.Save (this, DebugLogFilePath);
+					DbgLogger.IncludedEvents.Clear();
 					DebugLogRecording = false;
+					NotifyValueChanged("DebugEvents", DebugEvents );
  				} else {
+					DbgLogger.ConsoleOutput = false;
 					DbgLogger.Reset ();
+					NotifyValueChanged("DebugEvents", (object)null );
 					DbgLogger.IncludedEvents = new List<DbgEvtType> (logEvts);
 					DebugLogRecording = true;
 				}

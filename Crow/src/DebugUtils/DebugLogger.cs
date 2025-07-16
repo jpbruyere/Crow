@@ -31,6 +31,7 @@ namespace Crow
 		static object logMutex = new object ();
 		static Stopwatch chrono = Stopwatch.StartNew ();
 		static List<DbgEvent> events = new List<DbgEvent> ();
+		public static IEnumerable<DbgEvent> Events => events;
 		//started events per thread
 		static Dictionary<int, Stack<DbgEvent>> startedEvents = new Dictionary<int, Stack<DbgEvent>> ();
 		//helper for fetching current event list to add next event to while recording
@@ -49,6 +50,7 @@ namespace Crow
 		}
 		public static readonly bool IsEnabled = true;
 #else
+		public static IEnumerable<DbgEvent> Events => null;
 		public static readonly bool IsEnabled = false;
 #endif
 
@@ -179,18 +181,20 @@ lock (logMutex) {
 			Monitor.Exit(logMutex);
 
 			if (ConsoleOutput) {
-				if (evt.type.HasFlag (DbgEvtType.Error)) {
-					Console.ForegroundColor = ConsoleColor.Red;
-				}
-				if (evt is DbgWidgetEvent we) {
-					Console.WriteLine ($"{evt.Print()} {Widget.GraphicObjects[we.InstanceIndex]}");
-				} else
-					Console.WriteLine ($"{evt.Print()}");
-				Console.ResetColor ();
-			}			
+				printToConsole(evt);
+			}
+		}
+		static void printToConsole(DbgEvent evt) {
+			if (evt.type.HasFlag (DbgEvtType.Error)) {
+				Console.ForegroundColor = ConsoleColor.Red;
+			}
+			if (evt is DbgWidgetEvent we) {
+				Console.WriteLine ($"{evt.Print()} {Widget.GraphicObjects[we.InstanceIndex]}");
+			} else
+				Console.WriteLine ($"{evt.Print()}");
+			Console.ResetColor ();
 #endif
 		}
-
 #if DEBUG_LOG
 		static DbgEvent addEventInternal (DbgEvtType evtType, params object [] data)
 		{
@@ -236,6 +240,8 @@ lock (logMutex) {
 			foreach (DbgEvent e in evts) {
 				if (e == null)
 					continue;
+				/*if (e.type == DbgEvtType.GOSetProperty)
+					Debugger.Break();*/
 				s.WriteLine (new string ('\t', level) + e);
 				if (e.Events != null)
 					saveEventList (s, e.Events, level + 1);

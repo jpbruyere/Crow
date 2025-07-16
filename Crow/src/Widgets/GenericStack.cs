@@ -5,7 +5,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-using static Crow.Logger;
+
 namespace Crow {
 	/// <summary>
 	/// group container that stacked its children horizontally or vertically

@@ -1,4 +1,7 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack CacheEnabled="false" Name="MoveHandle" Background="{./Background}">
-    <Label CacheEnabled="false" Background="Jet" Text="{./DockingPosition}"/>
+<VerticalStack Name="MoveHandle" Background="{./Background}">
+    <Label Background="Jet" Text="{./DockingPosition}"/>
+    <TextBox Background="Jet" Text="{./Name}" Width="Stretched" Multiline="true"/>
+    <Label Background="Jet" Text="{./FloatingGroup}"/>
+    <Label Background="Jet" Text="{./Width}"/>
 </VerticalStack>

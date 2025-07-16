@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-<TextBox Margin="10"/>
+<TextBox Margin="10" Multiline="true"/>
 </VerticalStack>
 <!--<Group CacheEnabled="false" Name="dockRoot" Margin="20" Focusable="true" Width="Stretched" Height="Stretched">
 	<DockStack ClipToClientRect="false" CacheEnabled="false" Name="mainDock" Focusable="false" Width="50%" Background="0.1,0.1,0.1,0.8"/>

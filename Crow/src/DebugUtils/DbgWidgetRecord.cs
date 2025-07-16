@@ -19,6 +19,7 @@ namespace Crow.DebugLogger
 		public int listIndex;//prevent doing an IndexOf on list for each event to know y pos on screen
 							 //public int instanceNum;//class instantiation order, used to bind events to objs
 		public string name;
+		public string nameAndIndex => $"{name}{listIndex}";
 		//0 is the main graphic tree, for other obj tree not added to main tree, it range from 1->n
 		//useful to track events for obj shown later, not on start
 		public int InstanceIndex;

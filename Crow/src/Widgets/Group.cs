@@ -1,14 +1,8 @@
-﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2025  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-
-using System.Threading;
-
-using static Crow.Logger;
 
 namespace Crow
 {

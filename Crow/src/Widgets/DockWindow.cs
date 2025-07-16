@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2022  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2025  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -210,11 +210,17 @@ namespace Crow
 				r.Inflate(-2,-2);
 	            ISurface dragImg = IFace.Backend.CreateSurface (r.Width, r.Height);
 				using (IContext gr = IFace.Backend.CreateContext (dragImg)) {
-					gr.LineWidth = 1;
+					/*gr.LineWidth = 1;
 					gr.Rectangle (0,0,r.Width,r.Height);
 					gr.SetSource (0.2,0.3,0.9,0.5);
 					gr.FillPreserve ();
 					gr.SetSource (0.1,0.2,1);
+					gr.Stroke ();*/
+					gr.LineWidth = 2;
+					gr.Rectangle (0,0,r.Width,r.Height);
+					gr.SetSource (0.2,0.3,0.9,0.5);
+					gr.FillPreserve ();
+					gr.SetSource (1.0,0.2,1);
 					gr.Stroke ();
 				}
 				IFace.CreateDragImage (dragImg, r, false);
@@ -311,7 +317,7 @@ namespace Crow
 			if (Parent == IFace) {
 				IFace.RemoveWidget (this);
 			} else {
-				floatingGroup = Parent as Group;
+				FloatingGroup = Parent as Group;
 				floatingGroup.RemoveChild(this);
 			}
 

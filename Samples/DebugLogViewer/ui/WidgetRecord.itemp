@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ListItem Height="Fit" Margin="1" Focusable="true" HorizontalAlignment="Left" 
+				Selected = "{Background=${ControlHighlight}}"
+				Unselected = "{Background=Transparent}">
+	<HorizontalStack>
+		<Label Text="{nameAndIndex}" Width="Stretched"/>
+		<!--<Label Style="labWidgetRecordList" Text="{listIndex}" Tooltip="List index"/>-->
+		<Label Style="labWidgetRecordList" Text="{InstanceIndex}" Tooltip="tree index"/>
+		<Label Style="labWidgetRecordList" Text="{yIndex}" Tooltip="yIndex"/>
+		<Label Style="labWidgetRecordList" Text="{xLevel}" Tooltip="xLevel"/>
+	</HorizontalStack>
+</ListItem>

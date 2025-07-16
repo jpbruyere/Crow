@@ -164,10 +164,10 @@ namespace Drawing2D
 	public struct Color : IEquatable<Color>
     {
 		#region CTOR
-		public Color (int r, int g, int b, int a) :
+		public Color (int r, int g, int b, int a = 255) :
 			this ((uint)r, (uint)g, (uint)b, (uint)a) { }
 
-		public Color(uint r, uint g, uint b, uint a)
+		public Color(uint r, uint g, uint b, uint a = 255)
 		{
 			value =
 				((r & 0xFF) << 24) +
@@ -175,7 +175,7 @@ namespace Drawing2D
 				((b & 0xFF) << 8) +
 				((a & 0xFF));
 		}
-		public Color (byte r, byte g, byte b, byte a)
+		public Color (byte r, byte g, byte b, byte a = 0xff)
 		{
 			value = ((uint)r << 24) + ((uint)g << 16) + ((uint)b << 8) + a;
 		}
@@ -222,13 +222,6 @@ namespace Drawing2D
 			get => (value & 0x000000FF);
 			set => this.value = (value & 0x000000FF);
 		}
-
-
-
-
-		/*public string Name;
-		public string htmlCode;
-		internal bool predefinied;*/
 
 		#region Operators
 		/*public static implicit operator string(Color c) => c.ToString();
@@ -382,5 +375,6 @@ namespace Drawing2D
 				return new Color (X + m, C + m,  m, _alpha / 255.0);
 			return new Color (C + m, X + m,  m, _alpha / 255.0);
 		}
+		public static Color FromRGBA (int r, int g, int b, int a = 255) => new Color(r, g, b, a);
 	}
 }

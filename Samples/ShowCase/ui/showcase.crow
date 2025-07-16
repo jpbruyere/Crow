@@ -18,9 +18,9 @@
 							<Border CornerRadius="2" Margin="0" Height="Fit"
 									Foreground="Transparent"
 									MouseEnter="{Foreground=DimGrey}"
-									MouseLeave="{Foreground=Transparent}">								
+									MouseLeave="{Foreground=Transparent}">
 								<HorizontalStack>
-									<Image Margin="1" Width="14" Height="14" Path="#Crow.Icons.file.svg"/>
+									<Image Margin="1" Width="16" Height="16" Path="#Crow.Icons.file.svg"/>
 									<Label Text="{Name}" Width="Stretched"/>
 								</HorizontalStack>
 							</Border>
@@ -161,8 +161,7 @@
 					</Template>
 					<VerticalStack Width="200" Height="200" Background="Jet" Margin="5">
 						<CheckBox Caption="Embed source in template" IsChecked="{²EncloseInTemplatedControl}"/>
-						<TextBox BubbleEvents="None" Text="{²TemplateContainerSource}" Width="Stretched" Height="Stretched" Multiline="true"
-							Tooltip="Add '*source* where you want to load the source in the editor."/>
+						<TextBox BubbleEvents="None" Text="{²TemplateContainerSource}" Width="Stretched" Height="Stretched" Multiline="true"/>
 					</VerticalStack>
 				</Popper>
 			</Wrapper>
