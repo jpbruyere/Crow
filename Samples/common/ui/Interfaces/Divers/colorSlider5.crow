@@ -1,0 +1,8 @@
+﻿<ColorSlider Width="400" Component="Red" Background="Transparent" Height="16" CursorSize="10" >
+	<Template>
+		<Group Background="{./Background}" >
+			<ColorGauge Component="{./Component}" CurrentColor="{./CurrentColor}" Orientation="{./Orientation}" Margin="5" Height="Stretched" CornerRadius="10"/>
+			<Shape Name="Cursor" Foreground="White" Size="10,20" Path="M 5.5,11.5 L 9.5,15.5 L 9.5,19.5 L 1.5,19.5 L 1.5,15.5 F G" Scaled="false" KeepProportions="true" StrokeWidth="0" Margin="0" />
+		</Group>
+	</Template>
+</ColorSlider>

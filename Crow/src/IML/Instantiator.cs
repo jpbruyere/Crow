@@ -824,17 +824,16 @@ namespace Crow.IML {
                 il.Emit (OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
 
                 System.Reflection.Emit.Label finish = il.DefineLabel ();
+#if DEBUG_BINDING
                 il.Emit (OpCodes.Br, finish);
                 il.MarkLabel (cancel);
-				//#if DEBUG_BINDING
 				//TODO: try to print datasource type in the error message
 				il.EmitWriteLine ($"[{dm.Name}] Handler method '{bindingDef.TargetMember}' for '{sourceEvent.Name}' NOT FOUND in new dataSource");
-				//#endif
 				il.MarkLabel (finish);
-				#if DEBUG_BINDING
 				il.EmitWriteLine ($"[{dm.Name}] Handler method '{bindingDef.TargetMember}' for '{sourceEvent.Name}' FOUND in new dataSource");
-				#endif
-
+#else
+				il.MarkLabel (cancel);
+#endif
 				il.Emit (OpCodes.Ret);
 
 				//store dschange delegate in instatiator instance for access while instancing graphic object

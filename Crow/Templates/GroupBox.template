@@ -2,7 +2,7 @@
 <Container Background="{./Background}">
 	<Group CacheEnabled="true">
 		<VerticalStack Spacing="0">
-			<Widget Height="6"/>
+			<Widget Height="10"/>
 			<Border Style="ControlBorder" CornerRadius="{./CornerRadius}" Margin="10" >
 				<Container Name="Content" Margin="0" MinimumSize="70,10"/>
 			</Border>

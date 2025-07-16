@@ -911,6 +911,12 @@ namespace Crow.IML
 
 		//get value from member of object
 		internal static object getDataTypeAndFetch (object data, string fetchMethod){
+			#if DEBUG
+			if (data == null) {
+				Debug.WriteLine($"getDataTypeAndFetch({fetchMethod}) error: data is null");
+				return null;
+			}
+			#endif
 			Type dataType = data.GetType();
 			//Console.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethod, new Type[] {});

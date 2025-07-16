@@ -342,9 +342,10 @@ labColorV {
 	Width="50";
 	TextAlignment="Right";
 }
+
 ColorSlider {
 	Focusable="true";
-	Height="36";
+	Height="18";
 	Margin="0";
 	Maximum="255";
 	Decimals="0";

@@ -1,2 +1,2 @@
 <?xml version="1.0"?>
-<Label RootDataLevel="true" Style="TableHeaderLabel" Text="{Caption}" Width="{Width}"/>
+<Label RootDataLevel="true" Style="TableHeaderLabel" Text="{Caption}" Width="{Width}" Margin="2" Background="DarkGrey"/>

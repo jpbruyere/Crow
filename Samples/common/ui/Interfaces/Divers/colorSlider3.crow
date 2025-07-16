@@ -1,47 +1,47 @@
 ﻿<VerticalStack Margin="50" Spacing="20" Background="Black">
 	<ColorPicker>
 		<Template>
-<Border Background="{./Background}"	Foreground="{./Foreground}" Width="Stretched"
-		CornerRadius="{./CornerRadius}" BorderWidth="1">		
-	<VerticalStack Margin="2">
-		<Widget Width="30" Height="16" Background="{./CurrentColor}"/>
-		<HorizontalStack Height="Fit">
-			<Label Style="labColor" Text="R:"/>
-			<ColorSlider Name="cs" Component="Red" CurrentColor="{./CurrentColor}" Value="{²./Red}"/>			
-			<Label Style="labColorV" Text="{../cs.Value}" />
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Style="labColor" Text="G:"/>
-			<ColorSlider Name="cs" Component="Green" CurrentColor="{./CurrentColor}" Value="{²./Green}"/>
-			<Label Style="labColorV" Text="{../cs.Value}" />
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Style="labColor" Text="B:"/>
-			<ColorSlider Name="cs" Component="Blue" CurrentColor="{./CurrentColor}" Value="{²./Blue}"/>
-			<Label Style="labColorV" Text="{../cs.Value}" />
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Style="labColor" Text="A:"/>
-			<ColorSlider Name="cs" Component="Alpha" CurrentColor="{./CurrentColor}" Value="{²./Alpha}"/>
-			<Label Style="labColorV" Text="{../cs.Value}" />
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Style="labColor" Text="H:"/>
-			<ColorSlider Name="cs" Component="Hue" CurrentColor="{./CurrentColor}" Value="{²./Hue}"/>
-			<Label Style="labColorV" Text="{../cs.Value}" />
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Style="labColor" Text="S:"/>
-			<ColorSlider Name="cs" Component="Saturation" CurrentColor="{./CurrentColor}" Value="{²./Saturation}"/>
-			<Label Style="labColorV" Text="{../cs.Value}" />
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Style="labColor" Text="V:"/>
-			<ColorSlider Name="cs" Component="Value" CurrentColor="{./CurrentColor}" Value="{²./Value}"/>
-			<Label Style="labColorV" Text="{../cs.Value}" />
-		</HorizontalStack>
-	</VerticalStack>			
-</Border>
+			<Border Background="{./Background}"	Foreground="{./Foreground}" Width="Stretched"
+					CornerRadius="{./CornerRadius}" BorderWidth="1">		
+				<VerticalStack Margin="2">
+					<Widget Width="30" Height="16" Background="{./CurrentColor}"/>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="R:"/>
+						<ColorSlider Name="cs" Component="Red" CurrentColor="{./CurrentColor}" Value="{²./Red}"/>			
+						<Label Style="labColorV" Text="{../cs.Value}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="G:"/>
+						<ColorSlider Name="cs" Component="Green" CurrentColor="{./CurrentColor}" Value="{²./Green}"/>
+						<Label Style="labColorV" Text="{../cs.Value}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="B:"/>
+						<ColorSlider Name="cs" Component="Blue" CurrentColor="{./CurrentColor}" Value="{²./Blue}"/>
+						<Label Style="labColorV" Text="{../cs.Value}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="A:"/>
+						<ColorSlider Name="cs" Component="Alpha" CurrentColor="{./CurrentColor}" Value="{²./Alpha}"/>
+						<Label Style="labColorV" Text="{../cs.Value}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="H:"/>
+						<ColorSlider Name="cs" Component="Hue" CurrentColor="{./CurrentColor}" Value="{²./Hue}"/>
+						<Label Style="labColorV" Text="{../cs.Value}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="S:"/>
+						<ColorSlider Name="cs" Component="Saturation" CurrentColor="{./CurrentColor}" Value="{²./Saturation}"/>
+						<Label Style="labColorV" Text="{../cs.Value}" />
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Style="labColor" Text="V:"/>
+						<ColorSlider Name="cs" Component="Value" CurrentColor="{./CurrentColor}" Value="{²./Value}"/>
+						<Label Style="labColorV" Text="{../cs.Value}" />
+					</HorizontalStack>
+				</VerticalStack>			
+			</Border>
 		</Template>
 	</ColorPicker>
 </VerticalStack>
