@@ -84,6 +84,8 @@ namespace Crow
 		public static float WheelIncrement = 1;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TAB_SIZE = 4;
+		/// <summary>Text cursor blinking frequency</summary>
+		public static long TEXT_CURSOR_BLINK_FREQUENCY = 400;
 		[Obsolete]public static string LineBreak = "\n";
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
@@ -463,7 +465,6 @@ namespace Crow
 			return null;
 		}
 
-
 		public virtual MethodInfo SearchExtMethod (Type t, string methodName) {
 			string key = t.Name + "." + methodName;
 			if (knownExtMethods.ContainsKey (key))
@@ -694,6 +695,15 @@ namespace Crow
 		public ISurface DragImage = null;
 		public Rectangle DragImageBounds, lastDragImageBounds;
 		public bool DragImageFolowMouse;//prevent dragImg to be moved by mouse
+		Widget HoverOrDropTarget {
+			get => DragAndDropInProgress ? dragndropHover : HoverWidget;
+			set {
+				if (DragAndDropInProgress) {
+					dragndropHover = value;
+				} else
+					HoverWidget = value;
+			}
+		}		
 		public void ClearDragImage () {
 			lock (UpdateMutex) {
 				if (DragImage == null)
@@ -1245,7 +1255,7 @@ namespace Crow
 				}
 
 				if (lastDragImageBounds != DragImageBounds) {
-					ctx.LineWidth = 1;
+					/*ctx.LineWidth = 1;
 					ctx.SetSource(1,0,0,0.6);
 					ctx.Rectangle(DragImageBounds);
 					ctx.Stroke ();
@@ -1253,7 +1263,7 @@ namespace Crow
 					ctx.Rectangle(lastDragImageBounds);
 					ctx.Stroke ();
 					ctx.Arc(lastDragImageBounds.X, lastDragImageBounds.Y, 5,0,Math.PI*2.0);
-					ctx.Fill ();
+					ctx.Fill ();*/
 
 					DirtyRect += lastDragImageBounds;
 					ctx.Save ();
@@ -1311,11 +1321,6 @@ namespace Crow
 		}
 
 		#region Blinking text cursor
-		/// <summary>
-		/// Text cursor blinking frequency.
-		/// </summary>
-		public static long TEXT_CURSOR_BLINK_FREQUENCY = 400;
-		
 		bool _drawTextCursor = true;
 		public bool drawTextCursor {
 			get => _drawTextCursor;
@@ -1389,6 +1394,9 @@ namespace Crow
 		public void ClearInterface()
 		{
 			lock (UpdateMutex) {
+				HoverWidget = ActiveWidget = FocusedWidget = HoverOrDropTarget = StickedWidget = null;
+				ClearDragImage();
+				resetTooltip();
 				while (GraphicTree.Count > 0) {
 					//TODO:parent is not reset to null because object will be added
 					//to ObjectToRedraw list, and without parent, it fails
@@ -1535,7 +1543,7 @@ namespace Crow
 		public Point MousePosition { get; set; } = default;
 		public bool IsDown (MouseButton button) => Glfw3.GetMouseButton (hWin, button) != InputAction.Release;
 
-		public MouseCursor MouseCursor {
+		public virtual MouseCursor MouseCursor {
 			get => cursor;
 			set {
 
@@ -1569,15 +1577,12 @@ namespace Crow
 		}
 
 		Point stickyMouseDelta = default;
-		internal Widget stickedWidget = null;
-
-		Widget HoverOrDropTarget {
-			get => DragAndDropInProgress ? dragndropHover : HoverWidget;
+		Widget stickedWidget = null;
+		internal Widget StickedWidget {
+			get => stickedWidget;
 			set {
-				if (DragAndDropInProgress) {
-					dragndropHover = value;
-				} else
-					HoverWidget = value;
+				stickedWidget = value;
+				DbgLogger.AddEvent(DbgEvtType.StickedWidget, stickedWidget);
 			}
 		}
 		/// <summary>
@@ -1601,12 +1606,11 @@ namespace Crow
 				int deltaY = y - MousePosition.Y;
 
 				if (!DragAndDropInProgress) {
-					if (stickedWidget != null && ActiveWidget == null) {
+					if (StickedWidget != null && ActiveWidget == null) {
 						stickyMouseDelta.X += deltaX;
 						stickyMouseDelta.Y += deltaY;
-
-						if (Math.Abs (stickyMouseDelta.X) > stickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > stickedWidget.StickyMouse) {
-							stickedWidget = null;
+						if (Math.Abs (stickyMouseDelta.X) > StickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > StickedWidget.StickyMouse) {
+							StickedWidget = null;
 							stickyMouseDelta = default;
 						} else {
 							ForceMousePosition ();

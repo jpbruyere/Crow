@@ -42,6 +42,7 @@ namespace Crow
 		FocusedWidget					= Focus | Widget | 0x02,
 		ActiveWidget					= Focus | Widget | 0x04,
 		UnfocusedWidget					= Focus | Widget | 0x08,
+		StickedWidget					= Focus | Widget | 0x10,
 
 		//10 nth bit set for graphic obj
 		GOClassCreation					= Widget | 0x01,

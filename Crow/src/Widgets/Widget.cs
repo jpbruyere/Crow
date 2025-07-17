@@ -793,7 +793,7 @@ namespace Crow
 
 				if (isHover) {
 					if (stickyMouseEnabled && stickyMouse > 0)
-						IFace.stickedWidget = this;
+						IFace.StickedWidget = this;
 					Hover.Raise (this, null);
 				}
 

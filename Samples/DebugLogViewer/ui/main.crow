@@ -95,8 +95,8 @@
 			<ListBox Height="Stretched" Data="{CurrentWidgetEvents}" SelectedItem="{²CurrentEvent}" Background="DarkGrey"
 						ItemTemplate="#ui.DbgWidgetEventListItems.itemp"/>
 		</VerticalStack>
-		<!--<Splitter/>
-		<DbgEventView Template="#ui.DbgEventView.template" Event="{../../dbv.HoverEvent}"/>-->
+		<Splitter/>
+		<DbgEventView Template="#ui.DbgEventView.template" Event="{../../dbv.HoverEvent}"/>
 		<Splitter/>
 		<DbgEventView Template="#ui.DbgEventView.template" Event="{CurrentEvent}"/>
 	</HorizontalStack>

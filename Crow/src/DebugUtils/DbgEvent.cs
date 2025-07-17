@@ -112,6 +112,8 @@ namespace Crow.DebugLogger
 				case DbgEvtType.IFaceLoad:
 					return Colors.Teal;
 				default:
+					if (type.HasFlag(DbgEvtType.Focus))
+						return Colors.Yellow;
 					if (type.HasFlag(DbgEvtType.Mouse))
 						return Colors.DeepPink;
 					return Colors.White;

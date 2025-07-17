@@ -71,6 +71,11 @@ namespace Crow.DebugLogger
 				case DbgEvtType.TGCancelLoadingThread:
 					return Colors.Maroon;
 				default:
+					if (type.HasFlag(DbgEvtType.Focus))
+						return Colors.Yellow;
+					if (type.HasFlag(DbgEvtType.Mouse))
+						return Colors.DeepPink;
+
 					return Colors.White;
 				}
 			}
