@@ -12,7 +12,18 @@
 			</Border>
 		</Template>
 	</Button>
-
+	<Button Command="{SingleCommand}" Background="DimGrey" CornerRadius="8">
+		<Template>
+			<Border Background="{./Background}" Name="Content" Margin="5" Tooltip="{./Caption}"
+										Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
+										MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
+										MouseLeave="{Foreground=Transparent}"
+										MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White};{Background=${ControlHighlight}}"
+										MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black};{Background=DimGrey}">
+					<Image Name="caption" Width="20" Height="20" Path="{./Icon}" />
+			</Border>
+		</Template>
+	</Button>
 	<Button Command="{SingleCommand}">
 		<Template>
 			<Border Background="{./Background}" MinimumSize="50,20" Name="Content"

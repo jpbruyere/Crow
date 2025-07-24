@@ -6,10 +6,12 @@ ControlBorderWidth = "1";
 ControlCaptionHoverColor = "White";
 ControlCornerRadius = "0";
 ControlInsideMargin = "1";
+ControlIdle = "DimGrey";
 
 ButtonCaptionMargin = "6";
 
 IconSize = "11";
+WindowIconSize = "14";
 IconMargin = "1";
 ToggleIconSize = "16";
 
@@ -207,8 +209,8 @@ WindowIconBorder {
 	BorderWidth="1";
 	Margin="1";
 	Foreground="Transparent";
-	Height="12";
-	Width="12";
+	Height="${WindowIconSize}";
+	Width="${WindowIconSize}";
 	MouseEnter="{Foreground=Grey}";
 	MouseLeave="{Foreground=Transparent}";
 	MouseDown="{Background=${ControlHighlight}}";

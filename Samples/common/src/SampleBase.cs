@@ -204,6 +204,7 @@ namespace Samples
 			public void NotifyValueChanged(object _value, [CallerMemberName] string caller = null)
 				=> ValueChanged.Raise(this, new ValueChangeEventArgs(caller, _value));
 			string prop1, prop2;
+			bool boolProp;
 			public string Prop1
 			{
 				get => prop1;
@@ -229,17 +230,26 @@ namespace Samples
 
 
 			}
+			public bool BoolProp {
+				get => boolProp;
+				set {
+					if (boolProp == value)
+						return;
+					boolProp = value;
+					NotifyValueChanged(boolProp);
+				}
+			}
 
 			public override string ToString()
 					=> $"{Prop1}, {Prop2}";
 
 		}
-		TestClass tcInstance = new TestClass() { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
-		TestClassVC tcVCInstance;// = new TestClassVC () { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
-		TestClass tcInstance1 = new TestClass() { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };
-		TestClassVC tcVCInstance1 = new TestClassVC() { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };
-		TestClass tcInstance2 = new TestClass() { Prop1 = "instance 2 prop1 value", Prop2 = "instance 2 prop2 value" };
-		TestClassVC tcVCInstance2 = new TestClassVC() { Prop1 = "instance 2 prop1 value", Prop2 = "instance 2 prop2 value" };
+		public TestClass tcInstance = new TestClass() { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
+		public TestClassVC tcVCInstance = new TestClassVC () { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
+		public TestClass tcInstance1 = new TestClass() { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };
+		public TestClassVC tcVCInstance1 = new TestClassVC() { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };
+		public TestClass tcInstance2 = new TestClass() { Prop1 = "instance 2 prop1 value", Prop2 = "instance 2 prop2 value" };
+		public TestClassVC tcVCInstance2 = new TestClassVC() { Prop1 = "instance 2 prop1 value", Prop2 = "instance 2 prop2 value" };
 
 		public TestClass TcInstance
 		{

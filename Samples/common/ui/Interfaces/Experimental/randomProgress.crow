@@ -2,8 +2,8 @@
 	<VerticalStack Width="Fit" Background="DarkSlateGrey" Margin="10" Height="Fit">
 		<HorizontalStack Height="Fit" Spacing="10">
 			<Label Text="Value:"/>
-			<Spinner Name="slider" Width="100" Background="DarkGrey" LargeIncrement="20" SmallIncrement="5"
-				Minimum="10" Maximum="1000" Value="{²RandomProgressItemCount}"/>
+			<Spinner Name="slider" Width="100" Background="DarkGrey" LargeIncrement="500" SmallIncrement="5"
+				Minimum="10" Maximum="10000" Value="{²RandomProgressItemCount}"/>
 		</HorizontalStack>
 	</VerticalStack>
 	<ListBox UseLoadingThread="false" Data="{RandomProgressList}">

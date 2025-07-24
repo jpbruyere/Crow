@@ -111,14 +111,11 @@ namespace ShowCase
 			}
 		}
 		public string TemplateContainerSource {
-			get => Configuration.Global.Get<string> ("TemplateContainerSource", "<Button>");
+			get => Configuration.Global.Get<string> ("TemplateContainerSource", "<Button/>");
 			set {
 				if (TemplateContainerSource == value)
 					return;
-				if (value != null && value.EndsWith ("/>"))
-					Configuration.Global.Set ("TemplateContainerSource", value.Remove (value.Length -2) + ">");
-				else
-					Configuration.Global.Set ("TemplateContainerSource", value);
+				Configuration.Global.Set ("TemplateContainerSource", value);
 				NotifyValueChanged (TemplateContainerSource);
 				if (!reloadChrono.IsRunning)
 					reloadChrono.Restart ();

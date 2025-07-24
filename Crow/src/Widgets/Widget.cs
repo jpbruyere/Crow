@@ -47,8 +47,6 @@ namespace Crow
 #if DESIGN_MODE
 		static MethodInfo miDesignAddDefLoc = typeof(Widget).GetMethod("design_add_style_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
-		static MethodInfo miDesignAddValLoc = typeof(Widget).GetMethod("design_add_iml_location",
-			BindingFlags.Instance | BindingFlags.NonPublic);
 
 		public volatile bool design_HasChanged = false;
 		public string design_id;
@@ -58,23 +56,24 @@ namespace Crow
 		public bool design_isTGItem = false;//true if this is a templated item's root
 		public Dictionary<string,string> design_iml_values = new Dictionary<string, string>();
 		public Dictionary<string,string> design_style_values = new Dictionary<string, string>();
-		//public Dictionary<string,FileLocation> design_iml_locations = new Dictionary<string, FileLocation>();
+		public Dictionary<string,FileLocation> design_iml_locations = new Dictionary<string, FileLocation>();
 		public Dictionary<string,FileLocation> design_style_locations = new Dictionary<string, FileLocation>();
 
 		internal void design_add_style_location (string memberName, string path, int line, int col) {
 			if (design_style_locations.ContainsKey(memberName)){
-				System.Diagnostics.Debug.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+				Debug.WriteLine ("default value location already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 				return;
 			}
 			design_style_locations.Add(memberName, new FileLocation(path,line,col));
 		}
-//		internal void design_add_iml_location (string memberName, string path, int line, int col) {
-//			if (design_iml_locations.ContainsKey(memberName)){
-//				System.Diagnostics.Debug.WriteLine ("IML value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
-//				return;
-//			}
-//			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
-//		}
+		internal void design_add_iml_location (string memberName, string path, int line, int col) {
+			if (design_iml_locations.ContainsKey(memberName)){
+				Debug.WriteLine ("IML value location already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+				return;
+			}
+			//Debug.WriteLine ("IML value location added for {3}: {0}{1}.{2}", this.GetType().Name, this.design_id, memberName, path);
+			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
+		}
 
 		public virtual bool FindByDesignID(string designID, out Widget go){
 			go = null;

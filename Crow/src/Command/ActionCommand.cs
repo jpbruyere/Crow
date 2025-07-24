@@ -39,15 +39,27 @@ namespace Crow {
 		{
 			execute = executeAction;
 		}
+		public ActionCommand (ICommandHost _host, string caption, Action executeAction, string icon, KeyBinding _keyBinding,
+						Binding<bool> _canExecuteBinding)
+			: base (_host, caption, icon, _keyBinding, _canExecuteBinding)
+		{
+			execute = executeAction;
+		}
 		public ActionCommand (ICommandHost _host, string caption, Action executeAction, string icon = null, KeyBinding _keyBinding = null,
-						Binding<bool> _canExecuteBinding = null)
+						bool _canExecute = true)
+			: base (_host, caption, icon, _keyBinding, _canExecute)
+		{
+			execute = executeAction;
+		}
+		public ActionCommand (ICommandHost _host, string caption, Action<object> executeAction, string icon, KeyBinding _keyBinding,
+						Binding<bool> _canExecuteBinding)
 			: base (_host, caption, icon, _keyBinding, _canExecuteBinding)
 		{
 			execute = executeAction;
 		}
 		public ActionCommand (ICommandHost _host, string caption, Action<object> executeAction, string icon = null, KeyBinding _keyBinding = null,
-						Binding<bool> _canExecuteBinding = null)
-			: base (_host, caption, icon, _keyBinding, _canExecuteBinding)
+						bool _canExecute = true)
+			: base (_host, caption, icon, _keyBinding, _canExecute)
 		{
 			execute = executeAction;
 		}

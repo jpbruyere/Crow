@@ -1,0 +1,9 @@
+﻿<Container Name="test" Background="Onyx" RootDataLevel="true">
+<VerticalStack   Fit="true"  >
+	<CheckBox DataSource="{TcVCInstance}" Style="CheckBox2" IsChecked="{²BoolProp}"/>
+	<CheckBox DataSource="{TcVCInstance}" IsChecked="{²BoolProp}"/>
+	<CheckBox DataSource="{TcVCInstance}" IsChecked="{²BoolProp}"/>
+	<TextBox DataSource="{TcVCInstance}" Text="{²Prop1}"/> 
+	<TextBox DataSource="{TcVCInstance}" Text="{²Prop1}"/>
+</VerticalStack>
+</Container>

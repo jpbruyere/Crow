@@ -26,9 +26,9 @@ namespace Crow {
 		public CommandGroup (params CommandBase[] commands) {
 			Commands = new ObservableList<CommandBase>(commands);
 		}
-		public CommandGroup (ICommandHost host) {
+		/*public CommandGroup (ICommandHost host) {
 
-		}
+		}*/
 
 
 		public int Count => Commands.Count;

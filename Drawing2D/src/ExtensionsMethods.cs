@@ -29,6 +29,10 @@ namespace Crow
 			System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
 			return bytes;
 		}
+		public static bool IsWhiteSpace (this char c)
+		{
+			return c == '\t' || char.IsWhiteSpace (c);
+		}		
 		public static bool IsWhiteSpaceOrNewLine (this char c)
 		{
 			return c == '\t' || c.IsAnyLineBreakCharacter() || char.IsWhiteSpace (c);
@@ -62,7 +66,12 @@ namespace Crow
 				return "".AsSpan ();
 			return str.AsSpan ().Slice (start, ls.LengthIncludingLineBreak);
 		}
-
+		public static int CountLeadingWhiteSpaces (this ReadOnlySpan<char> str) {
+			int i = 0;
+			while (i < str.Length && str[i].IsWhiteSpace())
+				i++;
+			return i;
+		}
 		public static ReadOnlySpan<char> ToCharSpan (this LineBreakKind lineBreak) {
 			switch (lineBreak) {
 			case LineBreakKind.Unix:

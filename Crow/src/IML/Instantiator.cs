@@ -385,7 +385,7 @@ namespace Crow.IML {
 			}
 		}
 		#if DESIGN_MODE
-		void emitSetDesignAttribute (IMLContext ctx, string name, string value){
+		void emitSetDesignAttribute (IMLContext ctx, string name, string value, IXmlLineInfo li){
 			//store member value in iml
 			ctx.il.Emit (OpCodes.Ldloc_0);
 			ctx.il.Emit (OpCodes.Ldfld, CompilerServices.fiWidget_design_iml_values);
@@ -395,6 +395,18 @@ namespace Crow.IML {
 			else
 				ctx.il.Emit (OpCodes.Ldstr, value);
 			ctx.il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
+
+			ctx.il.Emit (OpCodes.Ldloc_0);
+			ctx.il.Emit (OpCodes.Ldstr, name);
+			if (string.IsNullOrEmpty(sourcePath))
+				ctx.il.Emit (OpCodes.Ldnull);
+			else
+				ctx.il.Emit (OpCodes.Ldstr, sourcePath);
+			//Debug.WriteLine($"{name}={value} l:{ctx.curLine}+{li.LineNumber} c:{li.LinePosition}");
+			ctx.il.Emit (OpCodes.Ldc_I4, ctx.curLine + li.LineNumber - 1);
+			ctx.il.Emit (OpCodes.Ldc_I4, li.LinePosition - 1);
+			ctx.il.Emit (OpCodes.Call, CompilerServices.miDesignAddValLoc);
+		
 		}
 		#endif
 
@@ -408,15 +420,15 @@ namespace Crow.IML {
 				reader.Read ();
 
 #if DESIGN_MODE
-				IXmlLineInfo li = (IXmlLineInfo)reader;
+				IXmlLineInfo li = reader;
 				ctx.il.Emit (OpCodes.Ldloc_0);
 				ctx.il.Emit (OpCodes.Ldstr, this.NextDesignID);
 				ctx.il.Emit (OpCodes.Stfld, CompilerServices.fiWidget_design_id);
 				ctx.il.Emit (OpCodes.Ldloc_0);
-				ctx.il.Emit (OpCodes.Ldc_I4, ctx.curLine + li.LineNumber);
+				ctx.il.Emit (OpCodes.Ldc_I4, ctx.curLine + li.LineNumber - 1);
 				ctx.il.Emit (OpCodes.Stfld, CompilerServices.fiWidget_design_line);
 				ctx.il.Emit (OpCodes.Ldloc_0);
-				ctx.il.Emit (OpCodes.Ldc_I4, li.LinePosition);
+				ctx.il.Emit (OpCodes.Ldc_I4, li.LinePosition - 1);
 				ctx.il.Emit (OpCodes.Stfld, CompilerServices.fiWidget_design_column);
 				if (!string.IsNullOrEmpty (sourcePath)) {
 					ctx.il.Emit (OpCodes.Ldloc_0);
@@ -431,7 +443,7 @@ namespace Crow.IML {
 					if (!string.IsNullOrEmpty (style)) {
 						CompilerServices.EmitSetValue (ctx.il, CompilerServices.piStyle, style);
 #if DESIGN_MODE
-						emitSetDesignAttribute (ctx, NT_style, style);
+						emitSetDesignAttribute (ctx, NT_style, style, reader);
 #endif
 					}
 					//check for dataSourceType, if set, datasource bindings will use direct setter/getter
@@ -457,7 +469,7 @@ namespace Crow.IML {
 							continue;
 
 #if DESIGN_MODE
-						emitSetDesignAttribute (ctx, reader.Name, reader.Value);
+						emitSetDesignAttribute (ctx, reader.Name, reader.Value, reader);
 #endif
 						string imlValue = reader.Value;
 						StringBuilder styledValue = new StringBuilder();

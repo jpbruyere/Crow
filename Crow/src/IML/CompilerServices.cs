@@ -99,7 +99,7 @@ namespace Crow.IML
 		internal static FieldInfo fiWidget_design_column = typeof(Widget).GetField("design_column");
 		internal static FieldInfo fiWidget_design_imlPath = typeof(Widget).GetField("design_imlPath");
 		internal static FieldInfo fiWidget_design_iml_values = typeof(Widget).GetField("design_iml_values");
-
+		internal static MethodInfo miDesignAddValLoc = typeof(Widget).GetMethod("design_add_iml_location", BindingFlags.Instance | BindingFlags.NonPublic);
 		#endif
 
 		#region tree handling methods

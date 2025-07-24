@@ -8,6 +8,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Crow
 {
@@ -94,6 +95,9 @@ namespace Crow
 		/// <param name="defaultConf">an optional text stream with default values.</param>
 		public Configuration (string path, Stream defaultConf = null) {
 			configPath = path;
+			string folder = Path.GetDirectoryName(configPath);
+			if (!Directory.Exists(folder))
+				Directory.CreateDirectory(folder);
 			if (File.Exists (configPath)) {
 				using (Stream s = new FileStream (configPath, FileMode.Open))
 					load (s);
@@ -216,6 +220,16 @@ namespace Crow
 				items[key].Set (value);
 			isDirty = true;
 		}
+		/*public void Set<T>(T value, [CallerMemberName] string key = null)
+		{
+			if (!items.ContainsKey (key)) {
+				lock(items)
+					items[key] = new ConfigItem (value);
+			}else
+				items[key].Set (value);
+			isDirty = true;
+		}*/
+		
 		/// <summary>
 		/// Save this configuration store with the path provided on creation. This is done automaticaly normaly.
 		/// </summary>
