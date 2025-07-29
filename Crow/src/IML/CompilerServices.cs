@@ -548,11 +548,30 @@ namespace Crow.IML
 				return;
 			}
 		}
-
+		static bool emitParse(ILGenerator il, Type destType) {
+			//search dest type for parse method
+			MethodInfo miParse = destType.GetMethod
+									("Parse", BindingFlags.Static | BindingFlags.Public,
+										Type.DefaultBinder, new Type [] { typeof (string) }, null);
+			if (miParse == null) {
+				//TODO:find parse for enums destTypes
+				if (destType.IsEnum) {
+					il.Emit (OpCodes.Ldtoken, destType);//push destination property type for testing
+					il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+					il.Emit (OpCodes.Call, CompilerServices.miParseEnumInversedParams);
+					il.Emit (OpCodes.Unbox_Any, destType);
+				} else
+					return false;
+			}else
+				il.Emit (OpCodes.Call, miParse);
+			return true;
+		}
 		/// <summary>
 		/// Emit MSIL for conversion from orig type to dest type
 		/// </summary>
 		internal static void emitConvert(ILGenerator il, Type origType, Type destType){
+			//Console.WriteLine ($"emitConvert: {origType.FullName} -> {destType.FullName}");
+			//il.EmitWriteLine ($"convert: {origType.FullName} -> {destType.FullName}");
 			if (destType == typeof(object))
 				return;
 			if (destType == typeof (string)) {
@@ -596,32 +615,30 @@ namespace Crow.IML
 					}
 				} else
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
+			} else if (destType.IsValueType && origType == typeof(object)){
+				System.Reflection.Emit.Label labContinue = il.DefineLabel ();
+				System.Reflection.Emit.Label emitFinish = il.DefineLabel ();
+				il.Emit (OpCodes.Dup);
+				il.Emit (OpCodes.Isinst, typeof(string));
+				il.Emit (OpCodes.Brfalse, labContinue);
+				emitParse (il, destType);
+				il.Emit (OpCodes.Br, emitFinish);
+				il.MarkLabel (labContinue);
+				il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
+				il.MarkLabel (emitFinish);
 			} else {
 				if (destType.IsAssignableFrom (origType))
 					il.Emit (OpCodes.Castclass, destType);
 				else {
 					if (origType == typeof (string)) {
-						//search dest type for parse method
-						MethodInfo miParse = destType.GetMethod
-												("Parse", BindingFlags.Static | BindingFlags.Public,
-													Type.DefaultBinder, new Type [] { typeof (string) }, null);
-						if (miParse == null) {
-							//TODO:find parse for enums destTypes
-							if (destType.IsEnum) {
-								il.Emit (OpCodes.Ldtoken, destType);//push destination property type for testing
-								il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-								il.Emit (OpCodes.Call, CompilerServices.miParseEnumInversedParams);
-								il.Emit (OpCodes.Unbox_Any, destType);
-							} else
-								throw new Exception ("no Parse method found for: " + destType.FullName);
-						}else
-							il.Emit (OpCodes.Call, miParse);
+						if (!emitParse (il, destType))
+							throw new Exception ("no Parse method found for: " + destType.FullName);
 					}
 					//implicit conversion can't be defined from or to object base class,
 					//so we will check if object underlying type is one of the implicit converter of destType
 					else if (origType == typeof (object)) {//test all implicit converter to destType on obj
+						System.Reflection.Emit.Label emitFinish = il.DefineLabel ();
 						System.Reflection.Emit.Label emitTestNextImpOp;
-						System.Reflection.Emit.Label emitImpOpFound = il.DefineLabel ();
 						foreach (MethodInfo mi in destType.GetMethods (BindingFlags.Public | BindingFlags.Static)) {
 							if (mi.Name == "op_Implicit") {
 								if (mi.GetParameters () [0].ParameterType == destType)
@@ -636,13 +653,13 @@ namespace Crow.IML
 									il.Emit (OpCodes.Isinst, mi.GetParameters () [0].ParameterType);
 
 								il.Emit (OpCodes.Call, mi);
-								il.Emit (OpCodes.Br, emitImpOpFound);
+								il.Emit (OpCodes.Br, emitFinish);
 
 								il.MarkLabel (emitTestNextImpOp);
 							}
 						}
 						//il.Emit (OpCodes.Br, emitImpOpNotFound);
-						il.MarkLabel (emitImpOpFound);
+						il.MarkLabel (emitFinish);
 					} else {//search both orig and dest types for implicit operators
 						MethodInfo miIO = getImplicitOp (origType, destType);
 						if (miIO != null)

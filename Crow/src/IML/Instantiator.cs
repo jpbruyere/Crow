@@ -1208,7 +1208,7 @@ namespace Crow.IML {
 			dm = new DynamicMethod (dschangeddelname,
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
-
+			
 			il = dm.GetILGenerator (64);
 
 			il.DeclareLocal (typeof (object));//used for checking propery less bindings
@@ -1216,7 +1216,7 @@ namespace Crow.IML {
 			il.DeclareLocal (typeof (object));//new datasource store, save one field access
 			Label cancel = il.DefineLabel ();
 			Label newDSIsNull = il.DefineLabel ();
-			Label cancelInit = il.DefineLabel ();
+			//Label cancelInit = il.DefineLabel ();
 #if DEBUG_BINDING
 			il.EmitWriteLine ($"DYN Called => {dschangeddelname}");
 #endif
@@ -1236,8 +1236,6 @@ namespace Crow.IML {
 				//test if new ds is of expected type
 				il.Emit (OpCodes.Ldloc_2);
 				il.Emit (OpCodes.Isinst, dsType);
-				//il.Emit (OpCodes.Call, CompilerServices.miGetMDToken);
-				//il.Emit (OpCodes.Ldc_I4, dsType.MetadataToken);
 				il.Emit (OpCodes.Brfalse, newDSIsNull);
 #if DEBUG_BINDING
 				il.EmitWriteLine ($"\tNew ds is of expected type: {dsType}");
@@ -1263,7 +1261,7 @@ namespace Crow.IML {
 			#endregion
 
 			if (!string.IsNullOrEmpty (bindingDef.TargetMember)) {
-				il.MarkLabel (cancelInit);
+				//il.MarkLabel (cancelInit);
 				//check if new dataSource implement IValueChange
 				il.Emit (OpCodes.Ldloc_2);//load new datasource
 				il.Emit (OpCodes.Isinst, typeof (IValueChange));
@@ -1296,18 +1294,18 @@ namespace Crow.IML {
 			//store dschange delegate in instatiator instance for access while instancing graphic object
 			int delDSIndex = cachedDelegates.Count;
 
-			//Int32 fiLength = (Int32)il.GetType ().GetField ("code_len", BindingFlags.Instance | BindingFlags.NonPublic).GetValue (il);
-			//byte [] bytes = (byte[])il.GetType ().GetField ("code", BindingFlags.Instance | BindingFlags.NonPublic).GetValue (il);
-
-			cachedDelegates.Add (dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
-			#endregion
-
-			ctx.emitCachedDelegateHandlerAddition (delDSIndex, CompilerServices.eiDSChange);
+			//Int32 fiLength = (Int32)Type.GetType("System.Reflection.Emit.ILGenerator").GetField("m_length",  BindingFlags.Instance | BindingFlags.NonPublic).GetValue (il);
+			//byte [] bytes = (byte[])Type.GetType("System.Reflection.Emit.ILGenerator").GetField ("m_ILStream", BindingFlags.Instance | BindingFlags.NonPublic).GetValue (il);
 
 #if DEBUG_BINDING
 			Console.WriteLine("\tDataSource ValueChanged: " + delName);
 			Console.WriteLine("\tDataSource Changed: " + dm.Name);
 #endif
+
+			cachedDelegates.Add (dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+			#endregion
+
+			ctx.emitCachedDelegateHandlerAddition (delDSIndex, CompilerServices.eiDSChange);
 		}
 
 		/// <summary>
