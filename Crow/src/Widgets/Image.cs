@@ -234,15 +234,15 @@ namespace Crow
 		public override int measureRawSize (LayoutingType lt)
 		{
 			if (_pic == null)
-				return 2 * Margin;
+				return lt == LayoutingType.Width ? 2 * Margin.Width : 2 * Margin.Height;
 			if (!_pic.IsLoaded)
 				_pic.load (IFace);
 				//_pic = "#Crow.Images.Icons.IconAlerte.svg";
 			//TODO:take scalling in account
 			if (lt == LayoutingType.Width)
-				return _pic.Dimensions.Width + 2 * Margin;
+				return _pic.Dimensions.Width + 2 * Margin.Width;
 			else
-				return _pic.Dimensions.Height + 2 * Margin;
+				return _pic.Dimensions.Height + 2 * Margin.Width;
 		}
 		protected override void onDraw (IContext gr)
 		{

@@ -64,13 +64,13 @@ namespace Crow {
 					if (Orientation == Orientation.Horizontal)
 						//return contentSize.Width + totSpace + 2 * Margin;
 						return stretchedGO == null ?
-							contentSize.Width + totSpace + 2 * Margin :
-							contentSize.Width + stretchedGO.measureRawSize(lt) + totSpace + 2 * Margin;
+							contentSize.Width + totSpace + 2 * Margin.Width :
+							contentSize.Width + stretchedGO.measureRawSize(lt) + totSpace + 2 * Margin.Width;
 				} else if (Orientation == Orientation.Vertical)
 					//return contentSize.Height + totSpace + 2 * Margin;
 					return stretchedGO == null ?
-						contentSize.Height + totSpace + 2 * Margin :
-						contentSize.Height + stretchedGO.measureRawSize(lt) + totSpace + 2 * Margin;
+						contentSize.Height + totSpace + 2 * Margin.Height :
+						contentSize.Height + stretchedGO.measureRawSize(lt) + totSpace + 2 * Margin.Height;
 
 				return base.measureRawSize (lt);
 			} finally {

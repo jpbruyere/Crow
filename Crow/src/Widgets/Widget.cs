@@ -275,7 +275,7 @@ namespace Crow
 		protected Measure width, height;
 		int left, top;
 		double cornerRadius;
-		int margin;
+		Size margin;
 		bool focusable ;
 		bool hasFocus;
 		bool isActive;
@@ -438,7 +438,7 @@ namespace Crow
 				return Slot;
 			if (Parent is Widget p)
 				return Slot + p.RelativeSlot (target).Position + Margin;
-			return Slot + new Point(Margin, Margin);
+			return Slot + Margin;
 		}
 		/// <summary>
 		/// Widget coordintate relative to the main drawing surface, normally a GLFW window.
@@ -925,7 +925,7 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Appearance")][DefaultValue(0.0)]
 		public virtual double CornerRadius {
-			get { return cornerRadius; }
+			get => cornerRadius;
 			set {
 				if (value == cornerRadius)
 					return;
@@ -938,9 +938,9 @@ namespace Crow
 		/// This is a single integer for the 4 direction, a gap between the control and it's container,
 		/// by default it is filled with the background.
 		/// </summary>
-		[DesignCategory ("Layout")][DefaultValue(0)]
-		public virtual int Margin {
-			get { return margin; }
+		[DesignCategory ("Layout")][DefaultValue("0,0")]
+		public virtual Size Margin {
+			get => margin;
 			set {
 				if (value == margin)
 					return;
@@ -952,7 +952,7 @@ namespace Crow
 		/// <summary>
 		/// set the visible state of the control, invisible controls does reserve space in the layouting system.
 		/// </summary>
-		[Obsolete][DesignCategory ("Appearance")][DefaultValue(true)]
+		[Obsolete("Use IsVisible instead.")][DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool Visible {
 			get => IsVisible;
 			set => IsVisible = value;
@@ -1627,7 +1627,7 @@ namespace Crow
 			try {
 				DbgLogger.SetMsg(DbgEvtType.GOMeasure, $"{lt} contentSize:{contentSize}");
 				return lt == LayoutingType.Width ?
-					contentSize.Width + 2 * margin : contentSize.Height + 2 * margin;
+					contentSize.Width + 2 * margin.Width : contentSize.Height + 2 * margin.Height;
 			} finally {
 				DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			}

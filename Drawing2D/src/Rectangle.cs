@@ -72,6 +72,13 @@ namespace Drawing2D {
 			this.Y -= yDelta;
 			this.Height += 2 * yDelta;
 		}
+		public void Inflate(Size delta)
+		{
+			this.X -= delta.Width;
+			this.Width += 2 * delta.Width;
+			this.Y -= delta.Height;
+			this.Height += 2 * delta.Height;
+		}
 		public void Inflate(int delta)
 		{
 			Inflate (delta, delta);

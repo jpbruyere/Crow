@@ -136,7 +136,7 @@ namespace Crow
 
 						if (dy == 0)
 							tmp -= Spacing;
-						return tmp + largestChild + 2 * Margin;
+						return tmp + largestChild + 2 * Margin.Width;
 					}
 				} else if (Orientation == Orientation.Horizontal) {
 					Height = Measure.Stretched;
@@ -171,7 +171,7 @@ namespace Crow
 
 					if (dx == 0)
 						tmp -= Spacing;
-					return tmp + tallestChild + 2 * Margin;
+					return tmp + tallestChild + 2 * Margin.Height;
 			}
 			} finally {
 				DbgLogger.EndEvent(DbgEvtType.GOMeasure);	

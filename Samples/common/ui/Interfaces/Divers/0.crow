@@ -17,8 +17,8 @@
 					</HorizontalStack>
 				</ItemTemplate>
 			</ListBox>
-			<Label Width="Stretched" Margin="3" Background="DimGrey" />
-			<TextBox Text="TextBox" Multiline="true" Margin="3" />
+			<Label Width="Stretched" Margin="3,1" Background="DimGrey" />
+			<TextBox Text="TextBox" Multiline="true" Margin="3,1" />
 			<HorizontalStack Height="Fit"  Background="Jet" CornerRadius="10" Margin="5">
 				<VerticalStack Spacing="5" Width="50%">
 					<CheckBox Fit="true" Caption="test" />

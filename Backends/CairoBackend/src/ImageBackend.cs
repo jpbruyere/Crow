@@ -71,14 +71,14 @@ namespace Crow.CairoBackend
 				ctx.Rectangle (clipping.GetRectangle (i));
 			ctx.Clip ();
 
-			ctx.PushGroup ();
+			//ctx.PushGroup ();
 
 			return ctx;
 		}
 		public override void FlushUIFrame(IContext ctx)
 		{
-			ctx.PopGroupToSource ();
-			ctx.Paint ();
+			/*ctx.PopGroupToSource ();
+			ctx.Paint ();*/
 			surf.Flush ();
 
 			base.FlushUIFrame (ctx);

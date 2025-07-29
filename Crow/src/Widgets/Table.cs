@@ -357,7 +357,7 @@ namespace Crow
 				double x = 0;
 				if (VerticalLineWidth > 0) {
 					gr.LineWidth = VerticalLineWidth;
-					x = cb.Left + HeaderRow.Margin + 0.5 * ColumnSpacing + HeaderRow.Children[0].Slot.Width;// - 0.5 * VerticalLineWidth;
+					x = cb.Left + HeaderRow.Margin.Width + 0.5 * ColumnSpacing + HeaderRow.Children[0].Slot.Width;// - 0.5 * VerticalLineWidth;
 					for (int i = 1; i < HeaderRow.Children.Count ; i++)
 					{
 						gr.MoveTo (x, cb.Y);
@@ -369,7 +369,7 @@ namespace Crow
 
 				if (HorizontalLineWidth > 0) {
 					gr.LineWidth = HorizontalLineWidth;
-					x = cb.Top + 0.5 * Spacing + Children[0].Slot.Height;// - 0.5 * HorizontalLineWidth;
+					x = cb.Top + HeaderRow.Margin.Height + 0.5 * Spacing + Children[0].Slot.Height;// - 0.5 * HorizontalLineWidth;
 					for (int i = 1; i < Children.Count; i++)
 					{
 						gr.MoveTo (cb.Left, x);

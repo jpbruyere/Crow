@@ -618,7 +618,7 @@ namespace Crow {
 			if (scroller != null && selectedItemContainer != null && itemsContainer is GenericStack gs) {
 				Rectangle scrollerCb = scroller.ClientRectangle;
 				Rectangle cb = gs.Slot;
-				Rectangle rItem = selectedItemContainer.Slot + new Point (gs.Margin);
+				Rectangle rItem = selectedItemContainer.Slot + gs.Margin;
 				if (gs.Orientation == Orientation.Vertical) {
 					if (rItem.Y - scroller.ScrollY < 0)
 						scroller.ScrollY = rItem.Y;

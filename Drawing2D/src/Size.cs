@@ -44,8 +44,11 @@ namespace Drawing2D
 		public static bool operator != (Size s, int i) => (s.Width != i || s.Height != i);*/
 		public static Size operator + (Size s1, Size s2) => new Size (s1.Width + s2.Width, s1.Height + s2.Height);
 		public static Size operator + (Size s, int i) => new Size (s.Width + i, s.Height + i);
+		public static Size operator - (Size s1, Size s2) => new Size (s1.Width - s2.Width, s1.Height - s2.Height);
+		public static Size operator - (Size s, int i) => new Size (s.Width - i, s.Height - i);
 		public static Size operator * (Size s, int i) => new Size (s.Width * i, s.Height * i);
 		public static Size operator / (Size s, int i) => new Size (s.Width / i, s.Height / i);
+		public static Size operator -(Size s) => new Size (-s.Width, -s.Height);
 
 		public static Size operator * (Size s, double i) => new Size ((int)(s.Width * i), (int)(s.Height * i));
 		#endregion

@@ -656,7 +656,7 @@ namespace Crow
 				}
 			}
 			DbgLogger.EndEvent(DbgEvtType.GOMeasure);
-			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
+			return lt == LayoutingType.Height ? cachedTextSize.Height + 2 * Margin.Height : cachedTextSize.Width + 2 * Margin.Width;
 		}
 
 		protected override void onDraw (IContext gr)

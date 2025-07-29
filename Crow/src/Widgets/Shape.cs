@@ -251,7 +251,7 @@ namespace Crow
 				}
 			}
 			return lt == LayoutingType.Width ?
-				contentSize.Width + 2 * Margin : contentSize.Height + 2 * Margin;
+				contentSize.Width + 2 * Margin.Width : contentSize.Height + 2 * Margin.Height;
 		}
 	}
 }

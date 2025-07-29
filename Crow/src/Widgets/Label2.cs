@@ -600,7 +600,7 @@ namespace Crow
 						measureTextBounds (gr);
 					}
 				}
-				return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
+				return lt == LayoutingType.Height ? cachedTextSize.Height + 2 * Margin.Height : cachedTextSize.Width + 2 * Margin.Width;
 			} finally {
 				DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			}
